@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "ene"
+version = "0.1.0"
+description = "Automatically track and sync anime watching progress"
+authors = ["Peijun Ma <peijun.ma@protonmail.com>"]
+license = "GPL-3.0+"
+readme = "README.md"
+repository = "https://github.com/MaT1g3R/ene"
+homepage = "https://github.com/MaT1g3R/ene"
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+click = ">=6"
+attrs = ">=18"
+
+[tool.poetry.dev-dependencies]
+pytest = ">=3.5"
+
