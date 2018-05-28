@@ -15,4 +15,5 @@ attrs = ">=18"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.5"
+flake8 = "^3.5"
 

@@ -37,6 +37,30 @@ platform = "UNKNOWN"
 [package.requirements]
 platform = "win32"
 [[package]]
+name = "flake8"
+version = "3.5.0"
+description = "the modular source code checker: pep8, pyflakes and co"
+category = "dev"
+optional = false
+python-versions = "*"
+platform = "*"
+
+[package.dependencies]
+enum34 = "*"
+configparser = "*"
+pyflakes = ">= 1.5.0.0, < 1.7.0.0"
+pycodestyle = ">= 2.0.0.0, < 2.4.0.0"
+mccabe = ">= 0.6.0.0, < 0.7.0.0"
+[[package]]
+name = "mccabe"
+version = "0.6.1"
+description = "McCabe checker, plugin for flake8"
+category = "dev"
+optional = false
+python-versions = "*"
+platform = "*"
+
+[[package]]
 name = "more-itertools"
 version = "4.2.0"
 description = "More routines for operating on iterables, beyond itertools"
@@ -64,6 +88,24 @@ category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 platform = "unix"
+
+[[package]]
+name = "pycodestyle"
+version = "2.3.1"
+description = "Python style guide checker"
+category = "dev"
+optional = false
+python-versions = "*"
+platform = "*"
+
+[[package]]
+name = "pyflakes"
+version = "1.6.0"
+description = "passive checker of Python programs"
+category = "dev"
+optional = false
+python-versions = "*"
+platform = "*"
 
 [[package]]
 name = "pytest"
@@ -96,15 +138,19 @@ platform = "*"
 [metadata]
 python-versions = ">=3.6"
 platform = "*"
-content-hash = "114496a7814d8088b5c9db2d606b15a5424769cfb778b99c4c58d5556779372e"
+content-hash = "211f76c63f062caa3662cabaf0cc42b7b6a431221ed49cefe051db7fadaa90db"
 
 [metadata.hashes]
 atomicwrites = [ "a24da68318b08ac9c9c45029f4a10371ab5b20e4226738e150e6e7c571630ae6", "240831ea22da9ab882b551b31d4225591e5e447a68c5e188db5b89ca1d487585",]
 attrs = [ "4b90b09eeeb9b88c35bc642cbac057e45a5fd85367b985bd2809c62b7b939265", "e0d0eb91441a3b53dab4d9b743eafc1ac44476296a2053b6ca3af0b139faf87b",]
 click = [ "29f99fc6125fbc931b758dc053b3114e55c77a6e4c6c3a2674a2dc986016381d", "f15516df478d5a56180fbf80e68f206010e6d160fc39fa508b65e035fd75130b",]
 colorama = [ "463f8483208e921368c9f306094eb6f725c6ca42b0f97e313cb5d5512459feda", "48eb22f4f8461b1df5734a074b57042430fb06e1d61bd1e11b078c0fe6d7a1f1",]
+flake8 = [ "c7841163e2b576d435799169b78703ad6ac1bbb0f199994fc05f700b2a90ea37", "7253265f7abd8b313e3892944044a365e3f4ac3fcdcfb4298f55ee9ddf188ba0",]
+mccabe = [ "ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42", "dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f",]
 more-itertools = [ "a18d870ef2ffca2b8463c0070ad17b5978056f403fb64e3f15fe62a52db21cc0", "6703844a52d3588f951883005efcf555e49566a48afd4db4e965d69b883980d3", "2b6b9893337bfd9166bee6a62c2b0c9fe7735dcf85948b387ec8cba30e85d8e8",]
 pluggy = [ "d345c8fe681115900d6da8d048ba67c25df42973bda370783cd58826442dcd7c", "e160a7fcf25762bb60efc7e171d4497ff1d8d2d75a3d0df7a21b76821ecbf5c5", "7f8ae7f5bdf75671a718d2daf0a64b7885f74510bcd98b1a0bb420eb9a9d0cff",]
 py = [ "983f77f3331356039fdd792e9220b7b8ee1aa6bd2b25f567a963ff1de5a64f6a", "29c9fab495d7528e80ba1e343b958684f4ace687327e6f789a94bf3d1915f881",]
+pycodestyle = [ "6c4245ade1edfad79c3446fadfc96b0de2759662dc29d07d80a6f27ad1ca6ba9", "682256a5b318149ca0d2a9185d365d8864a768a28db66a84a2ea946bcc426766",]
+pyflakes = [ "08bd6a50edf8cffa9fa09a463063c425ecaaf10d1eb0335a7e8b1401aef89e6f", "8d616a382f243dbf19b54743f280b80198be0bca3a5396f1d2e1fca6223e8805",]
 pytest = [ "c76e93f3145a44812955e8d46cdd302d8a45fbfc7bf22be24fe231f9d8d8853a", "39555d023af3200d004d09e51b4dd9fdd828baa863cded3fd6ba2f29f757ae2d",]
 six = [ "832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb", "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9",]
