@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ene"
-version = "0.1.0"
+version = "0.1.1"
 description = "Automatically track and sync anime watching progress"
 authors = ["Peijun Ma <peijun.ma@protonmail.com>"]
 license = "GPL-3.0+"
@@ -20,3 +20,5 @@ attrs = ">=18"
 pytest = ">=3.5"
 flake8 = "^3.5"
 
+[tool.poetry.scripts]
+ene = 'ene:__main__.main'
