@@ -1,6 +1,17 @@
 # Requirements
 
-Python3.6+
+* Python3.6+
+
+* QT: https://qt.io
+
+    You can install it from your system package manager on GNU/Linux
+
+    On macOS:
+
+    ```bash
+    brew install qt
+    ```
+
 
 # Setting up the development environment
 
@@ -18,6 +29,13 @@ source ene/bin/activate
 ```bash
 poetry install
 ```
+
+4. Install PySide2 (Detailed instructions: https://wiki.qt.io/Qt_for_Python/GettingStarted)
+
+```bash
+pip install --index-url=http://download.qt.io/snapshots/ci/pyside/5.9/latest/ pyside2 --trusted-host download.qt.io
+```
+
 
 # Coding Style
 
