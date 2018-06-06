@@ -85,7 +85,7 @@ class RedirectHandler(BaseHTTPRequestHandler):
         try:
             access_token = parse_qsl(urlparse(post_data).fragment)[0][1]
         except IndexError:
-            access_token = None
+            access_token = ''
 
         if access_token:
             self._set_headers(200)
