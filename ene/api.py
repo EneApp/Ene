@@ -17,59 +17,84 @@
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
-from urllib.parse import urlencode
+from urllib.parse import parse_qsl, urlencode, urlparse
 
 CLIENT_ID = '584'
-REDIR_URI = 'http://127.0.0.1:50000'
 
 
 class OAuth:
     TOKEN = None
 
-    def __init__(self, client_id, redirect_uri, addr, port):
+    def __init__(self, client_id, addr, port):
         server_addr = (addr, port)
         self.httpd = HTTPServer(server_addr, RedirectHandler)
         self.auth_params = {
             'client_id': client_id,
-            'redirect_uri': redirect_uri,
-            'response_type': 'code'
+            'response_type': 'token'
         }
 
     @classmethod
-    def get_token(cls, client_id, redirect_uri, addr, port):
-        self = cls(client_id, redirect_uri, addr, port)
+    def get_token(cls, client_id, addr, port):
+        self = cls(client_id, addr, port)
         server_thread = Thread(target=self.httpd.serve_forever)
         server_thread.start()
         encode = urlencode(self.auth_params)
         webbrowser.open(f'https://anilist.co/api/v2/oauth/authorize?{encode}')
-        while not cls.TOKEN:
+        while cls.TOKEN is None:
             pass
         self.httpd.shutdown()
         server_thread.join()
-        return cls.TOKEN if cls.TOKEN != -1 else None
+        return cls.TOKEN
 
 
 class RedirectHandler(BaseHTTPRequestHandler):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def _set_headers(self, status):
+        self.send_response(status)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
 
     def do_GET(self):
-        token = self.path.replace('/?code=', '')
-        if token:
-            self.send_response(200)  # OK
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            self.wfile.write(b'Success!')
-            OAuth.TOKEN = token
+        index = """
+<html>
+    <script>
+    let hash = window.location.hash;
+    xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+              alert("Authentication Success! You may close this browser tab now.");
+          }
+        } else {
+            alert("Authentication Failed!");
+        }
+    };
+    xhr.open('POST', '/');
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.send(hash);
+    </script>
+</html>
+        """
+        self._set_headers(200)
+        self.wfile.write(index.encode())
+
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length).decode()
+
+        try:
+            access_token = parse_qsl(urlparse(post_data).fragment)[0][1]
+        except IndexError:
+            access_token = None
+
+        if access_token:
+            self._set_headers(200)
         else:
-            self.send_response(400)  # OK
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            self.wfile.write(b'Fail!')
-            OAuth.TOKEN = -1
+            self._set_headers(400)
+
+        OAuth.TOKEN = access_token
 
 
 class API:
     def __init__(self):
-        self.token = OAuth.get_token(CLIENT_ID, REDIR_URI, '127.0.0.1', 50000)
+        self.token = OAuth.get_token(CLIENT_ID, '127.0.0.1', 50000)
