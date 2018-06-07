@@ -46,3 +46,5 @@ Please follow [PEP8](https://www.python.org/dev/peps/pep-0008/) with a few modif
 1. Preferable line length is under 80 characters per line, hard limit is 100 characters per line. If you are going to break lines, break at the 80th character
 
 2. Strings are single quoted, unless there are single quotes in the string, then they are double quoted.
+
+    2.1 Multi-line string literals and docstrings are to be surrounded with triple double quotes (""")
