@@ -8,9 +8,6 @@ before_install:
 
 install: "make ci_setup"
 
-before_script:
-  - source venv/bin/activate
-
 script:
   - make lint
   - make test
