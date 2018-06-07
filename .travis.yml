@@ -1,0 +1,19 @@
+language: python
+python:
+  - "3.6"
+  - "3.7-dev"
+
+before_install:
+  - sudo apt install qt5-default -y
+
+install: "make ci_setup"
+
+before_script:
+  - source venv/bin/activate
+
+script:
+  - make lint
+  - make test
+
+notifications:
+  email: false
