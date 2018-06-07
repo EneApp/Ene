@@ -11,6 +11,7 @@ exclude =
     __pycache__,
     .tox,
     .idea,
+    pyside-setup,
 
 max-line-length = 99
 ignore = E402 E731
