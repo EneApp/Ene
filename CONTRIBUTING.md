@@ -2,7 +2,7 @@
 
 * Python3.6+
 
-* QT: https://qt.io
+* QT5: https://qt.io
 
     You can install it from your system package manager on GNU/Linux
 
