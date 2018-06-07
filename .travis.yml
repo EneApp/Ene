@@ -10,7 +10,7 @@ install: "make ci_setup"
 
 script:
   - make lint
-  - make test
+  - make tests
 
 notifications:
   email: false
