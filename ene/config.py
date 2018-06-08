@@ -25,7 +25,6 @@ class Config(MutableMapping):
     Class for config access
     """
     CONFIG_DIR = Path.home() / '.config' / 'ene'
-    CONFIG_FILE = Path.home() / '.config' / 'ene' / 'config.toml'
     TOKEN_FILE = CONFIG_DIR / 'token'
     DEFAULT_CONFIG = {
     }
@@ -36,17 +35,21 @@ class Config(MutableMapping):
         """
         self.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
-        self.config = self._read_config() if self.CONFIG_FILE.is_file() else {}
+        self.config = self._read_config() if self.config_file.is_file() else {}
 
         if not self.config:
             self.config = self.DEFAULT_CONFIG
             self._write_config()
 
+    @property
+    def config_file(self):
+        return self.CONFIG_DIR / 'config.toml'
+
     def _write_config(self):
         """
         Writes the config in memory to file
         """
-        with open(self.CONFIG_FILE, 'w+') as f:
+        with open(self.config_file, 'w+') as f:
             toml.dump(self.config, f)
 
     def _read_config(self) -> dict:
@@ -55,7 +58,7 @@ class Config(MutableMapping):
         Returns:
             dict containing the config
         """
-        with open(self.CONFIG_FILE) as f:
+        with open(self.config_file) as f:
             return toml.load(f)
 
     def __getitem__(self, key):
