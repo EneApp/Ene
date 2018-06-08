@@ -170,6 +170,7 @@ class OAuth:
         server_thread = Thread(target=self.httpd.serve_forever)
         server_thread.start()
         encode = urlencode(self.auth_params)
+        # TODO open this in QT window
         webbrowser.open(f'https://anilist.co/api/v2/oauth/authorize?{encode}')
 
         start_time = time()
