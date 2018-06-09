@@ -14,12 +14,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
+from typing import Iterable, List, Optional
 
 from requests import HTTPError, post
 
-from .auth import OAuth
-from .errors import APIError
+from ene.auth import OAuth
+from ene.errors import APIError
 
 CLIENT_ID = 584
 GRAPHQL_URL = 'https://graphql.anilist.co'
@@ -63,3 +63,49 @@ class API:
             raise APIError(res.status_code, str(e))
         else:
             return res.json()
+
+    def _paged_request(self, query: str, variables: dict) -> Iterable[dict]:
+        while True:
+            res = self._request(query, variables)
+            has_next = res['data']['Page']['pageInfo']['hasNextPage']
+            yield res['data']
+            if not has_next:
+                return
+            variables['page'] += 1
+
+    def get_season_animes(self, season: str, year: int, per_page: int,
+                          sort: Optional[List[str]] = None) -> Iterable[dict]:
+        sort = sort or ['ID']
+        query = """
+query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $sort: [MediaSort]) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            hasNextPage
+        }
+            media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: $sort) {
+                id
+                title {
+                    userPreferred
+                }
+                averageScore
+                description
+                format
+                genres
+                coverImage {
+                    large
+                }
+                episodes
+                popularity
+        }
+    }
+}
+"""
+        variables = {
+            'page': 1,
+            'perPage': per_page,
+            'season': season,
+            'seasonYear': year,
+            'sort': sort
+        }
+        return self._paged_request(query, variables)
