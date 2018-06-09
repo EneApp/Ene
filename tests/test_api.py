@@ -20,7 +20,8 @@ from secrets import token_urlsafe
 import pytest
 from requests import post
 
-from ene.api import APIAuthError, OAuth
+from ene.api import OAuth
+from ene.errors import AuthError
 
 CLIENT_ID = 0
 TEST_ADDR = '127.0.0.1'
@@ -45,10 +46,10 @@ class TestAuth:
 
     def test_auth_fail_empty(self):
         self._setup(f'#access_token=&foo=bar')
-        with pytest.raises(APIAuthError):
+        with pytest.raises(AuthError):
             OAuth.get_token(CLIENT_ID, TEST_ADDR, 50000)
 
     def test_auth_fail_no(self):
         self._setup(f'cess_token=&foo=bar')
-        with pytest.raises(APIAuthError):
+        with pytest.raises(AuthError):
             OAuth.get_token(CLIENT_ID, TEST_ADDR, 50000)
