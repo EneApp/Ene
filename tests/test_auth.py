@@ -14,13 +14,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pathlib import Path
+
+Path.home = lambda: Path(__file__).parent
+
 import webbrowser
 from secrets import token_urlsafe
 
 import pytest
 from requests import post
-
-from ene.api import OAuth
+from . import rmdir
+from ene.auth import OAuth
+from ene.config import CONFIG_DIR
 from ene.errors import AuthError
 
 CLIENT_ID = 0
@@ -31,6 +36,7 @@ class TestAuth:
     token = token_urlsafe()
 
     def _setup(self, frag):
+        rmdir(CONFIG_DIR, True)
         redir_url = f'http://127.0.0.1:50000'
         webbrowser.open = lambda *args: post(redir_url, data=frag.encode())
 
@@ -53,3 +59,15 @@ class TestAuth:
         self._setup(f'cess_token=&foo=bar')
         with pytest.raises(AuthError):
             OAuth.get_token(CLIENT_ID, TEST_ADDR, 50000)
+
+    def test_auth_read_cache(self):
+        rmdir(CONFIG_DIR, True)
+        CONFIG_DIR.mkdir(parents=True)
+        OAuth.TOKEN_FILE.touch()
+        OAuth.TOKEN_FILE.write_text('foo')
+        assert OAuth.get_token(CLIENT_ID, '', 0, 0) == 'foo'
+
+    def test_auth_write_cache(self):
+        self._setup(f'#access_token={self.token}&foo=bar')
+        OAuth.get_token(CLIENT_ID, TEST_ADDR, 50000)
+        assert OAuth.TOKEN_FILE.read_text() == self.token

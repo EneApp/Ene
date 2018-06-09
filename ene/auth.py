@@ -19,6 +19,7 @@ from threading import Thread
 from time import time
 from urllib.parse import parse_qsl, urlencode, urlparse
 
+from .config import CONFIG_DIR
 from .errors import AuthError
 
 
@@ -37,6 +38,7 @@ class OAuth:
         https://anilist.gitbooks.io/anilist-apiv2-docs/oauth/implicit-grant.html
     """
     TOKEN = None
+    TOKEN_FILE = CONFIG_DIR / 'token'
 
     class _RedirectHandler(BaseHTTPRequestHandler):
         """
@@ -146,6 +148,14 @@ class OAuth:
         Raises:
             APIAuthError if failed to get the token
         """
+        try:
+            token = cls.TOKEN_FILE.read_text()
+        except OSError:
+            pass
+        else:
+            if token:
+                return token
+
         self = cls(client_id, addr, port)
         server_thread = Thread(target=self.httpd.serve_forever)
         server_thread.start()
@@ -163,4 +173,7 @@ class OAuth:
         if not cls.TOKEN:
             raise AuthError()
         else:
+            CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+            cls.TOKEN_FILE.touch()
+            cls.TOKEN_FILE.write_text(cls.TOKEN)
             return cls.TOKEN

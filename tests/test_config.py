@@ -17,11 +17,10 @@
 from pathlib import Path
 
 Path.home = lambda: Path(__file__).parent
-from shutil import rmtree
 
 import pytest
 from toml import dump, loads
-
+from . import rmdir
 from ene.config import Config, CONFIG_DIR
 
 CONFIG_FILE = CONFIG_DIR / 'config.toml'
@@ -38,17 +37,19 @@ MOCK_SETTINGS = {
 
 @pytest.fixture()
 def path():
+    rmdir(CONFIG_DIR, True)
     CONFIG_DIR.mkdir(parents=True)
     with CONFIG_FILE.open('w+') as f:
         dump(MOCK_SETTINGS, f)
     yield CONFIG_DIR
-    rmtree(CONFIG_DIR)
+    rmdir(CONFIG_DIR, False)
 
 
 @pytest.fixture()
 def path_empty():
+    rmdir(CONFIG_DIR, True)
     yield CONFIG_DIR
-    rmtree(CONFIG_DIR)
+    rmdir(CONFIG_DIR, False)
 
 
 def test_config_read(path):
