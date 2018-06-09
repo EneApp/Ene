@@ -15,12 +15,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+from pathlib import Path
 
-from PySide2.QtWidgets import QApplication, QLabel
-
+from PySide2.QtCore import QFile, Qt
+from PySide2.QtUiTools import QUiLoader
+from PySide2.QtWidgets import QApplication
 
 if __name__ == "__main__":
-    app = QApplication([])
-    label = QLabel("Hello World")
-    label.show()
+    QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
+    app = QApplication(sys.argv)
+    file = QFile(str(Path(__file__).parent.parent / 'ui' / 'ene.ui'))
+    file.open(QFile.ReadOnly)
+    loader = QUiLoader()
+    window = loader.load(file)
+    window.show()
     sys.exit(app.exec_())
