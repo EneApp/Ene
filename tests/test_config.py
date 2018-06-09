@@ -15,15 +15,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
+
+Path.home = lambda: Path(__file__).parent
 from shutil import rmtree
 
 import pytest
 from toml import dump, loads
 
-from ene.config import Config
+from ene.config import Config, CONFIG_DIR
 
-Config.CONFIG_DIR = CONFIG_PATH = Path(__file__).parent / '.config'
-CONFIG_FILE = CONFIG_PATH / 'config.toml'
+CONFIG_FILE = CONFIG_DIR / 'config.toml'
 
 MOCK_SETTINGS = {
     'foo': 1,
@@ -37,17 +38,17 @@ MOCK_SETTINGS = {
 
 @pytest.fixture()
 def path():
-    CONFIG_PATH.mkdir()
+    CONFIG_DIR.mkdir(parents=True)
     with CONFIG_FILE.open('w+') as f:
         dump(MOCK_SETTINGS, f)
-    yield CONFIG_PATH
-    rmtree(CONFIG_PATH)
+    yield CONFIG_DIR
+    rmtree(CONFIG_DIR)
 
 
 @pytest.fixture()
 def path_empty():
-    yield CONFIG_PATH
-    rmtree(CONFIG_PATH)
+    yield CONFIG_DIR
+    rmtree(CONFIG_DIR)
 
 
 def test_config_read(path):

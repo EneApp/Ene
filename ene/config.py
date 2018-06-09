@@ -19,13 +19,13 @@ from pathlib import Path
 
 import toml
 
+CONFIG_DIR = Path.home() / '.config' / 'ene'
+
 
 class Config(MutableMapping):
     """
     Class for config access
     """
-    CONFIG_DIR = Path.home() / '.config' / 'ene'
-    TOKEN_FILE = CONFIG_DIR / 'token'
     DEFAULT_CONFIG = {
     }
 
@@ -33,7 +33,7 @@ class Config(MutableMapping):
         """
         Create the config directory and files if they do not exist already
         """
-        self.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
         self.config = self._read_config() if self.config_file.is_file() else {}
 
@@ -43,7 +43,7 @@ class Config(MutableMapping):
 
     @property
     def config_file(self):
-        return self.CONFIG_DIR / 'config.toml'
+        return CONFIG_DIR / 'config.toml'
 
     def _write_config(self):
         """
