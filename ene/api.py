@@ -25,7 +25,7 @@ from ene.util import load_file
 
 CLIENT_ID = 584
 GRAPHQL_URL = 'https://graphql.anilist.co'
-GRAPHQL_FILE_DIR = Path(__file__).parent.parent / 'graphql'
+GRAPHQL_FILE_DIR = Path(__file__) / '..' / '..' / 'graphql'
 
 
 def load_query(name: str) -> str:

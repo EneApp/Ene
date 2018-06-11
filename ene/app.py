@@ -25,7 +25,7 @@ from PySide2.QtWidgets import QApplication, QAction, QMainWindow, QWidget
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
-UI_DIR = Path(__file__).parent.parent / 'ui'
+UI_DIR = (Path(__file__) /'..' / '..' / 'ui').resolve()
 APP_NAME = 'ENE'
 
 
