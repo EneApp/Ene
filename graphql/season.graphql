@@ -1,0 +1,23 @@
+query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $sort: [MediaSort]) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            hasNextPage
+        }
+        media(season: $season, seasonYear: $seasonYear, type: ANIME, sort: $sort) {
+            id
+            title {
+                userPreferred
+            }
+            averageScore
+            description
+            format
+            genres
+            coverImage {
+                large
+            }
+            episodes
+            popularity
+        }
+    }
+}
