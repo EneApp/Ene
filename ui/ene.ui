@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>ENE</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -24,29 +24,14 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>3</number>
     </property>
-    <widget class="QWidget" name="tabWidgetPage1" native="true">
+    <widget class="QWidget" name="tabWidgetPage1">
      <attribute name="title">
       <string>Local Files</string>
      </attribute>
-     <widget class="QWebEngineView" name="webEngineView">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>20</y>
-        <width>1361</width>
-        <height>751</height>
-       </rect>
-      </property>
-      <property name="url">
-       <url>
-        <string>https://anilist.co/</string>
-       </url>
-      </property>
-     </widget>
     </widget>
-    <widget class="QWidget" name="tabWidgetPage2" native="true">
+    <widget class="QWidget" name="tabWidgetPage2">
      <attribute name="title">
       <string>Streams</string>
      </attribute>
@@ -69,20 +54,20 @@
      <x>0</x>
      <y>0</y>
      <width>1440</width>
-     <height>30</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>Fi&amp;le</string>
     </property>
-    <addaction name="actionOpen_local_folder"/>
+    <addaction name="OpenLocalFolder"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
      <string>Setti&amp;ngs</string>
     </property>
-    <addaction name="actionPreferences"/>
+    <addaction name="action_prefences"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -98,12 +83,12 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionPreferences">
+  <action name="action_prefences">
    <property name="text">
     <string>Preferences</string>
    </property>
   </action>
-  <action name="actionOpen_local_folder">
+  <action name="OpenLocalFolder">
    <property name="text">
     <string>Open local folder</string>
    </property>
@@ -124,13 +109,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QWebEngineView</class>
-   <extends>QWidget</extends>
-   <header location="global">QtWebEngineWidgets/QWebEngineView</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
