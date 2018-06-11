@@ -33,7 +33,7 @@ poetry install
 4. Install PySide2 (Detailed instructions: https://wiki.qt.io/Qt_for_Python/GettingStarted)
 
 ```bash
-pip install --index-url=http://download.qt.io/snapshots/ci/pyside/5.9/latest/ pyside2 --trusted-host download.qt.io
+pip install --index-url=http://download.qt.io/snapshots/ci/pyside/5.11/latest/ pyside2 --trusted-host download.qt.io
 ```
 
 
