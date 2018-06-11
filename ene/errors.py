@@ -14,8 +14,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import attr
-
 
 class EneError(Exception):
     pass
@@ -25,10 +23,13 @@ class APIError(EneError):
     pass
 
 
-@attr.s
 class APIHTTPError(APIError):
-    stauts = attr.ib(type=int)
-    message = attr.ib(type=str, default=None)
+    def __init__(self, status, message=None):
+        self.stauts = status
+        self.message = message
+
+    def __repr__(self):
+        return f'APIHTTPError(status={self.stauts}, message={self.message})'
 
 
 class AuthError(EneError):
