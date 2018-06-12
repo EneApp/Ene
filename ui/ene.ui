@@ -54,14 +54,14 @@
      <x>0</x>
      <y>0</y>
      <width>1440</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>Fi&amp;le</string>
     </property>
-    <addaction name="OpenLocalFolder"/>
+    <addaction name="action_open_folder"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -85,27 +85,27 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_prefences">
    <property name="text">
-    <string>Preferences</string>
+    <string>&amp;Preferences</string>
    </property>
   </action>
-  <action name="OpenLocalFolder">
+  <action name="action_open_folder">
    <property name="text">
-    <string>Open local folder</string>
+    <string>&amp;Open local folder</string>
    </property>
   </action>
   <action name="actionAbout_Ene">
    <property name="text">
-    <string>About Ene</string>
+    <string>&amp;About Ene</string>
    </property>
   </action>
   <action name="actionSource_Code">
    <property name="text">
-    <string>Source Code</string>
+    <string>&amp;Source Code</string>
    </property>
   </action>
   <action name="actionHelp">
    <property name="text">
-    <string>Help</string>
+    <string>&amp;Help</string>
    </property>
   </action>
  </widget>

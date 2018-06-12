@@ -21,11 +21,11 @@ from typing import Optional
 
 from PySide2 import QtUiTools
 from PySide2.QtCore import Qt, QFile
-from PySide2.QtWidgets import QApplication, QAction, QMainWindow, QWidget
+from PySide2.QtWidgets import QApplication, QAction, QMainWindow, QWidget, QFileDialog
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
-UI_DIR = (Path(__file__) /'..' / '..' / 'ui').resolve()
+UI_DIR = (Path(__file__) / '..' / '..' / 'ui').resolve()
 APP_NAME = 'ENE'
 
 
@@ -55,7 +55,7 @@ def load_ui_widget(ui_file: str, parent: Optional[QWidget] = None) -> QWidget:
         parent: The parent of that wiget
 
     Returns:
-        The loaded ui wiget
+        The loaded ui widget
     """
     loader = QtUiTools.QUiLoader()
     with open_ui_file(ui_file) as uifile:
@@ -78,16 +78,19 @@ class MainForm(QMainWindow):
         self.main_window = load_ui_widget(str(UI_DIR / 'ene.ui'))
         self.main_window.setWindowTitle(APP_NAME)
         self.prefences_window = load_ui_widget(str(UI_DIR / 'settings.ui'))
-        self.prefences_window.setWindowTitle('Prefences')
+        self.prefences_window.setWindowTitle('Preferences')
         self.setup_children()
 
     def setup_children(self):
         """
-        Setup all the child wigets of the main window
+        Setup all the child widgets of the main window
         """
         self.act_prefences = self.main_window.findChild(QAction, '﻿action_prefences')
         assert self.act_prefences
         self.act_prefences.triggered.connect(self.prefences_window.show)
+        # this doesn't work the way I want it to
+        # self.act_open_folder = self.main_window.findChild(QAction, '﻿action_open_folder')
+        # self.act_open_folder.triggered.connect(QFileDialog.getExistingDirectory())
 
     @classmethod
     def launch(cls):
