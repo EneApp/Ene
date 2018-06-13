@@ -15,6 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import MutableMapping
+from contextlib import contextmanager
 from pathlib import Path
 
 import toml
@@ -36,21 +37,34 @@ class Config(MutableMapping):
         CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
         self.config = self._read_config() if self.config_file.is_file() else {}
+        self._old = None
 
         if not self.config:
             self.config = self.DEFAULT_CONFIG
-            self._write_config()
+            self.apply()
 
     @property
     def config_file(self):
         return CONFIG_DIR / 'config.toml'
 
-    def _write_config(self):
+    def apply(self):
         """
         Writes the config in memory to file
         """
+        self._old = self.config.copy()
         with open(self.config_file, 'w+') as f:
             toml.dump(self.config, f)
+
+    @contextmanager
+    def change(self):
+        """
+        Context manager to make changes to config.
+
+        Must call self.apply() within the scope to apply the changes.
+        """
+        self._old = self.config.copy()
+        yield self
+        self.config = self._old.copy()
 
     def _read_config(self) -> dict:
         """
@@ -66,11 +80,9 @@ class Config(MutableMapping):
 
     def __setitem__(self, key, value):
         self.config[key] = value
-        self._write_config()
 
     def __delitem__(self, key):
         del self.config[key]
-        self._write_config()
 
     def __iter__(self):
         return iter(self.config)
