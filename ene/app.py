@@ -23,6 +23,8 @@ from PySide2 import QtUiTools
 from PySide2.QtCore import Qt, QFile
 from PySide2.QtWidgets import QApplication, QAction, QMainWindow, QWidget, QFileDialog
 
+from ene.config import Config
+
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
 UI_DIR = (Path(__file__) / '..' / '..' / 'ui').resolve()
@@ -75,6 +77,7 @@ class MainForm(QMainWindow):
         Initialize the ui files for the application
         """
         super().__init__()
+        self.config = Config()
         self.setWindowTitle(APP_NAME)
         self.main_window = load_ui_widget(str(UI_DIR / 'ene.ui'))
         self.main_window.setWindowTitle(APP_NAME)
