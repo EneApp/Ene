@@ -145,15 +145,6 @@ setuptools = "*"
 six = ">=1.10.0"
 py = ">=1.5.0"
 [[package]]
-name = "python-vlc"
-version = "3.0.102"
-description = "VLC bindings for python."
-category = "main"
-optional = false
-python-versions = "*"
-platform = "*"
-
-[[package]]
 name = "requests"
 version = "2.19.0"
 description = "Python HTTP for Humans."
@@ -197,7 +188,7 @@ platform = "*"
 [metadata]
 python-versions = ">=3.6"
 platform = "*"
-content-hash = "5db82c705ed55698a0fb7207bfabb7923b6a1d507a1fc6f6cc1e7b694cae806a"
+content-hash = "af32726b76513b94da3ea7e27286c436f82d4c40edcf625665225d6a92d37f0b"
 
 [metadata.hashes]
 atomicwrites = [ "a24da68318b08ac9c9c45029f4a10371ab5b20e4226738e150e6e7c571630ae6", "240831ea22da9ab882b551b31d4225591e5e447a68c5e188db5b89ca1d487585",]
@@ -214,7 +205,6 @@ py = [ "983f77f3331356039fdd792e9220b7b8ee1aa6bd2b25f567a963ff1de5a64f6a", "29c9
 pycodestyle = [ "6c4245ade1edfad79c3446fadfc96b0de2759662dc29d07d80a6f27ad1ca6ba9", "682256a5b318149ca0d2a9185d365d8864a768a28db66a84a2ea946bcc426766",]
 pyflakes = [ "08bd6a50edf8cffa9fa09a463063c425ecaaf10d1eb0335a7e8b1401aef89e6f", "8d616a382f243dbf19b54743f280b80198be0bca3a5396f1d2e1fca6223e8805",]
 pytest = [ "26838b2bc58620e01675485491504c3aa7ee0faf335c37fcd5f8731ca4319591", "32c49a69566aa7c333188149ad48b58ac11a426d5352ea3d8f6ce843f88199cb",]
-python-vlc = [ "c51a1c553852a08bd92176de473e15bda7d507ff5ec58005b2a9de5ca8f593a5",]
 requests = [ "421cfc8d9dde7d6aff68196420afd86b88c65d77d8da9cf83f4ecad785d7b9d6", "cc408268d0e21589bcc2b2c248e42932b8c4d112f499c12c92e99e2178a6134c",]
 six = [ "832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb", "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9",]
 toml = [ "8e86bd6ce8cc11b9620cb637466453d94f5d57ad86f17e98a98d1f73e3baab2d",]
