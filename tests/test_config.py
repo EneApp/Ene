@@ -68,7 +68,9 @@ def test_config_write(path):
     cfg = Config()
     test_data = MOCK_SETTINGS.copy()
     test_data['asd'] = 2121
-    cfg['asd'] = 2121
+    with cfg.change():
+        cfg['asd'] = 2121
+        cfg.apply()
     assert loads(CONFIG_FILE.read_text()) == test_data
     assert cfg['asd'] == test_data['asd']
 
@@ -77,6 +79,16 @@ def test_config_write_default(path_empty):
     cfg = Config()
     test_data = cfg.DEFAULT_CONFIG.copy()
     test_data['asd'] = 2121
-    cfg['asd'] = 2121
+    with cfg.change():
+        cfg['asd'] = 2121
+        cfg.apply()
     assert loads(CONFIG_FILE.read_text()) == test_data
     assert cfg['asd'] == test_data['asd']
+
+
+def test_config_write_revert(path):
+    cfg = Config()
+    test_data = MOCK_SETTINGS.copy()
+    with cfg.change():
+        cfg['asd'] = 2121
+    assert loads(CONFIG_FILE.read_text()) == test_data
