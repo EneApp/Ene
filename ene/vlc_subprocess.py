@@ -14,15 +14,23 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ene.config import Config
-import pathlib
+import subprocess
 
 
-class FileManager:
+class VlcPlayer:
+    def __init__(self):
+        self.process = subprocess.Popen(['vlc', '-I', 'rc'], stdin=subprocess.PIPE)
 
-    def __init__(self, cfg):
-        self.config = cfg
-        self.dir = self.config.get('Local Files', default=pathlib.Path.home() / 'Videos')
+    def write_cmd(self, cmd):
+        # TODO: Prevent this from possibly deadlocking or find a way to use Popen.Communicate()
+        self.process.stdin.write(cmd + b'\n')
+        self.process.stdin.flush()
 
-    def set_dir(self, path):
-        self.dir = path
+    def add(self, path):
+        self.write_cmd(b'add ' + path)
+
+    def get_title(self):
+        self.write_cmd(b'get_title')
+
+    def stop(self):
+        self.write_cmd(b'stop')
