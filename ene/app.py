@@ -27,6 +27,7 @@ QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
 UI_DIR = (Path(__file__) / '..' / '..' / 'ui').resolve()
 APP_NAME = 'ENE'
+IS_WIN = sys.platform in ('win32', 'cygwin')
 
 
 @contextmanager
@@ -88,9 +89,21 @@ class MainForm(QMainWindow):
         self.act_prefences = self.main_window.findChild(QAction, '﻿action_prefences')
         assert self.act_prefences
         self.act_prefences.triggered.connect(self.prefences_window.show)
-        # this doesn't work the way I want it to
-        # self.act_open_folder = self.main_window.findChild(QAction, '﻿action_open_folder')
-        # self.act_open_folder.triggered.connect(QFileDialog.getExistingDirectory())
+        self.act_open_folder = self.main_window.findChild(QAction, '﻿action_open_folder')
+        self.act_open_folder.triggered.connect(self.choose_dir)
+
+    def choose_dir(self) -> Path:
+        """
+        Choose a directory from a file dialog
+
+        Returns: The dirtory path
+        """
+        args = [self, self.tr("Open Directory"), str(Path.home())]
+        if IS_WIN:
+            args.append(QFileDialog.DontUseNativeDialog)
+        dir_ = QFileDialog.getExistingDirectory(*args)
+        # TODO do something with this
+        return Path(dir_)
 
     @classmethod
     def launch(cls):
