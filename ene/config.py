@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import MutableMapping
+from collections import Mapping
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -23,7 +23,7 @@ import toml
 CONFIG_DIR = Path.home() / '.config' / 'ene'
 
 
-class Config(MutableMapping):
+class Config(Mapping):
     """
     Class for config access
     """
@@ -63,7 +63,7 @@ class Config(MutableMapping):
         Must call self.apply() within the scope to apply the changes.
         """
         self._old = self.config.copy()
-        yield self
+        yield self.config
         self.config = self._old.copy()
 
     def _read_config(self) -> dict:
@@ -77,12 +77,6 @@ class Config(MutableMapping):
 
     def __getitem__(self, key):
         return self.config[key]
-
-    def __setitem__(self, key, value):
-        self.config[key] = value
-
-    def __delitem__(self, key):
-        del self.config[key]
 
     def __iter__(self):
         return iter(self.config)
