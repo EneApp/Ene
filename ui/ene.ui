@@ -24,12 +24,22 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
-    <widget class="QWidget" name="tabWidgetPage1">
+    <widget class="QWidget" name="tabLocalFiles">
      <attribute name="title">
       <string>Local Files</string>
      </attribute>
+     <widget class="QWidget" name="widget" native="true">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>120</width>
+        <height>80</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tabWidgetPage2">
      <attribute name="title">

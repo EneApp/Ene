@@ -52,10 +52,10 @@ def open_ui_file(filename: str) -> QFile:
 
 def load_ui_widget(ui_file: str, parent: Optional[QWidget] = None) -> QWidget:
     """
-    Load a ui wiget from file
+    Load a ui widget from file
     Args:
         ui_file: The ui file name
-        parent: The parent of that wiget
+        parent: The parent of that widget
 
     Returns:
         The loaded ui widget
@@ -99,7 +99,7 @@ class MainForm(QMainWindow):
         """
         Choose a directory from a file dialog
 
-        Returns: The dirtory path
+        Returns: The directory path
         """
         args = [self, self.tr("Open Directory"), str(Path.home())]
         if IS_WIN:
