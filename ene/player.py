@@ -92,7 +92,7 @@ class RcVlcPlayer(AbstractPlayer):
         :param cmd:
         :return:
         """
-        # TODO: Find a better way to prevent this from possibly deadlocking or find a way to use Popen.Communicate()
+        # TODO: Find a better way to prevent this from possibly deadlocking or find a way to use Popen.Communicate() # noqa: E501
         sleep(1)
         self.process.stdin.write(cmd + '\n')
         self.process.stdin.flush()
@@ -159,7 +159,8 @@ class MpvPlayer(AbstractPlayer):
 
 class GenericPlayer(AbstractPlayer):
     """
-    For unsupported players, we can attempt to launch them with a subprocess and accept that we can't control them
+    For unsupported players, we can attempt to launch them with a subprocess
+    and accept that we can't control them
     """
 
     def __init__(self, path):

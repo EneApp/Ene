@@ -12,6 +12,8 @@ exclude =
     .tox,
     .idea,
     pyside-setup,
+    ene/graphql,
+    ene/ui,
 
 max-line-length = 99
 ignore = E402 E731
