@@ -14,11 +14,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import subprocess
 from abc import ABC, abstractmethod
 from shutil import which
 from threading import Event
 from time import sleep
+from typing import Union
 
 import mpv
 import vlc
@@ -28,10 +30,12 @@ from ene.constants import IS_MAC, IS_WIN
 
 class AbstractPlayer(ABC):
     @abstractmethod
-    def play(self, path):
+    def play(self, path: Union[str, os.PathLike]):
         """
         Plays the media file given by path
-        :param path: The location of the media file to play
+
+        Args:
+            path: The location of the media file to play
         """
         raise NotImplementedError()
 
@@ -89,8 +93,9 @@ class RcVlcPlayer(AbstractPlayer):
     def write_cmd(self, cmd):
         """
         Prepares and writes a command to the vlc rc interface on STDIN
-        :param cmd:
-        :return:
+
+        Args:
+            cmd:
         """
         # TODO: Find a better way to prevent this from possibly deadlocking or find a way to use Popen.Communicate() # noqa: E501
         sleep(1)
@@ -100,7 +105,9 @@ class RcVlcPlayer(AbstractPlayer):
     def play(self, path):
         """
         Plays the media file given by path
-        :param path: The location of the media file to play
+
+        Args:
+            path: The location of the media file to play
         """
         self.write_cmd('add ' + path)
 
@@ -130,7 +137,9 @@ class MpvPlayer(AbstractPlayer):
     def play(self, path):
         """
         Plays the media file given by path
-        :param path: The location of the media file to play
+
+        Args:
+            path: The location of the media file to play
         """
         self.player.play(path)
 
@@ -170,7 +179,9 @@ class GenericPlayer(AbstractPlayer):
     def play(self, path):
         """
         Plays the media file given by path
-        :param path: The location of the media file to play
+
+        Args:
+            path: The location of the media file to play
         """
         if self.player is None:
             self.player = subprocess.Popen([self.player_path, path])
