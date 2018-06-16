@@ -30,15 +30,16 @@
      <attribute name="title">
       <string>Local Files</string>
      </attribute>
-     <widget class="QWidget" name="widget" native="true">
+     <widget class="QWidget" name="gridLayoutWidget">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>120</width>
-        <height>80</height>
+        <width>1391</width>
+        <height>771</height>
        </rect>
       </property>
+      <layout class="QGridLayout" name="gridLayout_2"/>
      </widget>
     </widget>
     <widget class="QWidget" name="tabWidgetPage2">
@@ -86,7 +87,7 @@
     <addaction name="actionHelp"/>
     <addaction name="separator"/>
     <addaction name="actionAbout_Ene"/>
-    <addaction name="actionSource_Code"/>
+    <addaction name="action_source_code"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSettings"/>
@@ -108,7 +109,7 @@
     <string>&amp;About Ene</string>
    </property>
   </action>
-  <action name="actionSource_Code">
+  <action name="action_source_code">
    <property name="text">
     <string>&amp;Source Code</string>
    </property>

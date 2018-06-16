@@ -16,38 +16,116 @@
 
 import subprocess
 import mpv
+import vlc
 from time import sleep
+from sys import platform
+from abc import ABC, abstractmethod
+from threading import Event
 
 
-class VlcPlayer:
+class AbstractPlayer(ABC):
+    @abstractmethod
+    def play(self, path):
+        """
+        Plays the media file given by path
+        :param path: The location of the media file to play
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def stop(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def wait_for_playback_end(self):
+        raise NotImplementedError
+
+class VlcPlayer(AbstractPlayer):
+    """
+    An implementation of the VLC player using the python-vlc library
+    """
     def __init__(self):
-        self.process = subprocess.Popen(['vlc', '-I', 'rc'], stdin=subprocess.PIPE)
+        self.instance = vlc.Instance('--extraintf=hotkeys')
+        self.player = self.instance.media_player_new()
+        self.player.video_set_key_input(True)
+        self.player.video_set_mouse_input(True)
 
-    def write_cmd(self, cmd):
-        # TODO: Find a better way to prevent this from possibly deadlocking or find a way to use Popen.Communicate()
-        sleep(1)
-        self.process.stdin.write(cmd + b'\n')
-        self.process.stdin.flush()
-
-    def add(self, path):
-        self.write_cmd(b'add ' + path)
-
-    def get_title(self):
-        self.write_cmd(b'get_title')
+    def play(self, path):
+        media = self.instance.media_new(path)
+        self.player.set_media(media)
+        self.player.play()
 
     def stop(self):
-        self.write_cmd(b'stop')
+        self.player.stop()
+
+    def wait_for_playback_end(self):
+        sleep(30)
 
 
-class MpvPlayer:
+class RcVlcPlayer(AbstractPlayer):
+    """
+    An implementation of the VLC player using the rc interface and passing commands to stdin
+    """
+    def __init__(self, path=None):
+        if platform.startswith('linux'):
+            args = ['vlc']
+        else:
+            args = [path]
+        args.append('-I')
+        args.append('rc')
+        if platform == 'darwin':
+            # mac is special
+            args.append('--extraintf=macosx')
+        else:
+            args.append('--extraintf=qt')
+        self.process = subprocess.Popen(args, stdin=subprocess.PIPE, universal_newlines=True)
+
+    def write_cmd(self, cmd):
+        """
+        Prepares and writes a command to the vlc rc interface on STDIN
+        :param cmd:
+        :return:
+        """
+        # TODO: Find a better way to prevent this from possibly deadlocking or find a way to use Popen.Communicate()
+        sleep(1)
+        self.process.stdin.write(cmd + '\n')
+        self.process.stdin.flush()
+
+    def play(self, path):
+        """
+        Plays the media file given by path
+        :param path: The location of the media file to play
+        """
+        self.write_cmd('add ' + path)
+
+    def get_title(self):
+        self.write_cmd('get_title')
+
+    def stop(self):
+        self.write_cmd('stop')
+
+    def wait_for_playback_end(self):
+            sleep(10)
+
+
+class MpvPlayer(AbstractPlayer):
+    """
+    An implementation of the MPV player using the python-mpv library
+    """
+
     def __init__(self):
         """
         Sets up a new MPV instance with the default keybindings
         """
         self.player = mpv.MPV(input_default_bindings=True, input_vo_keyboard=True)
+        self.eof = Event()
         self.setup_listeners()
 
     def play(self, path):
+        """
+        Plays the media file given by path
+        :param path: The location of the media file to play
+        """
         self.player.play(path)
 
     def stop(self):
@@ -63,13 +141,44 @@ class MpvPlayer:
 
         @self.player.event_callback('end_file')
         def on_file_end(event):
-            # TODO: When this event is raised is when we should update anilist
-            self.stop()
-            print('End of file reached.')
+            self.eof.set()
 
-    def wait_for_pause(self):
+    def wait_for_playback_end(self):
         """
-        Waits until the media stream is paused
+        Waits until the media stream reaches end of file
         """
-        self.player.wait_for_property('pause', lambda x: x is True)
+        self.eof.wait()
 
+
+class GenericPlayer(AbstractPlayer):
+    """
+    For unsupported players, we can attempt to launch them with a subprocess and accept that we can't control them
+    """
+    def __init__(self, path):
+        self.player_path = path
+        self.player = None
+
+    def play(self, path):
+        """
+        Plays the media file given by path
+        :param path: The location of the media file to play
+        """
+        if self.player is None:
+            self.player = subprocess.Popen([self.player_path, path])
+
+    def stop(self):
+        if self.player is not None:
+            self.player.terminate()
+
+    def wait_for_playback_end(self):
+        if self.player is not None:
+            self.player.wait()
+
+
+p = RcVlcPlayer()
+p.play('/home/justin/test.mkv')
+p.wait_for_playback_end()
+print('GREAT SUCCESS')
+sleep(10)
+p.play('/home/justin/test.mkv')
+p.wait_for_playback_end()

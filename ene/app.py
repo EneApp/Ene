@@ -18,6 +18,7 @@ import sys
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
+from webbrowser import open
 
 from PySide2 import QtUiTools
 from PySide2.QtCore import Qt, QFile
@@ -94,6 +95,8 @@ class MainForm(QMainWindow):
         self.act_prefences.triggered.connect(self.prefences_window.show)
         self.act_open_folder = self.main_window.findChild(QAction, '﻿action_open_folder')
         self.act_open_folder.triggered.connect(self.choose_dir)
+        self.act_source_code = self.main_window.findChild(QAction, '﻿action_source_code')
+        self.act_source_code.triggered.connect(self.open_source_code)
 
     def choose_dir(self) -> Path:
         """
@@ -107,6 +110,9 @@ class MainForm(QMainWindow):
         dir_ = QFileDialog.getExistingDirectory(*args)
         # TODO do something with this
         return Path(dir_)
+
+    def open_source_code(self):
+        open('https://github.com/MaT1g3R/ene/')
 
     @classmethod
     def launch(cls):
