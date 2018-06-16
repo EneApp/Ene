@@ -17,11 +17,13 @@
 import sys
 from pathlib import Path
 
-APP_NAME = 'ENE'
-CONFIG_DIR = Path.home() / '.config' / 'ene'
 IS_WIN = sys.platform in ('win32', 'cygwin')
 IS_LINUX = sys.platform.startswith('linux')
 IS_MAC = sys.platform == 'darwin'
 IS_37 = sys.version_info >= (3, 7)
+
+APP_NAME = 'ENE'
 CLIENT_ID = 584
+
+CONFIG_DIR = Path.home() / '.config' / 'ene'
 GRAPHQL_URL = 'https://graphql.anilist.co'
