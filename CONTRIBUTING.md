@@ -48,3 +48,5 @@ Please follow [PEP8](https://www.python.org/dev/peps/pep-0008/) with a few modif
 2. Strings are single quoted, unless there are single quotes in the string, then they are double quoted.
 
     2.1 Multi-line string literals and docstrings are to be surrounded with triple double quotes (""")
+
+3. Doc-strings should follow the Google doc-string style: http://www.sphinx-doc.org/en/stable/ext/example_google.html
