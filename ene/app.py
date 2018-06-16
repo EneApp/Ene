@@ -25,12 +25,12 @@ from PySide2.QtCore import Qt, QFile
 from PySide2.QtWidgets import QApplication, QAction, QMainWindow, QWidget, QFileDialog
 
 from ene.config import Config
+from ene.util import IS_WIN
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
 UI_DIR = (Path(__file__) / '..' / '..' / 'ui').resolve()
 APP_NAME = 'ENE'
-IS_WIN = sys.platform in ('win32', 'cygwin')
 
 
 @contextmanager

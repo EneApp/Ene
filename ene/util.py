@@ -14,10 +14,15 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 from functools import lru_cache
 
+IS_WIN = sys.platform in ('win32', 'cygwin')
+IS_LINUX = sys.platform.startswith('linux')
+IS_MAC = sys.platform == 'darwin'
 
-@lru_cache
+
+@lru_cache(None)
 def load_file(path):
     """
     Read file content and put it in cache

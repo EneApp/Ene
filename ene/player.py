@@ -15,12 +15,15 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import subprocess
+from abc import ABC, abstractmethod
+from shutil import which
+from threading import Event
+from time import sleep
+
 import mpv
 import vlc
-from time import sleep
-from sys import platform
-from abc import ABC, abstractmethod
-from threading import Event
+
+from util import IS_MAC, IS_WIN
 
 
 class AbstractPlayer(ABC):
@@ -30,20 +33,22 @@ class AbstractPlayer(ABC):
         Plays the media file given by path
         :param path: The location of the media file to play
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @abstractmethod
     def stop(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @abstractmethod
     def wait_for_playback_end(self):
-        raise NotImplementedError
+        raise NotImplementedError()
+
 
 class VlcPlayer(AbstractPlayer):
     """
     An implementation of the VLC player using the python-vlc library
     """
+
     def __init__(self):
         self.instance = vlc.Instance('--extraintf=hotkeys')
         self.player = self.instance.media_player_new()
@@ -66,14 +71,15 @@ class RcVlcPlayer(AbstractPlayer):
     """
     An implementation of the VLC player using the rc interface and passing commands to stdin
     """
-    def __init__(self, path=None):
-        if platform.startswith('linux'):
-            args = ['vlc']
-        else:
-            args = [path]
-        args.append('-I')
-        args.append('rc')
-        if platform == 'darwin':
+
+    def __init__(self, binary=None):
+        if not binary and IS_WIN:
+            binary = which('vlc.exe')
+        elif not binary:
+            binary = which('vlc')
+
+        args = [binary, '-I', 'rc']
+        if IS_MAC:
             # mac is special
             args.append('--extraintf=macosx')
         else:
@@ -105,7 +111,7 @@ class RcVlcPlayer(AbstractPlayer):
         self.write_cmd('stop')
 
     def wait_for_playback_end(self):
-            sleep(10)
+        sleep(10)
 
 
 class MpvPlayer(AbstractPlayer):
@@ -135,6 +141,7 @@ class MpvPlayer(AbstractPlayer):
         """
         Attaches listeners for when the MPV instance gets terminated or reaches the end
         """
+
         @self.player.event_callback('shutdown')
         def on_shutdown(event):
             self.stop()
@@ -154,6 +161,7 @@ class GenericPlayer(AbstractPlayer):
     """
     For unsupported players, we can attempt to launch them with a subprocess and accept that we can't control them
     """
+
     def __init__(self, path):
         self.player_path = path
         self.player = None
@@ -173,12 +181,3 @@ class GenericPlayer(AbstractPlayer):
     def wait_for_playback_end(self):
         if self.player is not None:
             self.player.wait()
-
-
-p = RcVlcPlayer()
-p.play('/home/justin/test.mkv')
-p.wait_for_playback_end()
-print('GREAT SUCCESS')
-sleep(10)
-p.play('/home/justin/test.mkv')
-p.wait_for_playback_end()

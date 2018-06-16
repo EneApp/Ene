@@ -55,8 +55,6 @@ python-versions = "*"
 platform = "*"
 
 [package.dependencies]
-enum34 = "*"
-configparser = "*"
 pyflakes = ">=1.5.0,<1.7.0"
 pycodestyle = ">=2.0.0,<2.4.0"
 mccabe = ">=0.6.0,<0.7.0"
@@ -136,7 +134,6 @@ platform = "unix"
 
 [package.dependencies]
 colorama = "*"
-funcsigs = "*"
 pluggy = ">=0.5,<0.7"
 atomicwrites = ">=1.0"
 more-itertools = ">=4.0.0"
@@ -164,7 +161,7 @@ platform = "*"
 
 [[package]]
 name = "requests"
-version = "2.19.0"
+version = "2.19.1"
 description = "Python HTTP for Humans."
 category = "main"
 optional = false
@@ -176,6 +173,15 @@ certifi = ">=2017.4.17"
 urllib3 = ">=1.21.1,<1.24"
 idna = ">=2.5,<2.8"
 chardet = ">=3.0.2,<3.1.0"
+[[package]]
+name = "setuptools"
+version = "39.2.0"
+description = "Easily download, build, install, upgrade, and uninstall Python packages"
+category = "dev"
+optional = false
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*"
+platform = "*"
+
 [[package]]
 name = "six"
 version = "1.11.0"
@@ -225,7 +231,8 @@ pyflakes = [ "08bd6a50edf8cffa9fa09a463063c425ecaaf10d1eb0335a7e8b1401aef89e6f",
 pytest = [ "26838b2bc58620e01675485491504c3aa7ee0faf335c37fcd5f8731ca4319591", "32c49a69566aa7c333188149ad48b58ac11a426d5352ea3d8f6ce843f88199cb",]
 python-mpv = [ "d9cd929ae2342ca4b91f7a9b4cee2b2768b4f7f4b988c831f99727c35f71ae6e",]
 python-vlc = [ "c51a1c553852a08bd92176de473e15bda7d507ff5ec58005b2a9de5ca8f593a5",]
-requests = [ "421cfc8d9dde7d6aff68196420afd86b88c65d77d8da9cf83f4ecad785d7b9d6", "cc408268d0e21589bcc2b2c248e42932b8c4d112f499c12c92e99e2178a6134c",]
+requests = [ "63b52e3c866428a224f97cab011de738c36aec0185aa91cfacd418b5d58911d1", "ec22d826a36ed72a7358ff3fe56cbd4ba69dd7a6718ffd450ff0e9df7a47ce6a",]
+setuptools = [ "8fca9275c89964f13da985c3656cb00ba029d7f3916b37990927ffdf264e7926", "f7cddbb5f5c640311eb00eab6e849f7701fa70bf6a183fc8a2c33dd1d1672fb2",]
 six = [ "832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb", "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9",]
 toml = [ "8e86bd6ce8cc11b9620cb637466453d94f5d57ad86f17e98a98d1f73e3baab2d",]
 urllib3 = [ "b5725a0bd4ba422ab0e66e89e030c806576753ea3ee08554382c14e685d117b5", "a68ac5e15e76e7e5dd2b8f94007233e01effe3e50e8daddf69acfd81cb686baf",]
