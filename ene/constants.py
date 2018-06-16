@@ -20,6 +20,7 @@ from functools import lru_cache
 IS_WIN = sys.platform in ('win32', 'cygwin')
 IS_LINUX = sys.platform.startswith('linux')
 IS_MAC = sys.platform == 'darwin'
+IS_37 = sys.version_info >= (3, 7)
 
 
 @lru_cache(None)
