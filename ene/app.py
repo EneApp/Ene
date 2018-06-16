@@ -24,13 +24,16 @@ from PySide2 import QtUiTools
 from PySide2.QtCore import Qt, QFile
 from PySide2.QtWidgets import QApplication, QAction, QMainWindow, QWidget, QFileDialog
 
+import ene.ui
 from ene.config import Config
-from ene.util import IS_WIN
+from ene.constants import IS_WIN, IS_37, APP_NAME
+
+if IS_37:
+    from importlib.resources import path
+else:
+    from importlib_resources import path
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
-
-UI_DIR = (Path(__file__) / '..' / '..' / 'ui').resolve()
-APP_NAME = 'ENE'
 
 
 @contextmanager
@@ -43,7 +46,7 @@ def open_ui_file(filename: str) -> QFile:
     Returns:
         The ui file opened, and closes the file afterwards
     """
-    uifile = QFile(filename)
+    uifile = QFile(str(filename))
     try:
         uifile.open(QFile.ReadOnly)
         yield uifile
@@ -80,9 +83,13 @@ class MainForm(QMainWindow):
         super().__init__()
         self.config = Config()
         self.setWindowTitle(APP_NAME)
-        self.main_window = load_ui_widget(str(UI_DIR / 'ene.ui'))
+
+        with path(ene.ui, 'ene.ui') as p:
+            self.main_window = load_ui_widget(p)
+        with path(ene.ui, 'settings.ui') as p:
+            self.prefences_window = load_ui_widget(p)
+
         self.main_window.setWindowTitle(APP_NAME)
-        self.prefences_window = load_ui_widget(str(UI_DIR / 'settings.ui'))
         self.prefences_window.setWindowTitle('Preferences')
         self.setup_children()
 

@@ -15,24 +15,13 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from functools import lru_cache
+from pathlib import Path
 
+APP_NAME = 'ENE'
+CONFIG_DIR = Path.home() / '.config' / 'ene'
 IS_WIN = sys.platform in ('win32', 'cygwin')
 IS_LINUX = sys.platform.startswith('linux')
 IS_MAC = sys.platform == 'darwin'
 IS_37 = sys.version_info >= (3, 7)
-
-
-@lru_cache(None)
-def load_file(path):
-    """
-    Read file content and put it in cache
-
-    Args:
-        path: Path to the file
-
-    Returns:
-        The file content
-    """
-    with open(path) as f:
-        return f.read()
+CLIENT_ID = 584
+GRAPHQL_URL = 'https://graphql.anilist.co'

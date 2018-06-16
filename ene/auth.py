@@ -19,8 +19,8 @@ from threading import Thread
 from time import time
 from urllib.parse import parse_qsl, urlencode, urlparse
 
-from .config import CONFIG_DIR
-from .errors import AuthError
+from ene.constants import CONFIG_DIR
+from ene.errors import AuthError
 
 
 class OAuth:

@@ -16,11 +16,10 @@
 
 from collections import Mapping
 from contextlib import contextmanager
-from pathlib import Path
 
 import toml
 
-CONFIG_DIR = Path.home() / '.config' / 'ene'
+from ene.constants import CONFIG_DIR
 
 
 class Config(Mapping):

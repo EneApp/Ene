@@ -17,6 +17,7 @@ toml = "^0.9.4"
 requests = "^2.18"
 python-mpv = "^0.3.8"
 python-vlc = "^3.0"
+importlib_resources = { version = "^0.8.0", python = "<3.7", allows-prereleases = true }
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.5"

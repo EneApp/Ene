@@ -14,30 +14,19 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pathlib import Path
 from typing import Iterable, List, Optional
 
 from requests import HTTPError, post
 
+import ene.graphql
 from ene.auth import OAuth
+from ene.constants import IS_37, CLIENT_ID, GRAPHQL_URL
 from ene.errors import APIError
-from ene.util import load_file
 
-CLIENT_ID = 584
-GRAPHQL_URL = 'https://graphql.anilist.co'
-GRAPHQL_FILE_DIR = Path(__file__) / '..' / '..' / 'graphql'
-
-
-def load_query(name: str) -> str:
-    """
-    Load a GraphQL query from disk
-
-    Args:
-        name: The filename of the query file
-
-    Returns: The query stored in the file
-    """
-    return load_file(GRAPHQL_FILE_DIR / name)
+if IS_37:
+    from importlib.resources import contents, read_text
+else:
+    from importlib_resources import contents, read_text
 
 
 class API:
@@ -52,15 +41,18 @@ class API:
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
+        self.queries = {}
+        for name in contents(ene.graphql):
+            if name.endswith('.graphql'):
+                self.queries[name] = read_text(ene.graphql, name)
 
-    def query(self, query: str, variables: Optional[dict] = None, is_file=True) -> dict:
+    def query(self, query: str, variables: Optional[dict] = None) -> dict:
         """
         Makes HTTP request to the Anilist API
 
         Args:
             query: The GraphQL query to POST to the API
             variables: variables for the query, can be None
-            is_file: Wether the query is from a file
 
         Returns:
             The API response
@@ -68,8 +60,6 @@ class API:
         Raises:
             APIHTTPError if request failed
         """
-        if is_file:
-            query = load_query(query)
         post_json = {'query': query}
         if variables:
             post_json['variables'] = variables
@@ -82,14 +72,13 @@ class API:
         else:
             return res.json()
 
-    def query_pages(self, query: str, variables: dict, is_file=True) -> Iterable[dict]:
+    def query_pages(self, query: str, variables: dict) -> Iterable[dict]:
         """
         Make paged requests to the Anilist API
 
         Args:
             query: The GraphQL query to POST to the API
             variables: variables for the query, can be None
-            is_file: Wether the query is from a file
 
         Returns:
             A generator yielding each page of the API response
@@ -98,7 +87,7 @@ class API:
             APIHTTPError if request failed
         """
         while True:
-            res = self.query(query, variables, is_file)
+            res = self.query(query, variables)
             has_next = res['data']['Page']['pageInfo']['hasNextPage']
             yield res
             if not has_next:
@@ -131,4 +120,8 @@ class API:
             'seasonYear': year,
             'sort': sort
         }
-        return self.query_pages('season.graphql', variables)
+        return self.query_pages(self.queries['season.graphql'], variables)
+
+
+if __name__ == '__main__':
+    API()

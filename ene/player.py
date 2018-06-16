@@ -23,7 +23,7 @@ from time import sleep
 import mpv
 import vlc
 
-from util import IS_MAC, IS_WIN
+from ene.constants import IS_MAC, IS_WIN
 
 
 class AbstractPlayer(ABC):
