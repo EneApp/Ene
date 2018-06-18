@@ -19,7 +19,8 @@ from typing import Iterable, List, Optional
 from requests import HTTPError, post
 
 import ene.graphql
-from anilist.auth import OAuth
+from ene.anilist.auth import OAuth
+from ene.anilist.enums import MediaSeason, MediaSort
 from ene.constants import IS_37, CLIENT_ID, GRAPHQL_URL
 from ene.errors import APIError
 
@@ -106,16 +107,16 @@ class API:
 
     def get_season_anime(
             self,
-            season: str,
+            season: MediaSeason,
             year: int,
             per_page: int = 20,
-            sort: Optional[List[str]] = None
+            sort: Optional[List[MediaSort]] = None
     ) -> Iterable[dict]:
         """
         Query all anime of a given season
 
         Args:
-            season: The season, one of: (WINTER, SPRING, SUMMER, FALL)
+            season: The season
             year: The year for the season
             per_page: How many anime per page of the response
             sort: List of keys to sort by, defaults to popularity decending. See
@@ -127,11 +128,11 @@ class API:
         Raises:
             APIHTTPError if request failed
         """
-        sort = sort or ['POPULARITY_DESC']
+        sort = sort or [MediaSort.POPULARITY_DESC.name]
         variables = {
-            'season': season,
+            'season': season.name,
             'seasonYear': year,
-            'sort': sort
+            'sort': [s.name for s in sort]
         }
         for page in self.query_pages(self.queries['season.graphql'], per_page, variables):
             for anime in page['data']['Page']['media']:
