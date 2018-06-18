@@ -14,8 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Generate python enums from graphqls enums"""
+
 import re
-from sys import argv
+import sys
 
 copyright = '''\
 #  ENE, Automatically track and sync anime watching progress
@@ -40,24 +42,19 @@ from enum import Enum, auto
 
 '''
 
-from enum import Enum
-
-
-class foo(Enum):
-    pass
-
-
-class bar:
-    pass
-
-
 if __name__ == '__main__':
-    print(copyright)
-    file = argv[1]
+    usage = f"Usage: {__file__} FILE"
+
+    if len(sys.argv) != 2:
+        print(usage)
+        sys.exit(1)
+
+    file = sys.argv[1]
     start = False
 
     current_name = None
     current_items = []
+    print(copyright)
     with open(file) as f:
         for line in f:
             name = re.match(r'enum (\w+) {', line)
@@ -65,7 +62,7 @@ if __name__ == '__main__':
                 start = True
                 current_name = name.groups()[0]
             elif start and line.strip() == '}':
-                print(f'class {current_name}(Enum)')
+                print(f'class {current_name}(Enum):')
                 for item in current_items:
                     print(f'    {item} = auto()')
                 print('\n')
