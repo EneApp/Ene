@@ -10,7 +10,7 @@ query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $sort:
                 userPreferred
             }
             averageScore
-            description
+            description(asHtml: false)
             format
             genres
             coverImage {
