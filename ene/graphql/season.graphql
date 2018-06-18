@@ -16,8 +16,20 @@ query ($page: Int, $perPage: Int, $season: MediaSeason, $seasonYear: Int, $sort:
             coverImage {
                 large
             }
+            bannerImage
             episodes
             popularity
+            nextAiringEpisode {
+                episode
+                airingAt
+                timeUntilAiring
+            }
+            studios(isMain: true) {
+                nodes {
+                    id
+                    name
+                }
+            }
         }
     }
 }

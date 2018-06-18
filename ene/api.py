@@ -72,20 +72,30 @@ class API:
         else:
             return res.json()
 
-    def query_pages(self, query: str, variables: dict) -> Iterable[dict]:
+    def query_pages(
+            self,
+            query: str,
+            per_page: int,
+            variables: Optional[dict] = None
+    ) -> Iterable[dict]:
         """
         Make paged requests to the Anilist API
 
         Args:
             query: The GraphQL query to POST to the API
+            per_page: Number of items per page
             variables: variables for the query, can be None
 
-        Returns:
-            A generator yielding each page of the API response
+        Yields:
+            Each page of the API response
 
         Raises:
             APIHTTPError if request failed
         """
+        variables = variables.copy() if variables else {}
+        variables['page'] = 1
+        variables['perPage'] = per_page
+
         while True:
             res = self.query(query, variables)
             has_next = res['data']['Page']['pageInfo']['hasNextPage']
@@ -94,8 +104,13 @@ class API:
                 return
             variables['page'] += 1
 
-    def get_season_animes(self, season: str, year: int, per_page: int,
-                          sort: Optional[List[str]] = None) -> Iterable[dict]:
+    def get_season_anime(
+            self,
+            season: str,
+            year: int,
+            per_page: int = 20,
+            sort: Optional[List[str]] = None
+    ) -> Iterable[dict]:
         """
         Query all anime of a given season
 
@@ -103,25 +118,23 @@ class API:
             season: The season, one of: (WINTER, SPRING, SUMMER, FALL)
             year: The year for the season
             per_page: How many anime per page of the response
-            sort: List of keys to sort by, defaults to ID. See
+            sort: List of keys to sort by, defaults to popularity decending. See
                 https://anilist.github.io/ApiV2-GraphQL-Docs/mediasort.doc.html
 
-        Returns:
-            A generator yielding pages of anime in the season
+        Yields:
+            All anime in that season
 
         Raises:
             APIHTTPError if request failed
         """
-        sort = sort or ['ID']
+        sort = sort or ['POPULARITY_DESC']
         variables = {
-            'page': 1,
-            'perPage': per_page,
             'season': season,
             'seasonYear': year,
             'sort': sort
         }
-        return self.query_pages(self.queries['season.graphql'], variables)
-
-
-if __name__ == '__main__':
-    API()
+        for page in self.query_pages(self.queries['season.graphql'], per_page, variables):
+            data = page['data']
+            animu = data['Page']['media']
+            for anime in animu:
+                yield anime
