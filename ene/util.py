@@ -13,3 +13,19 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import re
+from functools import lru_cache
+
+
+@lru_cache(None)
+def strip_html(s: str) -> str:
+    """
+    Strip html tags from a string
+    Args:
+        s: The string
+
+    Returns:
+        The string with html tags stripped
+    """
+    return re.sub('<[^<]+?>', '', s)
