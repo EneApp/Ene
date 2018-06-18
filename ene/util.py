@@ -15,7 +15,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from functools import lru_cache
+from functools import lru_cache, partial, wraps
+from time import time
+from typing import Optional, Callable
 
 
 @lru_cache(None)
@@ -29,3 +31,37 @@ def strip_html(s: str) -> str:
         The string with html tags stripped
     """
     return re.sub('<[^<]+?>', '', s)
+
+
+def cache(func=None, *, timeout: Optional[int] = None) -> Callable:
+    """
+    Decorator to cache a method.
+
+    Class must have a ``_cache`` and a ``_timeout`` attribute
+    Args:
+        func: Function decorated
+        timeout: Timeout in seconds for the result to expire
+
+    Returns:
+        Wrapped function
+    """
+    if not func:
+        return partial(cache, timeout=timeout)
+
+    @wraps(cache)
+    def wrapper(self, *args, **kwargs):
+        name = func.__name__
+        last_time = self._timeout.get(name)
+
+        if name in self._cache and \
+                (not timeout or
+                 (timeout and last_time and time() - last_time < timeout)):
+            return self._cache[func.__name__]
+
+        res = func(self, *args, **kwargs)
+        self._cache[name] = res
+        if timeout:
+            self._timeout[name] = time()
+        return res
+
+    return wrapper
