@@ -134,7 +134,5 @@ class API:
             'sort': sort
         }
         for page in self.query_pages(self.queries['season.graphql'], per_page, variables):
-            data = page['data']
-            animu = data['Page']['media']
-            for anime in animu:
+            for anime in page['data']['Page']['media']:
                 yield anime
