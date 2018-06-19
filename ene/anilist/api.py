@@ -69,7 +69,18 @@ class API:
         try:
             res.raise_for_status()
         except HTTPError as e:
-            raise APIError(res.status_code, str(e))
+            try:
+                json = res.json()
+            except Exception:
+                msg = str(e)
+            else:
+                msg_lst = []
+                errors = json.get('errors', [])
+                if errors:
+                    for err in errors:
+                        msg_lst.append(err.get('message'))
+                msg = '\n'.join(m for m in msg_lst if m) or str(e)
+            raise APIError(res.status_code, msg)
         else:
             return res.json()
 
