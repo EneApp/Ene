@@ -43,31 +43,31 @@ class TestCache:
         return Dummy()
 
     def test_cache_hit(self, d):
-        d._cache['bar'] = 'baz'
+        d._cache[('bar', ())] = 'baz'
         assert d.bar() == 'baz'
 
     def test_cache_hit_time(self, d):
         f = d.foo
         del f
         sleep(0.5)
-        d._cache['foo'] = 'bar'
+        d._cache[('foo', ())] = 'bar'
         assert d.foo == 'bar'
 
     def test_cache_miss(self, d):
         d._cache['foo'] = 'o'
         assert d.bar() == 'bar'
-        assert d._cache['bar'] == 'bar'
+        assert d._cache[('bar', ())] == 'bar'
 
     def test_cache_miss_not_timedout(self, d):
         d._cache['bar'] = 'asdasd'
         assert d.foo == 'foo'
-        assert d._cache['foo'] == 'foo'
-        assert time() - d._timeout['foo'] < 1
+        assert d._cache[('foo', ())] == 'foo'
+        assert time() - d._timeout[('foo', ())] < 1
 
     def test_cache_miss_timeout(self, d):
-        d._cache['foo'] = 'asd'
-        d._timeout['foo'] = time() - 10
+        d._cache[('foo', ())] = 'asd'
+        d._timeout[('foo', ())] = time() - 10
 
         assert d.foo == 'foo'
-        assert d._cache['foo'] == 'foo'
-        assert time() - d._timeout['foo'] < 1
+        assert d._cache[('foo', ())] == 'foo'
+        assert time() - d._timeout[('foo', ())] < 1

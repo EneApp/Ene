@@ -51,17 +51,18 @@ def cache(func=None, *, timeout: Optional[int] = None) -> Callable:
     @wraps(cache)
     def wrapper(self, *args, **kwargs):
         name = func.__name__
-        last_time = self._timeout.get(name)
+        key = (name, args, ((k, v) for k, v in kwargs.items())) if kwargs else (name, args)
+        last_time = self._timeout.get(key)
 
-        if name in self._cache and \
+        if key in self._cache and \
                 (not timeout or
                  (timeout and last_time and time() - last_time < timeout)):
-            return self._cache[func.__name__]
+            return self._cache[key]
 
         res = func(self, *args, **kwargs)
-        self._cache[name] = res
+        self._cache[key] = res
         if timeout:
-            self._timeout[name] = time()
+            self._timeout[key] = time()
         return res
 
     return wrapper
