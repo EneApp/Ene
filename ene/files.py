@@ -14,14 +14,60 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pathlib
+from pathlib import Path
+import re
+import ene.config
 
 
 class FileManager:
 
     def __init__(self, cfg):
         self.config = cfg
-        self.dir = self.config.get('Local Files', default=pathlib.Path.home() / 'Videos')
+        self.dir = Path(self.config.get('Local Files', default=Path.home() / 'Videos'))
 
     def set_dir(self, path):
-        self.dir = path
+        self.dir = Path(path)
+
+    def find_episodes(self, name, directory=None):
+        """
+        Finds all episodes in the set directory that match the given name
+        Args:
+            name: Name of the show to find episodes for
+            directory: None for default directory, otherwise searches a subfolder
+
+        Returns:
+            episodes: A list of all episodes found
+        """
+        regex = self._build_regex(name)
+        if directory is None:
+            directory = self.dir
+        episodes = []
+        for path in directory.iterdir():
+            # check each file in the set directory
+            if regex.match(path.name.lower()):
+                if path.is_dir():
+                    # if a folder matches the regex, assume it contains the episodes for that show
+                    episodes = self.find_episodes(name, path)
+                    break
+                else:
+                    # otherwise just append it to the list
+                    episodes.append(path)
+            elif path.is_dir() and self.config.get('Search Subfolders', default=False):
+                # If folders are sorted differently, e.g. Ongoing/Winter 2018/Plan to Watch
+                episodes += self.find_episodes(name, path)
+
+        return episodes
+
+    def _build_regex(self, name):
+        pattern = '.*'
+        title = name.split(' ')
+        for word in title:
+            pattern += word.lower()
+            pattern += '.*'
+        return re.compile(pattern)
+
+
+test = FileManager(ene.config.Config())
+test.set_dir('/run/media/justin/HDD/weeb/')
+for episode in test.find_episodes('Tada kun'):
+    print(episode.name)
