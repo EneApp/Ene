@@ -65,9 +65,3 @@ class FileManager:
             pattern += word.lower()
             pattern += '.*'
         return re.compile(pattern)
-
-
-test = FileManager(ene.config.Config())
-test.set_dir('/run/media/justin/HDD/weeb/')
-for episode in test.find_episodes('Tada kun'):
-    print(episode.name)
