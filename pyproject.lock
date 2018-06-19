@@ -46,6 +46,17 @@ platform = "UNKNOWN"
 [package.requirements]
 platform = "win32"
 [[package]]
+name = "dataclasses"
+version = "0.6"
+description = "A backport of the dataclasses module for Python 3.6"
+category = "main"
+optional = false
+python-versions = "*"
+platform = "*"
+
+[package.requirements]
+python = "<3.7"
+[[package]]
 name = "flake8"
 version = "3.5.0"
 description = "the modular source code checker: pep8, pyflakes and co"
@@ -238,7 +249,7 @@ python = "<3.7"
 [metadata]
 python-versions = ">=3.6"
 platform = "*"
-content-hash = "594040c2dfe077e0e045c929d78a562f9f8cf8c2e185646b303cdc419ce176e8"
+content-hash = "87309f80339f8717713cacf1e00c23203bf36063b39546a0479887f2a759a2b5"
 
 [metadata.hashes]
 atomicwrites = [ "a24da68318b08ac9c9c45029f4a10371ab5b20e4226738e150e6e7c571630ae6", "240831ea22da9ab882b551b31d4225591e5e447a68c5e188db5b89ca1d487585",]
@@ -246,6 +257,7 @@ attrs = [ "4b90b09eeeb9b88c35bc642cbac057e45a5fd85367b985bd2809c62b7b939265", "e
 certifi = [ "9fa520c1bacfb634fa7af20a76bcbd3d5fb390481724c597da32c719a7dca4b0", "13e698f54293db9f89122b0581843a782ad0934a4fe0172d2a980ba77fc61bb7",]
 chardet = [ "fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691", "84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae",]
 colorama = [ "463f8483208e921368c9f306094eb6f725c6ca42b0f97e313cb5d5512459feda", "48eb22f4f8461b1df5734a074b57042430fb06e1d61bd1e11b078c0fe6d7a1f1",]
+dataclasses = [ "454a69d788c7fda44efd71e259be79577822f5e3f53f029a22d08004e951dc9f", "6988bd2b895eef432d562370bb707d540f32f7360ab13da45340101bc2307d84",]
 flake8 = [ "c7841163e2b576d435799169b78703ad6ac1bbb0f199994fc05f700b2a90ea37", "7253265f7abd8b313e3892944044a365e3f4ac3fcdcfb4298f55ee9ddf188ba0",]
 idna = [ "156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e", "684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16",]
 importlib-resources = [ "ba9acf2c7c84f29ccce2de61a77b25592fe0357e249f92e3c1333a9f9cccb8d6", "6a01fd2d5b90bd422783719e49528365db6739a1ee762ed8442868fbff80b2b3",]
