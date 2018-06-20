@@ -15,10 +15,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from fuzzywuzzy import fuzz
-from pathlib import Path
-from os import walk
 from collections import defaultdict
+from os import walk
+from pathlib import Path
+
+from fuzzywuzzy import fuzz
 
 
 class FileManager:
