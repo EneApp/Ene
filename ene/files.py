@@ -15,7 +15,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+from fuzzywuzzy import fuzz
 from pathlib import Path
+from os import walk
+from collections import defaultdict
 
 
 class FileManager:
@@ -56,6 +59,52 @@ class FileManager:
                 episodes += self.find_episodes(name, path)
 
         return episodes
+
+    def discover_episodes(self):
+        """
+        Search through a directory to find all files which have a close enough
+        name to be considered a part of the same series
+        Returns:
+            A dictionary with the series name as a key and a list of episodes
+            in that series
+        """
+        series = defaultdict(list)
+        for path, dirs, files in walk(self.dir):
+            for file in files:
+                matched = False
+                for show in series:
+                    if fuzz.token_set_ratio(show, file) > 80:
+                        series[show].append(path + file)
+                        matched = True
+                        break
+                if not matched:
+                    series[file].append(path + file)
+        series = self.clean_titles(series)
+        return series
+
+    def clean_titles(self, series):
+        """
+        Attempts to clean up the title in the series dictionary by comparing
+        the names of two files
+        Args:
+            series:
+                A dictionary with the series name as a key and a list of files
+        Returns:
+            A dictionary with a slightly more well formatted name
+        """
+        updated_titles = defaultdict(str)
+        for key, item in series.items():
+            # First iterate through the list to find title that can be updated
+            if len(item) > 1:
+                name = set(key.split(' '))
+                title = ' '.join([x for x in item[1].split() if x in name and not x.startswith('[')])
+                # title = ' '.join(intersect)
+                updated_titles[title] = key
+
+        for new, old in updated_titles.items():
+            # Then go through and replace the old with the new
+            series[new] = series.pop(old)
+        return series
 
     def _build_regex(self, name):
         pattern = '.*'

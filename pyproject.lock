@@ -66,9 +66,20 @@ python-versions = "*"
 platform = "*"
 
 [package.dependencies]
+enum34 = "*"
+configparser = "*"
 pyflakes = ">=1.5.0,<1.7.0"
 pycodestyle = ">=2.0.0,<2.4.0"
 mccabe = ">=0.6.0,<0.7.0"
+[[package]]
+name = "fuzzywuzzy"
+version = "0.16.0"
+description = "Fuzzy string matching in python"
+category = "main"
+optional = false
+python-versions = "*"
+platform = "*"
+
 [[package]]
 name = "idna"
 version = "2.7"
@@ -88,6 +99,8 @@ python-versions = ">=2.7,!=3.0,!=3.1,!=3.2,!=3.3"
 platform = "*"
 
 [package.dependencies]
+typing = "*"
+pathlib2 = "*"
 wheel = "*"
 setuptools = "*"
 [package.requirements]
@@ -159,6 +172,7 @@ platform = "unix"
 
 [package.dependencies]
 colorama = "*"
+funcsigs = "*"
 pluggy = ">=0.5,<0.7"
 atomicwrites = ">=1.0"
 more-itertools = ">=4.0.0"
@@ -198,15 +212,6 @@ certifi = ">=2017.4.17"
 urllib3 = ">=1.21.1,<1.24"
 idna = ">=2.5,<2.8"
 chardet = ">=3.0.2,<3.1.0"
-[[package]]
-name = "setuptools"
-version = "39.2.0"
-description = "Easily download, build, install, upgrade, and uninstall Python packages"
-category = "main"
-optional = false
-python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*"
-platform = "*"
-
 [[package]]
 name = "six"
 version = "1.11.0"
@@ -249,7 +254,7 @@ python = "<3.7"
 [metadata]
 python-versions = ">=3.6"
 platform = "*"
-content-hash = "87309f80339f8717713cacf1e00c23203bf36063b39546a0479887f2a759a2b5"
+content-hash = "632781ba3cb603c078034d83dcb628db0372a0785bdfae45c659f1d6ad6866b2"
 
 [metadata.hashes]
 atomicwrites = [ "a24da68318b08ac9c9c45029f4a10371ab5b20e4226738e150e6e7c571630ae6", "240831ea22da9ab882b551b31d4225591e5e447a68c5e188db5b89ca1d487585",]
@@ -259,6 +264,7 @@ chardet = [ "fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691", 
 colorama = [ "463f8483208e921368c9f306094eb6f725c6ca42b0f97e313cb5d5512459feda", "48eb22f4f8461b1df5734a074b57042430fb06e1d61bd1e11b078c0fe6d7a1f1",]
 dataclasses = [ "454a69d788c7fda44efd71e259be79577822f5e3f53f029a22d08004e951dc9f", "6988bd2b895eef432d562370bb707d540f32f7360ab13da45340101bc2307d84",]
 flake8 = [ "c7841163e2b576d435799169b78703ad6ac1bbb0f199994fc05f700b2a90ea37", "7253265f7abd8b313e3892944044a365e3f4ac3fcdcfb4298f55ee9ddf188ba0",]
+fuzzywuzzy = [ "ecf490216fb4d76b558a03042ff8f45a8782f17326caca1384d834cbaa2c7e6f", "d40c22d2744dff84885b30bbfc07fab7875f641d070374331777a4d1808b8d4e",]
 idna = [ "156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e", "684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16",]
 importlib-resources = [ "ba9acf2c7c84f29ccce2de61a77b25592fe0357e249f92e3c1333a9f9cccb8d6", "6a01fd2d5b90bd422783719e49528365db6739a1ee762ed8442868fbff80b2b3",]
 mccabe = [ "ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42", "dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f",]
@@ -271,7 +277,6 @@ pytest = [ "26838b2bc58620e01675485491504c3aa7ee0faf335c37fcd5f8731ca4319591", "
 python-mpv = [ "d9cd929ae2342ca4b91f7a9b4cee2b2768b4f7f4b988c831f99727c35f71ae6e",]
 python-vlc = [ "c51a1c553852a08bd92176de473e15bda7d507ff5ec58005b2a9de5ca8f593a5",]
 requests = [ "63b52e3c866428a224f97cab011de738c36aec0185aa91cfacd418b5d58911d1", "ec22d826a36ed72a7358ff3fe56cbd4ba69dd7a6718ffd450ff0e9df7a47ce6a",]
-setuptools = [ "8fca9275c89964f13da985c3656cb00ba029d7f3916b37990927ffdf264e7926", "f7cddbb5f5c640311eb00eab6e849f7701fa70bf6a183fc8a2c33dd1d1672fb2",]
 six = [ "832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb", "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9",]
 toml = [ "8e86bd6ce8cc11b9620cb637466453d94f5d57ad86f17e98a98d1f73e3baab2d",]
 urllib3 = [ "b5725a0bd4ba422ab0e66e89e030c806576753ea3ee08554382c14e685d117b5", "a68ac5e15e76e7e5dd2b8f94007233e01effe3e50e8daddf69acfd81cb686baf",]

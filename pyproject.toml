@@ -19,6 +19,7 @@ python-mpv = "^0.3.8"
 python-vlc = "^3.0"
 importlib_resources = { version = "^0.8.0", python = "<3.7" }
 dataclasses = { version = "^0.6.0", python = "<3.7" }
+fuzzywuzzy = "^0.16.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.5"
