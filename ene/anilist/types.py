@@ -20,14 +20,13 @@ from functools import lru_cache
 from time import time
 from typing import Optional
 
-from dataclasses import dataclass
-
 from ene.anilist.api import API
 from ene.anilist.enums import MediaType, MediaFormat, MediaStatus
 from ene.util import cache
 
 
 class Resource(metaclass=ABCMeta):
+    __slots__ = ('api', '_cache', '_timeout')
 
     def __init__(self, api, data=None):
         self.api = api
@@ -68,20 +67,71 @@ class Resource(metaclass=ABCMeta):
         return NotImplemented
 
 
-@dataclass(unsafe_hash=True, order=True)
 class MediaTitle:
-    romaji: str
-    english: str
-    native: str
-    userPreferred: str
-    __slots__ = ('romaji', 'english', 'native', 'userPreferred')
+    """The official titles of the media in various languages"""
+    __slots__ = ('media', '_cache', '_timeout')
+
+    def __init__(self, media):
+        self.media = media
+        self._cache = {}
+        self._timeout = {}
+
+    @cache
+    def _request_title(self, stylised: bool = True) -> dict:
+        return self.media._request("""\
+                title {
+                    romaji(stylised: %s)
+                    english(stylised: %s)
+                    native(stylised: %s)
+                    userPreferred
+                }""" % ((str(stylised).lower(),) * 3)).get('title', {})
+
+    def romaji(self, stylised: bool = True) -> Optional[str]:
+        """
+        The romanization of the native language title
+        Args:
+            stylised: Wether the title is stylised
+        """
+        return self._request_title(stylised).get('romaji')
+
+    def english(self, stylised: bool = True) -> Optional[str]:
+        """
+        The official english title
+        Args:
+            stylised: Wether the title is stylised
+        """
+        return self._request_title(stylised).get('english')
+
+    def native(self, stylised: bool = True) -> Optional[str]:
+        """
+        Official title in it's native language
+        Args:
+            stylised: Wether the title is stylised
+        """
+        return self._request_title(stylised).get('native')
+
+    @property
+    def userPreferred(self) -> Optional[str]:
+        """
+        The currently authenticated users preferred title language.
+        Default romaji for non-authenticated
+        """
+        return self._request_title().get('userPreferred')
 
 
 class Media(Resource):
+    __slots__ = ('_id', '_type', '_title')
+
     def __init__(self, id_: int, type_: MediaType, api: API, data=None):
-        self.id = id_
-        self.type = type_
+        self._id = id_
+        self._type = type_
+        self._title = MediaTitle(self)
         super().__init__(api, data)
+
+    @property
+    def id(self) -> int:
+        """ The id of the media"""
+        return self._id
 
     @property
     @cache
@@ -90,18 +140,14 @@ class Media(Resource):
         return self._request_scalar('idMal')
 
     @property
-    @cache
-    def title(self) -> Optional[MediaTitle]:
+    def title(self) -> MediaTitle:
         """The official titles of the media in various languages"""
-        res = self._request("""\
-                title {
-                    romaji
-                    english
-                    native
-                    userPreferred
-                }""").get('title')
-        if res:
-            return MediaTitle(**res)
+        return self._title
+
+    @property
+    def type(self) -> MediaType:
+        """The type of the media; anime or manga"""
+        return self._type
 
     @property
     @cache
