@@ -97,7 +97,7 @@ class FileManager:
             # First iterate through the list to find title that can be updated
             if len(item) > 1:
                 name = set(key.split(' '))
-                title = ' '.join([x for x in item[1].split() if x in name and not x.startswith('[')])
+                title = ' '.join(x for x in item[1].split() if x in name and not x.startswith('['))
                 # title = ' '.join(intersect)
                 updated_titles[title] = key
 
