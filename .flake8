@@ -14,6 +14,7 @@ exclude =
     pyside-setup,
     ene/graphql,
     ene/ui,
+    ene/lib,
 
 max-line-length = 99
 ignore = E402 E731

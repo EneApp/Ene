@@ -75,11 +75,11 @@ class FileManager:
                 matched = False
                 for show in series:
                     if fuzz.token_set_ratio(show, file) > 80:
-                        series[show].append(path + file)
+                        series[show].append(Path(path) / file)
                         matched = True
                         break
                 if not matched:
-                    series[file].append(path + file)
+                    series[file].append(Path(path) / file)
         series = self.clean_titles(series)
         return series
 
@@ -97,9 +97,16 @@ class FileManager:
         for key, item in series.items():
             # First iterate through the list to find title that can be updated
             if len(item) > 1:
-                name = set(key.split(' '))
-                title = ' '.join(x for x in item[1].split() if x in name and not x.startswith('['))
-                # title = ' '.join(intersect)
+                name_a = re.split(',|_| ', key)
+                name_b = re.split(',|_| ', item[1].name)
+
+                title = ' '.join(x for x in name_a if x in name_b)
+                if title == '':
+                    title = key
+                # pull out a few common things that should not be part of a title
+                title = re.sub('\[[^]]*\]', '', title)
+                title = re.sub('\..*$', '', title)
+
                 updated_titles[title] = key
 
         for new, old in updated_titles.items():
