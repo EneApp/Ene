@@ -83,7 +83,7 @@ class Resource(ABC):
 
     def _request(
             self,
-            fileds: List[Union[dict, str]],
+            fields: List[Union[dict, str]],
             params: Optional[dict] = None,
             variables: Optional[dict] = None
     ) -> dict:
@@ -98,7 +98,7 @@ class Resource(ABC):
         Returns:
             The response data
         """
-        query = self._build_query(fileds, params)
+        query = self._build_query(fields, params)
         res = self.api.query(query, variables)
         return res.get('data', {}).get(self.__class__.__name__, {})
 
