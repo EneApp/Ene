@@ -14,49 +14,122 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod, ABC
 from datetime import date
-from functools import lru_cache
 from time import time
-from typing import Optional
+from typing import Optional, Hashable, Type, List, Iterable, Union
 
 from ene.anilist.api import API
 from ene.anilist.enums import MediaType, MediaFormat, MediaStatus
-from ene.util import cache
+from ene.util import cache, strip_html
 
 
-class Resource(metaclass=ABCMeta):
-    __slots__ = ('api', '_cache', '_timeout')
+class Resource(ABC):
+    """
+    Base class for all requestable types from the anilist API
+    """
+    __slots__ = ('api', '_cache', '_timeout', '_base_query')
 
-    def __init__(self, api, data=None):
+    def __init__(self, api: API, base_query: str, data: Optional[dict] = None):
         self.api = api
+        self._base_query = base_query
         self._cache = data or {}
         self._timeout = {}
         now = time()
         for key in self._cache:
             self._timeout[key] = now
 
+    def _format_fields(self, fields: List[Union[dict, str]], padding: int = 8) -> Iterable[str]:
+        """
+        Convert request fields into GraphQL format
+        Args:
+            fields:
+                List of fields,
+                can be a str for simple field or dict for more complex fields
+            padding: Left padding of the output string
+        Yields:
+            Lines of text for the resulting string
+        """
+        spaces = padding * ' '
+        for field in fields:
+            if isinstance(field, str):
+                yield f'{spaces}{field}'
+                continue
+            args = field.get('args', '')
+            base = f'{spaces}{field["name"]}'
+            subfields = field.get('subfields')
+            if args:
+                base = f'{base} ({args})'
+            if subfields:
+                yield base + ' {'
+                yield from self._format_fields(subfields, padding + 4)
+                yield spaces + '}'
+            else:
+                yield base
+
+    def _build_query(self, fields: List[dict], params: Optional[dict] = None) -> str:
+        """
+        Build request query
+        Args:
+            params: Parameters used in the request in {name: type} format
+        Returns:
+            The request query
+        """
+        if params:
+            params = f'({", ".join(f"${name}: {type_}" for name, type_ in params.items())})'
+        else:
+            params = ''
+        return self._base_query % (params, '\n'.join(self._format_fields(fields)))
+
+    def _request(
+            self,
+            fileds: List[Union[dict, str]],
+            params: Optional[dict] = None,
+            variables: Optional[dict] = None
+    ) -> dict:
+        """
+        Make a request
+        Args:
+            fields:
+                List of fields,
+                can be a str for simple field or dict for more complex fields
+            params: Parameters used in the request in {name: type} format
+            variables: variables for the query
+        Returns:
+            The response data
+        """
+        query = self._build_query(fileds, params)
+        res = self.api.query(query, variables)
+        return res.get('data', {}).get(self.__class__.__name__, {})
+
+    def _request_scalar(self, name: str):
+        """
+        Request a single scalar value
+        Args:
+            name: Name of the salar
+        Returns:
+            The value requested
+        """
+        return self._request([name]).get(name)
+
+    def _request_enum(self, enum_type: Type, name: str):
+        """
+        Request an enum value
+        Args:
+            enum_type: The type of the enum
+            name: The name of the field
+        Returns:
+            The enum value requested
+        """
+        res = self._request_scalar(name)
+        if res:
+            return getattr(enum_type, res)
+
     @property
     @abstractmethod
-    def _key(self):
+    def _key(self) -> Hashable:
+        """The key should uniquely identify the instance of a ``Resource``"""
         raise NotImplementedError()
-
-    @abstractmethod
-    def _build_query(self, format):
-        raise NotImplementedError()
-
-    def _request(self, format, variables=None):
-        query = self._build_query(format)
-        res = self.api.query(query, variables)
-        return res['data'][self.__class__.__name__]
-
-    def _request_scalar(self, name):
-        return self._request(' ' * 16 + name).get(name)
-
-    def _request_enum(self, cls, name):
-        res = self._request(' ' * 16 + name).get(name)
-        if res:
-            return getattr(cls, res)
 
     def __hash__(self):
         return hash(self._key)
@@ -78,13 +151,23 @@ class MediaTitle:
 
     @cache
     def _request_title(self, stylised: bool = True) -> dict:
-        return self.media._request("""\
-                title {
-                    romaji(stylised: %s)
-                    english(stylised: %s)
-                    native(stylised: %s)
-                    userPreferred
-                }""" % ((str(stylised).lower(),) * 3)).get('title', {})
+        """
+        Request title information
+        Args:
+            stylised: Wether the title is stylised
+        Returns:
+            Titles of the media in all languages
+        """
+        args = 'stylised: $stylised'
+        return self.media._request(
+            [{'name': 'title', 'subfields':
+                [{'name': 'romaji', 'args': args},
+                 {'name': 'english', 'args': args},
+                 {'name': 'native', 'args': args},
+                 'userPreferred']
+              }],
+            {'stylised': 'Boolean'}, {'stylised': stylised}
+        ).get('title', {})
 
     def romaji(self, stylised: bool = True) -> Optional[str]:
         """
@@ -126,7 +209,13 @@ class Media(Resource):
         self._id = id_
         self._type = type_
         self._title = MediaTitle(self)
-        super().__init__(api, data)
+        base_query = """\
+query %s {
+    Media (id: $id, type: $type) {
+%s
+    }
+}"""
+        super().__init__(api, base_query, data)
 
     @property
     def id(self) -> int:
@@ -169,19 +258,23 @@ class Media(Resource):
             asHtml:
                 Return the string in pre-parsed html instead of markdown
         """
-        name = 'description'
-        return self._request(f'{" " * 16}{name}(asHtml: {str(asHtml).lower()})').get(name)
+        res = self._request(
+            [{'name': 'description', 'args': 'asHtml: $asHtml'}],
+            {'asHtml': 'Boolean'},
+            {'asHtml': asHtml}
+        ).get('description')
+        if res and asHtml:
+            return res
+        elif res:
+            return strip_html(res)
 
     @property
     @cache
     def startDate(self) -> Optional[date]:
         """The first official release date of the media"""
-        res = self._request("""\
-                startDate {
-                    year
-                    month
-                    day
-                }""").get('startDate')
+        res = self._request(
+            [{'name': 'startDate', 'subfields': ['year', 'month', 'day']}]
+        ).get('startDate')
         if res:
             return date(**res)
 
@@ -189,12 +282,9 @@ class Media(Resource):
     @cache
     def endDate(self) -> Optional[date]:
         """The last official release date of the media"""
-        res = self._request("""\
-                endDate {
-                    year
-                    month
-                    day
-                }""").get('endDate')
+        res = self._request(
+            [{'name': 'endDate', 'subfields': ['year', 'month', 'day']}]
+        ).get('endDate')
         if res:
             return date(**res)
 
@@ -202,15 +292,16 @@ class Media(Resource):
     def _key(self):
         return (self.id, self.type)
 
-    @lru_cache(None)
-    def _build_query(self, format):
-        return """\
-        query {
-            Media (id: %d, type: %s) {
-%s
-            }
-        }""" % (self.id, self.type.name, format)
-
-
-if __name__ == '__main__':
-    m = Media(15125, MediaType.ANIME, API())
+    def _request(
+            self,
+            fields: List[Union[dict, str]],
+            params: Optional[dict] = None,
+            variables: Optional[dict] = None
+    ) -> dict:
+        params = params or {}
+        params['id'] = 'Int'
+        params['type'] = 'MediaType'
+        variables = variables or {}
+        variables['type'] = self.type.name
+        variables['id'] = self.id
+        return super()._request(fields, params, variables)
