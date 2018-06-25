@@ -23,6 +23,10 @@ from ene.anilist.api import API
 from ene.anilist.enums import MediaType, MediaFormat, MediaStatus
 from ene.util import cache, strip_html
 
+Field = Union[str, dict]
+Fields = List[Field]
+Opt = Optional
+
 
 class Resource(ABC):
     """
@@ -30,7 +34,7 @@ class Resource(ABC):
     """
     __slots__ = ('api', '_cache', '_timeout', '_base_query')
 
-    def __init__(self, api: API, base_query: str, data: Optional[dict] = None):
+    def __init__(self, api: API, base_query: str, data: Opt[dict] = None):
         self.api = api
         self._base_query = base_query
         self._cache = data or {}
@@ -39,7 +43,7 @@ class Resource(ABC):
         for key in self._cache:
             self._timeout[key] = now
 
-    def _format_fields(self, fields: List[Union[dict, str]], padding: int = 8) -> Iterable[str]:
+    def _format_fields(self, fields: Fields, padding: int = 8) -> Iterable[str]:
         """
         Convert request fields into GraphQL format
         Args:
@@ -67,7 +71,7 @@ class Resource(ABC):
             else:
                 yield base
 
-    def _build_query(self, fields: List[dict], params: Optional[dict] = None) -> str:
+    def _build_query(self, fields: Fields, params: Opt[dict] = None) -> str:
         """
         Build request query
         Args:
@@ -83,9 +87,9 @@ class Resource(ABC):
 
     def _request(
             self,
-            fields: List[Union[dict, str]],
-            params: Optional[dict] = None,
-            variables: Optional[dict] = None
+            fields: Fields,
+            params: Opt[dict] = None,
+            variables: Opt[dict] = None
     ) -> dict:
         """
         Make a request
@@ -169,7 +173,7 @@ class MediaTitle:
             {'stylised': 'Boolean'}, {'stylised': stylised}
         ).get('title', {})
 
-    def romaji(self, stylised: bool = True) -> Optional[str]:
+    def romaji(self, stylised: bool = True) -> Opt[str]:
         """
         The romanization of the native language title
         Args:
@@ -177,7 +181,7 @@ class MediaTitle:
         """
         return self._request_title(stylised).get('romaji')
 
-    def english(self, stylised: bool = True) -> Optional[str]:
+    def english(self, stylised: bool = True) -> Opt[str]:
         """
         The official english title
         Args:
@@ -185,7 +189,7 @@ class MediaTitle:
         """
         return self._request_title(stylised).get('english')
 
-    def native(self, stylised: bool = True) -> Optional[str]:
+    def native(self, stylised: bool = True) -> Opt[str]:
         """
         Official title in it's native language
         Args:
@@ -194,7 +198,7 @@ class MediaTitle:
         return self._request_title(stylised).get('native')
 
     @property
-    def userPreferred(self) -> Optional[str]:
+    def userPreferred(self) -> Opt[str]:
         """
         The currently authenticated users preferred title language.
         Default romaji for non-authenticated
@@ -224,7 +228,7 @@ query %s {
 
     @property
     @cache
-    def idMal(self) -> Optional[int]:
+    def idMal(self) -> Opt[int]:
         """The mal id of the media"""
         return self._request_scalar('idMal')
 
@@ -240,18 +244,18 @@ query %s {
 
     @property
     @cache
-    def format(self) -> Optional[MediaFormat]:
+    def format(self) -> Opt[MediaFormat]:
         """The format the media was released in"""
         return self._request_enum(MediaFormat, 'format')
 
     @property
     @cache
-    def status(self) -> Optional[MediaStatus]:
+    def status(self) -> Opt[MediaStatus]:
         """The current releasing status of the media"""
         return self._request_enum(MediaStatus, 'status')
 
     @cache
-    def description(self, asHtml: bool = False) -> Optional[str]:
+    def description(self, asHtml: bool = False) -> Opt[str]:
         """
         Short description of the media's story and characters
         Args:
@@ -270,7 +274,7 @@ query %s {
 
     @property
     @cache
-    def startDate(self) -> Optional[date]:
+    def startDate(self) -> Opt[date]:
         """The first official release date of the media"""
         res = self._request(
             [{'name': 'startDate', 'subfields': ['year', 'month', 'day']}]
@@ -280,7 +284,7 @@ query %s {
 
     @property
     @cache
-    def endDate(self) -> Optional[date]:
+    def endDate(self) -> Opt[date]:
         """The last official release date of the media"""
         res = self._request(
             [{'name': 'endDate', 'subfields': ['year', 'month', 'day']}]
@@ -294,9 +298,9 @@ query %s {
 
     def _request(
             self,
-            fields: List[Union[dict, str]],
-            params: Optional[dict] = None,
-            variables: Optional[dict] = None
+            fields: Fields,
+            params: Opt[dict] = None,
+            variables: Opt[dict] = None
     ) -> dict:
         params = params or {}
         params['id'] = 'Int'
