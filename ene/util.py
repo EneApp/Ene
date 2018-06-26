@@ -43,7 +43,7 @@ def cache(func=None, *, timeout: Optional[int] = None) -> Callable:
         timeout: Timeout in seconds for the result to expire
 
     Returns:
-        Wrapped function
+        Wrapped method
     """
     if not func:
         return partial(cache, timeout=timeout)
@@ -66,3 +66,20 @@ def cache(func=None, *, timeout: Optional[int] = None) -> Callable:
         return res
 
     return wrapper
+
+
+def cached_property(func=None, *, timeout: Optional[int] = None):
+    """
+    Decorator to cache a property.
+
+    Class must have a ``_cache`` and a ``_timeout`` attribute
+    Args:
+        func: Function decorated
+        timeout: Timeout in seconds for the result to expire
+
+    Returns:
+        Wrapped property
+    """
+    if not func:
+        return partial(cached_property, timeout=timeout)
+    return property(cache(func=func, timeout=timeout))

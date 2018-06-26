@@ -21,7 +21,7 @@ from typing import Optional, Hashable, Type, List, Iterable, Union
 
 from ene.anilist.api import API
 from ene.anilist.enums import MediaType, MediaFormat, MediaStatus
-from ene.util import cache, strip_html
+from ene.util import cache, strip_html, cached_property
 
 Field = Union[str, dict]
 Fields = List[Field]
@@ -226,8 +226,7 @@ query %s {
         """ The id of the media"""
         return self._id
 
-    @property
-    @cache
+    @cached_property
     def idMal(self) -> Opt[int]:
         """The mal id of the media"""
         return self._request_scalar('idMal')
@@ -242,14 +241,12 @@ query %s {
         """The type of the media; anime or manga"""
         return self._type
 
-    @property
-    @cache
+    @cached_property
     def format(self) -> Opt[MediaFormat]:
         """The format the media was released in"""
         return self._request_enum(MediaFormat, 'format')
 
-    @property
-    @cache
+    @cached_property
     def status(self) -> Opt[MediaStatus]:
         """The current releasing status of the media"""
         return self._request_enum(MediaStatus, 'status')
@@ -272,8 +269,7 @@ query %s {
         elif res:
             return strip_html(res)
 
-    @property
-    @cache
+    @cached_property
     def startDate(self) -> Opt[date]:
         """The first official release date of the media"""
         res = self._request(
@@ -282,8 +278,7 @@ query %s {
         if res:
             return date(**res)
 
-    @property
-    @cache
+    @cached_property
     def endDate(self) -> Opt[date]:
         """The last official release date of the media"""
         res = self._request(
