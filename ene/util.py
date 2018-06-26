@@ -33,7 +33,7 @@ def strip_html(s: str) -> str:
     return re.sub('<[^<]+?>', '', s)
 
 
-def cache(func=None, *, timeout: Optional[int] = None) -> Callable:
+def cache(func=None, *, timeout: Optional[int] = 300) -> Callable:
     """
     Decorator to cache a method.
 
@@ -68,7 +68,7 @@ def cache(func=None, *, timeout: Optional[int] = None) -> Callable:
     return wrapper
 
 
-def cached_property(func=None, *, timeout: Optional[int] = None):
+def cached_property(func=None, *, timeout: Optional[int] = 300):
     """
     Decorator to cache a property.
 

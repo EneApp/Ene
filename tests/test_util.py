@@ -31,7 +31,7 @@ class Dummy:
     def foo(self):
         return 'foo'
 
-    @cache
+    @cache(timeout=None)
     def bar(self):
         return 'bar'
 
