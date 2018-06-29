@@ -10,7 +10,7 @@ version = "1.1.5"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "dev"
@@ -24,7 +24,7 @@ version = "18.1.0"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "main"
@@ -35,6 +35,11 @@ platform = "*"
 python-versions = "*"
 version = "2018.4.16"
 
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
+
 [[package]]
 category = "main"
 description = "Universal encoding detector for Python 2 and 3"
@@ -44,17 +49,27 @@ platform = "*"
 python-versions = "*"
 version = "3.0.4"
 
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
+
 [[package]]
 category = "dev"
 description = "Cross-platform colored terminal text."
 name = "colorama"
 optional = false
-platform = "UNKNOWN"
+platform = "*"
 python-versions = "*"
 version = "0.3.9"
 
 [package.requirements]
 platform = "win32"
+
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "main"
@@ -67,6 +82,11 @@ version = "0.6"
 
 [package.requirements]
 python = "<3.7"
+
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "dev"
@@ -85,7 +105,7 @@ pyflakes = ">=1.5.0,<1.7.0"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "main"
@@ -96,6 +116,11 @@ platform = "*"
 python-versions = "*"
 version = "0.16.0"
 
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
+
 [[package]]
 category = "main"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -105,13 +130,18 @@ platform = "*"
 python-versions = "*"
 version = "2.7"
 
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
+
 [[package]]
 category = "main"
 description = "Read resources from Python packages"
 name = "importlib-resources"
 optional = false
 platform = "*"
-python-versions = ">=2.7,!=3.0,!=3.1,!=3.2,!=3.3"
+python-versions = "*"
 version = "0.8"
 
 [package.dependencies]
@@ -120,6 +150,11 @@ wheel = "*"
 
 [package.requirements]
 python = "<3.7"
+
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "dev"
@@ -133,7 +168,7 @@ version = "0.6.1"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "dev"
@@ -150,7 +185,7 @@ six = ">=1.0.0,<2.0.0"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "dev"
@@ -164,16 +199,21 @@ version = "0.6.0"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "dev"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
 name = "py"
 optional = false
-platform = "unix"
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+platform = "*"
+python-versions = "*"
 version = "1.5.4"
+
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "dev"
@@ -187,7 +227,7 @@ version = "2.3.1"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "dev"
@@ -201,7 +241,7 @@ version = "1.6.0"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "main"
@@ -222,8 +262,8 @@ category = "dev"
 description = "pytest: simple powerful testing with Python"
 name = "pytest"
 optional = false
-platform = "unix"
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+platform = "*"
+python-versions = "*"
 version = "3.6.2"
 
 [package.dependencies]
@@ -239,6 +279,11 @@ six = ">=1.10.0"
 platform = "win32"
 version = "*"
 
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
+
 [[package]]
 category = "main"
 description = "A python interface to the mpv media player"
@@ -251,7 +296,7 @@ version = "0.3.8"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "main"
@@ -261,6 +306,11 @@ optional = false
 platform = "*"
 python-versions = "*"
 version = "3.0.102"
+
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "main"
@@ -280,7 +330,7 @@ urllib3 = ">=1.21.1,<1.24"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "dev"
@@ -294,7 +344,7 @@ version = "1.11.0"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "main"
@@ -308,7 +358,7 @@ version = "0.9.4"
 [package.source]
 reference = ""
 type = "legacy"
-url = "https://pypi.org"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "main"
@@ -316,8 +366,13 @@ description = "HTTP library with thread-safe connection pooling, file post, and 
 name = "urllib3"
 optional = false
 platform = "*"
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
+python-versions = "*"
 version = "1.23"
+
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
 
 [[package]]
 category = "main"
@@ -325,14 +380,19 @@ description = "A built-package format for Python."
 name = "wheel"
 optional = false
 platform = "*"
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = "*"
 version = "0.31.1"
 
 [package.requirements]
 python = "<3.7"
 
+[package.source]
+reference = ""
+type = "legacy"
+url = "https://pypi.org/simple"
+
 [metadata]
-content-hash = "c820047e13b09e79f717ad8152c603f8647dbc7bfe5a92979c39d6808b7c6d8c"
+content-hash = "7851627aee51c1c023370af7933b474d26f15754e68480fd30701e892c6c41d7"
 platform = "*"
 python-versions = ">=3.6"
 

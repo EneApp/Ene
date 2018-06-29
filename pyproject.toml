@@ -13,7 +13,7 @@ classifiers = [
 
 [[tool.poetry.source]]
 name = 'default'
-url = 'https://pypi.org'
+url = 'https://pypi.org/simple'
 
 [[tool.poetry.source]]
 name = 'qt'
