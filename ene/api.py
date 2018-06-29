@@ -19,8 +19,8 @@ from typing import Iterable, List, Optional
 from requests import HTTPError, post
 
 import ene.graphql
-from ene.anilist.auth import OAuth
-from ene.anilist.enums import MediaSeason, MediaSort
+from auth import OAuth
+from enums import MediaSeason, MediaSort
 from ene.constants import IS_37, CLIENT_ID, GRAPHQL_URL
 from ene.errors import APIError
 
