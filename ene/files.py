@@ -97,15 +97,15 @@ class FileManager:
         for key, item in series.items():
             # First iterate through the list to find title that can be updated
             if len(item) > 1:
-                name_a = re.split(',|_| ', key)
-                name_b = re.split(',|_| ', item[1].name)
+                name_a = re.split(r'[,_\s]', key)
+                name_b = re.split(r'[,_\s]', item[1].name)
 
                 title = ' '.join(x for x in name_a if x in name_b)
                 if title == '':
                     title = key
                 # pull out a few common things that should not be part of a title
-                title = re.sub('\[[^]]*\]', '', title)
-                title = re.sub('\..*$', '', title)
+                title = re.sub(r'\[[^]]*\]', '', title)
+                title = re.sub(r'\..*$', '', title)
 
                 updated_titles[title] = key
 
