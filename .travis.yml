@@ -3,7 +3,7 @@ cache: pip
 
 python:
   - "3.6"
-  - "3.7"
+  - "3.7-dev"
 
 before_install:
   - sudo apt install qt5-default -y
