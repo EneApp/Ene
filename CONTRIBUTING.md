@@ -30,13 +30,6 @@ source ene/bin/activate
 poetry install
 ```
 
-4. Install PySide2 (Detailed instructions: https://wiki.qt.io/Qt_for_Python/GettingStarted)
-
-```bash
-pip install --index-url=http://download.qt.io/snapshots/ci/pyside/5.11/latest/ pyside2 --trusted-host download.qt.io
-```
-
-
 # Coding Style
 
 All code (including tests) must pass `flake8` check.

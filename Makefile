@@ -1,9 +1,8 @@
 .PHONY: ci_setup
 ci_setup:
 	pip install -U pip
-	pip install poetry
+	pip install -U poetry
 	poetry install
-	pip install --index-url=http://download.qt.io/snapshots/ci/pyside/5.11/latest/ pyside2 --trusted-host download.qt.io
 
 .PHONY: lint
 lint: ; flake8
