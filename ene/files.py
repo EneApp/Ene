@@ -21,7 +21,6 @@ from pathlib import Path
 
 from fuzzywuzzy import fuzz
 
-
 class FileManager:
 
     def __init__(self, cfg):
@@ -74,7 +73,7 @@ class FileManager:
             for file in files:
                 matched = False
                 for show in series:
-                    if fuzz.token_set_ratio(show, file) > 80:
+                    if fuzz.token_set_ratio(show, file) > 90:
                         series[show].append(Path(path) / file)
                         matched = True
                         break
@@ -97,21 +96,28 @@ class FileManager:
         for key, item in series.items():
             # First iterate through the list to find title that can be updated
             if len(item) > 1:
+                # Split both names on commas, underscores and whitespace
                 name_a = re.split(r'[,_\s]', key)
                 name_b = re.split(r'[,_\s]', item[1].name)
 
                 title = ' '.join(x for x in name_a if x in name_b)
-                if title == '':
-                    title = key
-                # pull out a few common things that should not be part of a title
-                title = re.sub(r'\[[^]]*\]', '', title)
-                title = re.sub(r'\..*$', '', title)
+            else:
+                # When we can't compare to a similar title, just remove the same as above
+                title = re.sub(r'[,_\s]', ' ', key)
+            # pull out a few common things that should not be part of a title
+            # Adding detailed comments because coming back to regex after a break is confusing
+            title = re.sub(r'\[[^]]*\]', '', title)  # Removes things between square brackets
+            title = re.sub(r'\..*$', '', title)  # Removes file extensions
+            title = re.sub(r'-\s[0-9v]*\s*$', '', title)  # Removes trailing episode numbers
 
-                updated_titles[title] = key
+            if title == '':
+                title = key
 
-        for new, old in updated_titles.items():
+            updated_titles[key] = title
+
+        for old, new in updated_titles.items():
             # Then go through and replace the old with the new
-            series[new] = series.pop(old)
+            series[new].extend(series.pop(old))
         return series
 
     def _build_regex(self, name):
