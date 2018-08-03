@@ -21,6 +21,7 @@ from pathlib import Path
 
 from fuzzywuzzy import fuzz
 
+
 class FileManager:
 
     def __init__(self, cfg):
