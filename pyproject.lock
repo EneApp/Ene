@@ -196,6 +196,18 @@ version = "*"
 
 [[package]]
 category = "main"
+description = "Python extension for computing string edit distances and similarities."
+name = "python-levenshtein"
+optional = false
+platform = "UNKNOWN"
+python-versions = "*"
+version = "0.12.0"
+
+[package.dependencies]
+setuptools = "*"
+
+[[package]]
+category = "main"
 description = "A python interface to the mpv media player"
 name = "python-mpv"
 optional = false
@@ -267,7 +279,7 @@ version = "0.31.1"
 python = "<3.7"
 
 [metadata]
-content-hash = "aa518be8372059c0df79c80d3a70ead1744f50e8280f7d9b92468fe43c5a0ade"
+content-hash = "aa1d3004b16885849a047953c1f6b26c47a2679ca289b71a7f6aa2b7e1a8a9eb"
 platform = "*"
 python-versions = "^3.6"
 
@@ -290,6 +302,7 @@ pycodestyle = ["682256a5b318149ca0d2a9185d365d8864a768a28db66a84a2ea946bcc426766
 pyflakes = ["08bd6a50edf8cffa9fa09a463063c425ecaaf10d1eb0335a7e8b1401aef89e6f", "8d616a382f243dbf19b54743f280b80198be0bca3a5396f1d2e1fca6223e8805"]
 pyside2 = ["09914eadc2e4f8834aa1937ed1abb58aeac6c7338be8ee7fafb180e19a6ef5ff", "41669d9b0326683144ff1b50893b57157b8fa9b53e0abef8034954e54cdca6d6", "729d36501166ad7a2129291b4a929e9e0eb3a60f338fb7c7b689ea91559b6235", "c3c3adec613acb187f2bb1ee91858c7b1a6048289958e657088e35d51c8f55b0", "d5e29aeef62e36fb0268a0567c39c4530b6c03466c9fd19492297245d74834d5", "dfcc4ccbf77429e7a831bd5ced06e35e046d9007694533a0f38f96f06449787d"]
 pytest = ["86a8dbf407e437351cef4dba46736e9c5a6e3c3ac71b2e942209748e76ff2086", "e74466e97ac14582a8188ff4c53e6cc3810315f342f6096899332ae864c1d432"]
+python-levenshtein = ["033a11de5e3d19ea25c9302d11224e1a1898fe5abd23c61c7c360c25195e3eb1"]
 python-mpv = ["13dbbbcbd996afda37163cae6d4cbad0ef510188e467b16bc50aadc2a2cbdd52"]
 python-vlc = ["c51a1c553852a08bd92176de473e15bda7d507ff5ec58005b2a9de5ca8f593a5"]
 requests = ["63b52e3c866428a224f97cab011de738c36aec0185aa91cfacd418b5d58911d1", "ec22d826a36ed72a7358ff3fe56cbd4ba69dd7a6718ffd450ff0e9df7a47ce6a"]
