@@ -21,12 +21,12 @@ from typing import Optional
 from webbrowser import open
 
 from PySide2 import QtUiTools
-from PySide2.QtCore import Qt, QFile
-from PySide2.QtWidgets import QApplication, QAction, QMainWindow, QWidget, QFileDialog
+from PySide2.QtCore import QFile, Qt
+from PySide2.QtWidgets import QAction, QApplication, QFileDialog, QMainWindow, QWidget
 
 import ene.ui
 from ene.config import Config
-from ene.constants import IS_WIN, IS_37, APP_NAME
+from ene.constants import APP_NAME, IS_37, IS_WIN
 
 if IS_37:
     from importlib.resources import path
