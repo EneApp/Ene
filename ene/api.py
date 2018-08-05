@@ -173,7 +173,7 @@ class API:
         category
         isAdult
         isGeneralSpoiler
-        isMediaSpoiler    
+        isMediaSpoiler
     }
 }"""
         res = self.query(query)

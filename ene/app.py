@@ -24,8 +24,10 @@ from PySide2.QtCore import QFile, Qt
 from PySide2.QtWidgets import QAction, QApplication, QFileDialog, QMainWindow, QWidget
 
 import ene.ui
+from ene.api import API
 from ene.config import Config
 from ene.constants import APP_NAME, IS_37, IS_WIN
+from ene.util import open_source_code
 
 if IS_37:
     from importlib.resources import path
@@ -81,6 +83,7 @@ class MainForm(QMainWindow):
         """
         super().__init__()
         self.config = Config()
+        self.api = API()
         self.setWindowTitle(APP_NAME)
 
         with path(ene.ui, 'ene.ui') as p:
@@ -102,7 +105,7 @@ class MainForm(QMainWindow):
         self.act_open_folder = self.main_window.findChild(QAction, '﻿action_open_folder')
         self.act_open_folder.triggered.connect(self.choose_dir)
         self.act_source_code = self.main_window.findChild(QAction, '﻿action_source_code')
-        self.act_source_code.triggered.connect(self.open_source_code)
+        self.act_source_code.triggered.connect(open_source_code)
 
     def choose_dir(self) -> Path:
         """
