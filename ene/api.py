@@ -19,9 +19,9 @@ from typing import Iterable, List, Optional
 from requests import HTTPError, post
 
 import ene.graphql
-from auth import OAuth
-from enums import MediaSeason, MediaSort
-from ene.constants import IS_37, CLIENT_ID, GRAPHQL_URL
+from ene.auth import OAuth
+from ene.constants import CLIENT_ID, GRAPHQL_URL, IS_37
+from ene.enums import MediaSeason, MediaSort
 from ene.errors import APIError
 
 if IS_37:
@@ -148,3 +148,33 @@ class API:
         for page in self.query_pages(self.queries['season.graphql'], per_page, variables):
             for anime in page['data']['Page']['media']:
                 yield anime
+
+    def get_genres(self) -> List[str]:
+        """
+        Get all genres
+        Returns:
+            List of genres
+        """
+        query = '{GenreCollection}'
+        res = self.query(query)
+        return res['data']['GenreCollection']
+
+    def get_tags(self) -> List[dict]:
+        """
+        Get all tags
+        Returns:
+            List of tags
+        """
+        query = """\
+{
+    MediaTagCollection {
+        id
+        name
+        category
+        isAdult
+        isGeneralSpoiler
+        isMediaSpoiler    
+    }
+}"""
+        res = self.query(query)
+        return res['data']['MediaTagCollection']
