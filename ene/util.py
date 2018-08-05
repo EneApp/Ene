@@ -15,9 +15,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import webbrowser
 from functools import lru_cache, partial, wraps
 from time import time
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 
 @lru_cache(None)
@@ -83,3 +84,7 @@ def cached_property(func=None, *, timeout: Optional[int] = None):
     if not func:
         return partial(cached_property, timeout=timeout)
     return property(cache(func=func, timeout=timeout))
+
+
+def open_source_code():
+    webbrowser.open('https://github.com/MaT1g3R/ene/')

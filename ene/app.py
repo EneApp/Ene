@@ -18,7 +18,6 @@ import sys
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
-from webbrowser import open
 
 from PySide2 import QtUiTools
 from PySide2.QtCore import QFile, Qt
@@ -117,9 +116,6 @@ class MainForm(QMainWindow):
         dir_ = QFileDialog.getExistingDirectory(*args)
         # TODO do something with this
         return Path(dir_)
-
-    def open_source_code(self):
-        open('https://github.com/MaT1g3R/ene/')
 
     @classmethod
     def launch(cls):
