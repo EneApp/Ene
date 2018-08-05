@@ -17,7 +17,7 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>10</y>
       <width>1421</width>
       <height>831</height>
@@ -354,6 +354,41 @@
         <string>Streaming On</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>Crunchyroll</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Funimation</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Netflix</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Amazon</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Hidive</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Hulu</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Animelab</string>
+       </property>
+      </item>
      </widget>
      <widget class="QComboBox" name="genre_combobox">
       <property name="geometry">
@@ -387,7 +422,7 @@
      <x>0</x>
      <y>0</y>
      <width>1440</width>
-     <height>22</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
