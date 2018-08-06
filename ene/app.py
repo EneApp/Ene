@@ -21,7 +21,8 @@ from typing import Optional
 
 from PySide2 import QtUiTools
 from PySide2.QtCore import QFile, Qt
-from PySide2.QtWidgets import QAction, QApplication, QFileDialog, QMainWindow, QWidget
+from PySide2.QtWidgets import (QAction, QApplication, QComboBox, QFileDialog, QMainWindow, QSlider,
+                               QTabWidget, QToolButton, QWidget)
 
 import ene.ui
 from ene.api import API
@@ -77,6 +78,21 @@ class MainForm(QMainWindow):
     Main form of the application
     """
 
+    action_prefences: QAction
+    action_open_folder: QAction
+    action_source_code: QAction
+    widget_tab: QTabWidget
+
+    combobox_season: QComboBox
+    combobox_sort: QComboBox
+    combobox_format: QComboBox
+    combobox_status: QComboBox
+    combobox_streaming: QComboBox
+    combobox_genre_tag: QComboBox
+
+    slider_year: QSlider
+    button_sort_order: QToolButton
+
     def __init__(self):
         """
         Initialize the ui files for the application
@@ -93,19 +109,40 @@ class MainForm(QMainWindow):
 
         self.main_window.setWindowTitle(APP_NAME)
         self.prefences_window.setWindowTitle('Preferences')
+
         self.setup_children()
+
+    def _set_child(self, name: str, where: QWidget):
+        typ = self.__annotations__[name]
+        child = where.findChild(typ, name)
+        if not child:
+            raise RuntimeError(f'Could not find child "{name}" in {where.windowTitle()}')
+        setattr(self, name, child)
 
     def setup_children(self):
         """
         Setup all the child widgets of the main window
         """
-        self.act_prefences = self.main_window.findChild(QAction, '﻿action_prefences')
-        assert self.act_prefences
-        self.act_prefences.triggered.connect(self.prefences_window.show)
-        self.act_open_folder = self.main_window.findChild(QAction, '﻿action_open_folder')
-        self.act_open_folder.triggered.connect(self.choose_dir)
-        self.act_source_code = self.main_window.findChild(QAction, '﻿action_source_code')
-        self.act_source_code.triggered.connect(open_source_code)
+        self._set_child('action_prefences', self.main_window)
+        self.action_prefences.triggered.connect(self.prefences_window.show)
+
+        self._set_child('action_open_folder', self.main_window)
+        self.action_open_folder.triggered.connect(self.choose_dir)
+
+        self._set_child('action_source_code', self.main_window)
+        self.action_source_code.triggered.connect(open_source_code)
+
+        self._set_child('widget_tab', self.main_window)
+
+        self._set_child('combobox_season', self.widget_tab)
+        self._set_child('combobox_sort', self.widget_tab)
+        self._set_child('combobox_format', self.widget_tab)
+        self._set_child('combobox_status', self.widget_tab)
+        self._set_child('combobox_streaming', self.widget_tab)
+        self._set_child('combobox_genre_tag', self.widget_tab)
+
+        self._set_child('slider_year', self.widget_tab)
+        self._set_child('button_sort_order', self.widget_tab)
 
     def choose_dir(self) -> Path:
         """
