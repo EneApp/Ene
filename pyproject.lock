@@ -279,7 +279,7 @@ version = "0.31.1"
 python = "<3.7"
 
 [metadata]
-content-hash = "aa1d3004b16885849a047953c1f6b26c47a2679ca289b71a7f6aa2b7e1a8a9eb"
+content-hash = "a9e6f22d056576f2b09ea2f6011054d4ad927dd61f74003045c174a4e4d06ee7"
 platform = "*"
 python-versions = "^3.6"
 

@@ -27,12 +27,15 @@ from PySide2.QtWidgets import (
     QApplication,
     QComboBox,
     QFileDialog,
+    QFrame,
     QMainWindow,
+    QPushButton,
     QSlider,
     QStyleOptionViewItem,
     QStyledItemDelegate,
     QTabWidget,
     QToolButton,
+    QTreeView,
     QWidget
 )
 
@@ -104,6 +107,11 @@ class MainForm(QMainWindow):
     action_source_code: QAction
     widget_tab: QTabWidget
 
+    settings_list: QTreeView
+    settings_frame: QFrame
+    button_cancel: QPushButton
+    button_OK: QPushButton
+
     combobox_season: QComboBox
     combobox_sort: QComboBox
     combobox_format: QComboBox
@@ -161,6 +169,11 @@ class MainForm(QMainWindow):
         sc('action_open_folder', self.main_window)
         sc('action_source_code', self.main_window)
 
+        sc('settings_list', self.prefences_window)
+        sc('settings_frame', self.prefences_window)
+        sc('button_OK', self.settings_frame)
+        sc('button_cancel', self.settings_frame)
+
         sc('widget_tab', self.main_window)
 
         sc('combobox_season', self.widget_tab)
@@ -177,17 +190,30 @@ class MainForm(QMainWindow):
         self.action_prefences.triggered.connect(self.prefences_window.show)
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
+        self.button_cancel.clicked.connect(self.prefences_window.hide)
+
+        tree_model = self.populate_settings()
+        self.settings_list.setModel(tree_model)
 
         # TODO: make real items
-        model = QStandardItemModel()
+        genre_model = QStandardItemModel()
         for i in range(3):
             item = QStandardItem(str(i))
             item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
             item.setData(Qt.Unchecked, Qt.CheckStateRole)
-            model.setItem(i, 0, item)
-        self.combobox_genre_tag.setModel(model)
+            genre_model.setItem(i, 0, item)
+        self.combobox_genre_tag.setModel(genre_model)
         self.combobox_genre_tag.setItemDelegate(CheckmarkDelegate())
         self.combobox_genre_tag.view().pressed.connect(self.handle_item_pressed)
+
+    def populate_settings(self):
+        """
+        Builds a model of settings to populate the settings menu
+        :return: A Model containing the settings tree
+        """
+        model = QStandardItemModel()
+        model.appendRow(QStandardItem('Video Player'))
+        return model
 
     def handle_item_pressed(self, index):
         """

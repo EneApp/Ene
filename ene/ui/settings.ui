@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <widget class="QTreeView" name="treeView">
+  <widget class="QTreeView" name="settings_list">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -22,8 +22,17 @@
      <height>431</height>
     </rect>
    </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
+   <property name="rootIsDecorated">
+    <bool>false</bool>
+   </property>
+   <attribute name="headerVisible">
+    <bool>false</bool>
+   </attribute>
   </widget>
-  <widget class="QFrame" name="frame">
+  <widget class="QFrame" name="settings_frame">
    <property name="geometry">
     <rect>
      <x>260</x>
@@ -38,7 +47,7 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QPushButton" name="buttonCancel">
+   <widget class="QPushButton" name="button_cancel">
     <property name="geometry">
      <rect>
       <x>370</x>
@@ -51,7 +60,7 @@
      <string>Cancel</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="buttonOK">
+   <widget class="QPushButton" name="button_OK">
     <property name="geometry">
      <rect>
       <x>270</x>

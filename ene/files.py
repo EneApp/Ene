@@ -109,7 +109,7 @@ class FileManager:
             # Adding detailed comments because coming back to regex after a break is confusing
             title = re.sub(r'\[[^]]*\]', '', title)  # Removes things between square brackets
             title = re.sub(r'\..*$', '', title)  # Removes file extensions
-            title = re.sub(r'-\s[0-9v]*\s*$', '', title)  # Removes trailing episode numbers
+            title = re.sub(r'-\s*[0-9v]*\s*$', '', title)  # Removes trailing episode numbers
 
             if title == '':
                 title = key
