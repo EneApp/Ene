@@ -14,7 +14,7 @@
    <string>ENE</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTabWidget" name="tabWidget">
+   <widget class="QTabWidget" name="widget_tab">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -57,7 +57,7 @@
      <attribute name="title">
       <string>This Season</string>
      </attribute>
-     <widget class="QComboBox" name="season_combobox">
+     <widget class="QComboBox" name="combobox_season">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -90,13 +90,13 @@
        </property>
       </item>
      </widget>
-     <widget class="QLabel" name="season_label">
+     <widget class="QLabel" name="label_season">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
+        <y>0</y>
         <width>141</width>
-        <height>21</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
@@ -108,7 +108,7 @@
        <string>Season</string>
       </property>
      </widget>
-     <widget class="QLabel" name="year_label">
+     <widget class="QLabel" name="label_year">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -126,7 +126,7 @@
        <string>Year</string>
       </property>
      </widget>
-     <widget class="QSlider" name="year_slider">
+     <widget class="QSlider" name="slider_year">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -151,7 +151,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="year_number_label">
+     <widget class="QLabel" name="label_year_number">
       <property name="geometry">
        <rect>
         <x>110</x>
@@ -169,7 +169,7 @@
        <string>1950</string>
       </property>
      </widget>
-     <widget class="QLabel" name="filter_label">
+     <widget class="QLabel" name="label_filter">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -187,7 +187,7 @@
        <string>Filters</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="sort_combobox">
+     <widget class="QComboBox" name="combobox_sort">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -230,7 +230,7 @@
        </property>
       </item>
      </widget>
-     <widget class="QToolButton" name="sort_asc_button">
+     <widget class="QToolButton" name="button_sort_order">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -246,7 +246,7 @@
        <enum>Qt::DownArrow</enum>
       </property>
      </widget>
-     <widget class="QComboBox" name="format_combobox">
+     <widget class="QComboBox" name="combobox_format">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -299,7 +299,7 @@
        </property>
       </item>
      </widget>
-     <widget class="QComboBox" name="status_combobox">
+     <widget class="QComboBox" name="combobox_status">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -337,7 +337,7 @@
        </property>
       </item>
      </widget>
-     <widget class="QComboBox" name="streaming_combobox">
+     <widget class="QComboBox" name="combobox_streaming">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -390,7 +390,7 @@
        </property>
       </item>
      </widget>
-     <widget class="QComboBox" name="genre_combobox">
+     <widget class="QComboBox" name="combobox_genre_tag">
       <property name="geometry">
        <rect>
         <x>0</x>
