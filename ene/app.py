@@ -31,9 +31,9 @@ from ene.constants import APP_NAME, IS_37, IS_WIN
 from ene.util import open_source_code
 
 if IS_37:
-    from importlib.resources import path
+    from importlib import resources
 else:
-    from importlib_resources import path
+    import importlib_resources as resources
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
@@ -102,9 +102,9 @@ class MainForm(QMainWindow):
         self.api = API()
         self.setWindowTitle(APP_NAME)
 
-        with path(ene.ui, 'ene.ui') as p:
+        with resources.path(ene.ui, 'ene.ui') as p:
             self.main_window = load_ui_widget(p)
-        with path(ene.ui, 'settings.ui') as p:
+        with resources.path(ene.ui, 'settings.ui') as p:
             self.prefences_window = load_ui_widget(p)
 
         self.main_window.setWindowTitle(APP_NAME)
