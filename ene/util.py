@@ -56,8 +56,7 @@ def cache(func=None, *, timeout: Optional[int] = None) -> Callable:
         last_time = self._timeout.get(key)
 
         if key in self._cache and \
-                (not timeout or
-                 (timeout and last_time and time() - last_time < timeout)):
+                (not timeout or (timeout and last_time and time() - last_time < timeout)):
             return self._cache[key]
 
         res = func(self, *args, **kwargs)
