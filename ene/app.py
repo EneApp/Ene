@@ -112,37 +112,47 @@ class MainForm(QMainWindow):
 
         self.setup_children()
 
-    def _set_child(self, name: str, where: QWidget):
+    def _set_child(self, name: str, parent: QWidget):
+        """
+        Set ``self``'s attribute with name ``name``
+        to a QObject with the same name
+        Args:
+            name: Name of the object
+            parent: Parent of the object
+
+        Raises:
+            RunTimeError if name is not found
+        """
         typ = self.__annotations__[name]
-        child = where.findChild(typ, name)
+        child = parent.findChild(typ, name)
         if not child:
-            raise RuntimeError(f'Could not find child "{name}" in {where.windowTitle()}')
+            raise RuntimeError(f'Could not find child "{name}" in {parent.windowTitle()}')
         setattr(self, name, child)
 
     def setup_children(self):
-        """
-        Setup all the child widgets of the main window
-        """
-        self._set_child('action_prefences', self.main_window)
+        """Setup all the child widgets of the main window"""
+        sc = self._set_child
+
+        sc('action_prefences', self.main_window)
+        sc('action_open_folder', self.main_window)
+        sc('action_source_code', self.main_window)
+
+        sc('widget_tab', self.main_window)
+
+        sc('combobox_season', self.widget_tab)
+        sc('combobox_sort', self.widget_tab)
+        sc('combobox_format', self.widget_tab)
+        sc('combobox_status', self.widget_tab)
+        sc('combobox_streaming', self.widget_tab)
+        sc('combobox_genre_tag', self.widget_tab)
+
+        sc('slider_year', self.widget_tab)
+
+        sc('button_sort_order', self.widget_tab)
+
         self.action_prefences.triggered.connect(self.prefences_window.show)
-
-        self._set_child('action_open_folder', self.main_window)
         self.action_open_folder.triggered.connect(self.choose_dir)
-
-        self._set_child('action_source_code', self.main_window)
         self.action_source_code.triggered.connect(open_source_code)
-
-        self._set_child('widget_tab', self.main_window)
-
-        self._set_child('combobox_season', self.widget_tab)
-        self._set_child('combobox_sort', self.widget_tab)
-        self._set_child('combobox_format', self.widget_tab)
-        self._set_child('combobox_status', self.widget_tab)
-        self._set_child('combobox_streaming', self.widget_tab)
-        self._set_child('combobox_genre_tag', self.widget_tab)
-
-        self._set_child('slider_year', self.widget_tab)
-        self._set_child('button_sort_order', self.widget_tab)
 
     def choose_dir(self) -> Path:
         """
