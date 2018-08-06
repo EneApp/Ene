@@ -22,9 +22,19 @@ from typing import Optional
 from PySide2 import QtUiTools
 from PySide2.QtCore import QFile, Qt
 from PySide2.QtGui import QStandardItem, QStandardItemModel
-from PySide2.QtWidgets import (QAction, QApplication, QComboBox, QFileDialog, QMainWindow, QSlider,
-                               QStyleOptionViewItem, QStyledItemDelegate, QTabWidget, QToolButton,
-                               QWidget)
+from PySide2.QtWidgets import (
+    QAction,
+    QApplication,
+    QComboBox,
+    QFileDialog,
+    QMainWindow,
+    QSlider,
+    QStyleOptionViewItem,
+    QStyledItemDelegate,
+    QTabWidget,
+    QToolButton,
+    QWidget
+)
 
 import ene.ui
 from ene.api import API
