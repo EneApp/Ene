@@ -21,8 +21,10 @@ from typing import Optional
 
 from PySide2 import QtUiTools
 from PySide2.QtCore import QFile, Qt
+from PySide2.QtGui import QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import (QAction, QApplication, QComboBox, QFileDialog, QMainWindow, QSlider,
-                               QTabWidget, QToolButton, QWidget)
+                               QStyleOptionViewItem, QStyledItemDelegate, QTabWidget, QToolButton,
+                               QWidget)
 
 import ene.ui
 from ene.api import API
@@ -71,6 +73,15 @@ def load_ui_widget(ui_file: str, parent: Optional[QWidget] = None) -> QWidget:
         ui = loader.load(uifile, parent)
     uifile.close()
     return ui
+
+
+class CheckmarkDelegate(QStyledItemDelegate):
+    """This subclass makes checkmark appear for some reason"""
+
+    def paint(self, painter_, option_, index_):
+        refToNonConstOption = QStyleOptionViewItem(option_)
+        refToNonConstOption.showDecorationSelected = False
+        super().paint(painter_, option_, index_)
 
 
 class MainForm(QMainWindow):
@@ -126,7 +137,10 @@ class MainForm(QMainWindow):
         typ = self.__annotations__[name]
         child = parent.findChild(typ, name)
         if not child:
-            raise RuntimeError(f'Could not find child "{name}" in {parent.windowTitle()}')
+            raise RuntimeError(
+                f'Could not find child "{name}" in '
+                f'{parent.windowTitle() or str(parent)}'
+            )
         setattr(self, name, child)
 
     def setup_children(self):
@@ -153,6 +167,29 @@ class MainForm(QMainWindow):
         self.action_prefences.triggered.connect(self.prefences_window.show)
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
+
+        # TODO: make real items
+        model = QStandardItemModel()
+        for i in range(3):
+            item = QStandardItem(str(i))
+            item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+            item.setData(Qt.Unchecked, Qt.CheckStateRole)
+            model.setItem(i, 0, item)
+        self.combobox_genre_tag.setModel(model)
+        self.combobox_genre_tag.setItemDelegate(CheckmarkDelegate())
+        self.combobox_genre_tag.view().pressed.connect(self.handle_item_pressed)
+
+    def handle_item_pressed(self, index):
+        """
+        Handles a checkable item being pressed in a combo box
+        Args:
+            index: Index of the item
+        """
+        item = self.combobox_genre_tag.model().itemFromIndex(index)
+        if item.checkState() == Qt.Checked:
+            item.setCheckState(Qt.Unchecked)
+        else:
+            item.setCheckState(Qt.Checked)
 
     def choose_dir(self) -> Path:
         """
