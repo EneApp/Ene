@@ -24,7 +24,7 @@ from secrets import token_urlsafe
 import pytest
 from requests import post
 from . import rmdir
-from ene.auth import OAuth
+from ene.api import OAuth
 from ene.config import CONFIG_DIR
 from ene.errors import AuthError
 

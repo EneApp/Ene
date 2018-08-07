@@ -131,7 +131,7 @@ class MainForm(QMainWindow):
         self.api = API()
         self.setWindowTitle(APP_NAME)
 
-        with resources.path(ene.ui, 'ene.ui') as p:
+        with resources.path(ene.ui, 'main_form.ui') as p:
             self.main_window = load_ui_widget(p)
         with resources.path(ene.ui, 'settings.ui') as p:
             self.prefences_window = load_ui_widget(p)
