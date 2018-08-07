@@ -15,6 +15,7 @@ exclude =
     ene/graphql,
     ene/ui,
     ene/lib,
+    /**/__init__.py,
 
 max-line-length = 99
 ignore = E402 E731

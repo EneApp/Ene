@@ -18,7 +18,7 @@ from typing import Iterable, List, Optional
 
 from requests import HTTPError, post
 
-import ene.graphql
+import ene.api
 from ene.auth import OAuth
 from ene.constants import CLIENT_ID, GRAPHQL_URL, IS_37
 from ene.enums import MediaSeason, MediaSort
@@ -43,9 +43,9 @@ class API:
             'Accept': 'application/json'
         }
         self.queries = {}
-        for name in contents(ene.graphql):
+        for name in contents(ene.anilist):
             if name.endswith('.graphql'):
-                self.queries[name] = read_text(ene.graphql, name)
+                self.queries[name] = read_text(ene.anilist, name)
 
     def query(self, query: str, variables: Optional[dict] = None) -> dict:
         """
