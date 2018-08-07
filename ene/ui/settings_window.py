@@ -15,26 +15,65 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PySide2.QtGui import QStandardItem, QStandardItemModel
-from PySide2.QtWidgets import QMdiSubWindow
+from PySide2.QtWidgets import QMdiSubWindow, QPushButton, QListView, QStackedWidget
 
 import ene
 from ene.constants import resources
-from .common import load_ui_widget
+from .common import load_ui_widget, ChildFinderMixin
+
+SETTINGS = {
+    'Video Player': 1,
+    'AniList': 2
+}
 
 
-# TODO: Justin implement this shit
-class SettingsWindow(QMdiSubWindow):
+# TODO: Justin finish implementing this
+class SettingsWindow(QMdiSubWindow, ChildFinderMixin):
+    button_OK: QPushButton
+    button_cancel: QPushButton
+    settings_menu: QStackedWidget
+    settings_list: QListView
+
     def __init__(self):
         super().__init__()
         with resources.path(ene.ui, 'settings.ui') as p:
             self.window = load_ui_widget(p)
         self.window.setWindowTitle('Preferences')
+        self._setup_children({
+            'window': [
+                'button_OK',
+                'button_cancel',
+                'settings_menu',
+                'settings_list'
+            ]
+        })
+
+    def _setup_children(self, children):
+        super()._setup_children(children)
+        self.button_cancel.clicked.connect(self.window.hide)
+        model = self.populate_settings()
+        self.settings_list.setModel(model)
+        self.settings_list.selectionModel().selectionChanged.connect(self.on_select_setting)
 
     def populate_settings(self):
         """
-        Builds a model of settings to populate the settings menu
-        :return: A Model containing the settings tree
+        Builds a model of settings items from the dictionary
+        Returns:
+            The item model for all settings
         """
         model = QStandardItemModel()
-        model.appendRow(QStandardItem('Video Player'))
+        for setting in SETTINGS.keys():
+            model.appendRow(QStandardItem(setting))
+
         return model
+
+    def on_select_setting(self, selected):
+        """
+        Triggered when a new settings item is selected from the list. Updates
+        the stacked widget to the appropriate page for the selected item
+        Args:
+            selected:
+                The selected item
+        """
+        index = selected.indexes()[0].data()
+        self.settings_menu.setCurrentIndex(SETTINGS[index])

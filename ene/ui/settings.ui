@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>758</width>
-    <height>451</height>
+    <height>505</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
   </property>
-  <widget class="QTreeView" name="settings_list">
+  <widget class="QListView" name="settings_list">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -25,14 +25,11 @@
    <property name="editTriggers">
     <set>QAbstractItemView::NoEditTriggers</set>
    </property>
-   <property name="rootIsDecorated">
+   <property name="showDropIndicator" stdset="0">
     <bool>false</bool>
    </property>
-   <attribute name="headerVisible">
-    <bool>false</bool>
-   </attribute>
   </widget>
-  <widget class="QFrame" name="settings_frame">
+  <widget class="QStackedWidget" name="settings_menu">
    <property name="geometry">
     <rect>
      <x>260</x>
@@ -47,32 +44,55 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QPushButton" name="button_cancel">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>390</y>
-      <width>88</width>
-      <height>34</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Cancel</string>
-    </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="page"/>
+   <widget class="QWidget" name="player" native="true">
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>91</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Video Player</string>
+     </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+    </widget>
    </widget>
-   <widget class="QPushButton" name="button_OK">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>390</y>
-      <width>88</width>
-      <height>34</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>OK</string>
-    </property>
-   </widget>
+   <widget class="QWidget" name="anilist"/>
+  </widget>
+  <widget class="QPushButton" name="button_OK">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>450</y>
+     <width>88</width>
+     <height>34</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button_cancel">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>450</y>
+     <width>88</width>
+     <height>34</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
   </widget>
  </widget>
  <resources/>
