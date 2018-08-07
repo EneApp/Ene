@@ -15,4 +15,4 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .main_window import MainWindow
-from .settings import SettingsWindow
+from .settings_window import SettingsWindow
