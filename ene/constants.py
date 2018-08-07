@@ -17,10 +17,18 @@
 import sys
 from pathlib import Path
 
+IS_37 = sys.version_info >= (3, 7)
+
+if IS_37:
+    # noinspection PyUnresolvedReferences
+    from importlib import resources
+else:
+    # noinspection PyUnresolvedReferences
+    import importlib_resources as resources
+
 IS_WIN = sys.platform in ('win32', 'cygwin')
 IS_LINUX = sys.platform.startswith('linux')
 IS_MAC = sys.platform == 'darwin'
-IS_37 = sys.version_info >= (3, 7)
 
 APP_NAME = 'ENE'
 CLIENT_ID = 584

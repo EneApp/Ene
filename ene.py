@@ -1,5 +1,4 @@
-from ene.app import MainForm
-
+from ene.app import launch
 
 if __name__ == '__main__':
-    MainForm.launch()
+    launch()

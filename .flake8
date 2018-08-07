@@ -12,10 +12,9 @@ exclude =
     .tox,
     .idea,
     pyside-setup,
-    ene/graphql,
-    ene/ui,
     ene/lib,
     /**/__init__.py,
+    ene/constants.py
 
 max-line-length = 99
 ignore = E402 E731
