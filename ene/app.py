@@ -28,6 +28,8 @@ QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
 
 class App(QApplication):
+    """Main Application class"""
+
     def __init__(self):
         super().__init__([APP_NAME])
         self.config = Config()
