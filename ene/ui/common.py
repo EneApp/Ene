@@ -61,8 +61,8 @@ class CheckmarkDelegate(QStyledItemDelegate):
     """This subclass makes checkmark appear for some reason"""
 
     def paint(self, painter_, option_, index_):
-        refToNonConstOption = QStyleOptionViewItem(option_)
-        refToNonConstOption.showDecorationSelected = False
+        ref_to_non_const_option = QStyleOptionViewItem(option_)
+        ref_to_non_const_option.showDecorationSelected = False
         super().paint(painter_, option_, index_)
 
 
