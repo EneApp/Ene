@@ -28,15 +28,12 @@ from PySide2.QtWidgets import (
     QToolButton,
 )
 
-import ene.ui
-from ene.api import API
-from ene.config import Config
-from ene.constants import APP_NAME, IS_WIN, resources
+from ene.constants import APP_NAME, IS_WIN
 from ene.util import open_source_code
-from .common import CheckmarkDelegate, ChildFinderMixin, load_ui_widget
+from .common import CheckmarkDelegate, ParentWindow
 
 
-class MainWindow(ChildFinderMixin, QMainWindow):
+class MainWindow(ParentWindow, QMainWindow):
     """
     Main form of the application
     """
@@ -56,21 +53,11 @@ class MainWindow(ChildFinderMixin, QMainWindow):
     slider_year: QSlider
     button_sort_order: QToolButton
 
-    def __init__(self):
+    def __init__(self, app):
         """
         Initialize the ui files for the application
         """
-        super().__init__()
-        self.config = Config()
-        self.api = API()
-        self.setWindowTitle(APP_NAME)
-
-        with resources.path(ene.ui, 'main_window.ui') as p:
-            self.window = load_ui_widget(p)
-
-        self.window.setWindowTitle(APP_NAME)
-
-        self._setup_children({
+        children = {
             'window': [
                 'action_prefences',
                 'action_open_folder',
@@ -86,8 +73,11 @@ class MainWindow(ChildFinderMixin, QMainWindow):
                 'combobox_genre_tag',
                 'slider_year',
                 'button_sort_order',
-            ]
-        })
+            ],
+        }
+        super().__init__(app, 'main_window.ui', children)
+        self.window.setWindowTitle(APP_NAME)
+        self.setWindowTitle(APP_NAME)
 
     def _setup_children(self, children):
         """Setup all the child widgets of the main window"""

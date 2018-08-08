@@ -21,6 +21,9 @@ from PySide2 import QtUiTools
 from PySide2.QtCore import QFile
 from PySide2.QtWidgets import QStyleOptionViewItem, QStyledItemDelegate, QWidget
 
+import ene.ui
+from ene.constants import resources
+
 
 @contextmanager
 def open_ui_file(filename: str) -> QFile:
@@ -61,13 +64,27 @@ class CheckmarkDelegate(QStyledItemDelegate):
     """This subclass makes checkmark appear for some reason"""
 
     def paint(self, painter_, option_, index_):
-        refToNonConstOption = QStyleOptionViewItem(option_)
-        refToNonConstOption.showDecorationSelected = False
+        ref_to_non_const_option = QStyleOptionViewItem(option_)
+        ref_to_non_const_option.showDecorationSelected = False
         super().paint(painter_, option_, index_)
+
+
+class UIWindowMixin:
+    """Mixin class that represents a window from a ui file"""
+
+    def __init__(self, app, ui_file: str, *args, **kwargs):
+        self.app = app
+        with resources.path(ene.ui, ui_file) as p:
+            self.window = load_ui_widget(p)
+        super().__init__(*args, **kwargs)
 
 
 class ChildFinderMixin:
     """Mixin class that provides child finding functions"""
+
+    def __init__(self, children, *args, **kwargs):
+        self._setup_children(children)
+        super().__init__(*args, **kwargs)
 
     def _set_child(self, name: str, parent: str):
         """
@@ -99,3 +116,7 @@ class ChildFinderMixin:
         for parent, names in children.items():
             for name in names:
                 self._set_child(name, parent)
+
+
+class ParentWindow(UIWindowMixin, ChildFinderMixin):
+    """A UI window from file with children"""

@@ -19,6 +19,8 @@ import sys
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QApplication
 
+from ene.api import API
+from ene.config import Config
 from ene.constants import APP_NAME
 from ene.ui import MainWindow, SettingsWindow
 
@@ -26,10 +28,14 @@ QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
 
 class App(QApplication):
+    """Main Application class"""
+
     def __init__(self):
         super().__init__([APP_NAME])
-        self.main_window = MainWindow()
-        self.settings_window = SettingsWindow()
+        self.config = Config()
+        self.api = API()
+        self.main_window = MainWindow(self)
+        self.settings_window = SettingsWindow(self)
         self.main_window.action_prefences.triggered.connect(self.settings_window.window.show)
 
 

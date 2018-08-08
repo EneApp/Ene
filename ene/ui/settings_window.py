@@ -17,9 +17,7 @@
 import PySide2.QtGui
 from PySide2.QtWidgets import QListView, QMdiSubWindow, QPushButton, QStackedWidget
 
-import ene
-from ene.constants import resources
-from .common import ChildFinderMixin, load_ui_widget
+from .common import ParentWindow
 
 SETTINGS = {
     'Video Player': 1,
@@ -28,25 +26,23 @@ SETTINGS = {
 
 
 # TODO: Justin finish implementing this
-class SettingsWindow(QMdiSubWindow, ChildFinderMixin):
+class SettingsWindow(ParentWindow, QMdiSubWindow):
     button_OK: QPushButton
     button_cancel: QPushButton
     settings_menu: QStackedWidget
     settings_list: QListView
 
-    def __init__(self):
-        super().__init__()
-        with resources.path(ene.ui, 'settings_window.ui') as p:
-            self.window = load_ui_widget(p)
-        self.window.setWindowTitle('Preferences')
-        self._setup_children({
+    def __init__(self, app):
+        children = {
             'window': [
                 'button_OK',
                 'button_cancel',
                 'settings_menu',
-                'settings_list'
-            ]
-        })
+                'settings_list',
+            ],
+        }
+        super().__init__(app, 'settings_window.ui', children)
+        self.window.setWindowTitle('Preferences')
 
     def _setup_children(self, children):
         super()._setup_children(children)
