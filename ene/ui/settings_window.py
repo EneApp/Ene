@@ -14,12 +14,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PySide2.QtGui import QStandardItem, QStandardItemModel
-from PySide2.QtWidgets import QMdiSubWindow, QPushButton, QListView, QStackedWidget
+import PySide2.QtGui
+from PySide2.QtWidgets import QListView, QMdiSubWindow, QPushButton, QStackedWidget
 
 import ene
 from ene.constants import resources
-from .common import load_ui_widget, ChildFinderMixin
+from .common import ChildFinderMixin, load_ui_widget
 
 SETTINGS = {
     'Video Player': 1,
@@ -36,7 +36,7 @@ class SettingsWindow(QMdiSubWindow, ChildFinderMixin):
 
     def __init__(self):
         super().__init__()
-        with resources.path(ene.ui, 'settings.ui') as p:
+        with resources.path(ene.ui, 'settings_window.ui') as p:
             self.window = load_ui_widget(p)
         self.window.setWindowTitle('Preferences')
         self._setup_children({
@@ -61,9 +61,9 @@ class SettingsWindow(QMdiSubWindow, ChildFinderMixin):
         Returns:
             The item model for all settings
         """
-        model = QStandardItemModel()
+        model = PySide2.QtGui.QStandardItemModel()
         for setting in SETTINGS.keys():
-            model.appendRow(QStandardItem(setting))
+            model.appendRow(PySide2.QtGui.QStandardItem(setting))
 
         return model
 

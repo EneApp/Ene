@@ -65,7 +65,7 @@ class MainWindow(ChildFinderMixin, QMainWindow):
         self.api = API()
         self.setWindowTitle(APP_NAME)
 
-        with resources.path(ene.ui, 'main_form.ui') as p:
+        with resources.path(ene.ui, 'main_window.ui') as p:
             self.window = load_ui_widget(p)
 
         self.window.setWindowTitle(APP_NAME)
