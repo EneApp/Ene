@@ -16,13 +16,13 @@
 
 """This module contains the settings window."""
 import PySide2.QtGui
-from PySide2.QtWidgets import QListView, QMdiSubWindow, QPushButton, QStackedWidget
+from PySide2.QtWidgets import QListView, QMdiSubWindow, QPushButton, QStackedWidget, QWidget, QMessageBox
 
 from .window import ParentWindow
 
 SETTINGS = {
     'Video Player': 1,
-    'AniList': 2
+    'Local Files': 2
 }
 
 
@@ -33,14 +33,19 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
     button_cancel: QPushButton
     settings_menu: QStackedWidget
     settings_list: QListView
+    player: QWidget
 
     def __init__(self, app):
         super().__init__(app, 'settings_window.ui', 'window')
         self.window.setWindowTitle('Preferences')
         self._setup_children()
+        self.current_page = self.settings_menu.currentIndex()
+        self.changes = False
+
 
     def _setup_children(self):
         self.button_cancel.clicked.connect(self.window.hide)
+        self.button_OK.clicked.connect(self.on_press_okay())
         model = self.populate_settings()
         self.settings_list.setModel(model)
         self.settings_list.selectionModel().selectionChanged.connect(self.on_select_setting)
@@ -66,5 +71,21 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
             selected:
                 The selected item
         """
+        if self.changes:
+            save = QMessageBox.question(self.window,
+                                        "Save",
+                                        "Changes detected. Save current page?")
+            if save == QMessageBox.Yes:
+                self.save_current_page()
+        # reset the page
         index = selected.indexes()[0].data()
         self.settings_menu.setCurrentIndex(SETTINGS[index])
+        self.current_page = SETTINGS[index]
+        self.changes = False
+
+    def save_current_page(self):
+        page = self.settings_menu.childAt(self.current_page)
+
+    def on_press_okay(self):
+        self.save_current_page()
+        self.window.hide()
