@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module contains common elements for UI."""
 from contextlib import contextmanager
 from typing import Dict, List, Optional
 
@@ -64,6 +65,10 @@ class CheckmarkDelegate(QStyledItemDelegate):
     """This subclass makes checkmark appear for some reason"""
 
     def paint(self, painter_, option_, index_):
+        """
+        Renders the delegate using the given painter and style option for
+        the item specified  by index.
+        """
         ref_to_non_const_option = QStyleOptionViewItem(option_)
         ref_to_non_const_option.showDecorationSelected = False
         super().paint(painter_, option_, index_)
@@ -74,8 +79,8 @@ class UIWindowMixin:
 
     def __init__(self, app, ui_file: str, *args, **kwargs):
         self.app = app
-        with resources.path(ene.ui, ui_file) as p:
-            self.window = load_ui_widget(p)
+        with resources.path(ene.ui, ui_file) as path:
+            self.window = load_ui_widget(path)
         super().__init__(*args, **kwargs)
 
 
@@ -97,13 +102,13 @@ class ChildFinderMixin:
         Raises:
             RunTimeError if name is not found
         """
-        parent = getattr(self, parent)
+        parent_widget = getattr(self, parent)
         typ = self.__annotations__[name]
-        child = parent.findChild(typ, name)
+        child = parent_widget.findChild(typ, name)
         if not child:
             raise RuntimeError(
                 f'Could not find child "{name}" in '
-                f'{parent.windowTitle() or str(parent)}'
+                f'{parent_widget.windowTitle() or str(parent_widget)}'
             )
         setattr(self, name, child)
 

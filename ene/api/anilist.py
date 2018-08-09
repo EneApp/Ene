@@ -14,20 +14,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module contains anilist API class."""
 from typing import Iterable, List, Optional
 
 from requests import HTTPError, post
 
 import ene.api
-from ene.constants import CLIENT_ID, GRAPHQL_URL, IS_37
+from ene.constants import CLIENT_ID, GRAPHQL_URL, resources
 from ene.errors import APIError
 from .auth import OAuth
 from .enums import MediaSeason, MediaSort
-
-if IS_37:
-    from importlib.resources import contents, read_text
-else:
-    from importlib_resources import contents, read_text
 
 
 class API:
@@ -43,9 +39,9 @@ class API:
             'Accept': 'application/json'
         }
         self.queries = {}
-        for name in contents(ene.api):
+        for name in resources.contents(ene.api):
             if name.endswith('.graphql'):
-                self.queries[name] = read_text(ene.api, name)
+                self.queries[name] = resources.read_text(ene.api, name)
 
     def query(self, query: str, variables: Optional[dict] = None) -> dict:
         """
@@ -68,18 +64,18 @@ class API:
         res = post(GRAPHQL_URL, json=post_json, headers=self.headers)
         try:
             res.raise_for_status()
-        except HTTPError as e:
+        except HTTPError as http_ex:
             try:
                 json = res.json()
-            except Exception:
-                msg = str(e)
+            except Exception as e:  # pylint: disable=W0703
+                msg = f'{http_ex}\n{e}'
             else:
                 msg_lst = []
                 errors = json.get('errors', [])
                 if errors:
                     for err in errors:
                         msg_lst.append(err.get('message'))
-                msg = '\n'.join(m for m in msg_lst if m) or str(e)
+                msg = '\n'.join(m for m in msg_lst if m) or str(http_ex)
             raise APIError(res.status_code, msg)
         else:
             return res.json()

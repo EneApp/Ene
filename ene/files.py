@@ -14,6 +14,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module handles local video files."""
+
 import re
 from collections import defaultdict
 from os import walk
@@ -23,13 +25,13 @@ from fuzzywuzzy import fuzz
 
 
 class FileManager:
+    """
+    Class to manage video files.
+    """
 
     def __init__(self, cfg):
         self.config = cfg
         self.dir = Path(self.config.get('Local Files', default=Path.home() / 'Videos'))
-
-    def set_dir(self, path):
-        self.dir = Path(path)
 
     def find_episodes(self, name, directory=None):
         """
@@ -41,7 +43,7 @@ class FileManager:
         Returns:
             episodes: A list of all episodes found
         """
-        regex = self._build_regex(name)
+        regex = _build_regex(name)
         if directory is None:
             directory = self.dir
         episodes = []
@@ -70,7 +72,7 @@ class FileManager:
             in that series
         """
         series = defaultdict(list)
-        for path, dirs, files in walk(self.dir):
+        for path, dirs, files in walk(self.dir):  # pylint: disable=W0612
             for file in files:
                 matched = False
                 for show in series:
@@ -80,51 +82,53 @@ class FileManager:
                         break
                 if not matched:
                     series[file].append(Path(path) / file)
-        series = self.clean_titles(series)
+        series = clean_titles(series)
         return series
 
-    def clean_titles(self, series):
-        """
-        Attempts to clean up the title in the series dictionary by comparing
-        the names of two files
-        Args:
-            series:
-                A dictionary with the series name as a key and a list of files
-        Returns:
-            A dictionary with a slightly more well formatted name
-        """
-        updated_titles = defaultdict(str)
-        for key, item in series.items():
-            # First iterate through the list to find title that can be updated
-            if len(item) > 1:
-                # Split both names on commas, underscores and whitespace
-                name_a = re.split(r'[,_\s]', key)
-                name_b = re.split(r'[,_\s]', item[1].name)
 
-                title = ' '.join(x for x in name_a if x in name_b)
-            else:
-                # When we can't compare to a similar title, just remove the same as above
-                title = re.sub(r'[,_\s]', ' ', key)
-            # pull out a few common things that should not be part of a title
-            # Adding detailed comments because coming back to regex after a break is confusing
-            title = re.sub(r'\[[^]]*\]', '', title)  # Removes things between square brackets
-            title = re.sub(r'\..*$', '', title)  # Removes file extensions
-            title = re.sub(r'-\s*[0-9v]*\s*$', '', title)  # Removes trailing episode numbers
+def clean_titles(series):
+    """
+    Attempts to clean up the title in the series dictionary by comparing
+    the names of two files
+    Args:
+        series:
+            A dictionary with the series name as a key and a list of files
+    Returns:
+        A dictionary with a slightly more well formatted name
+    """
+    updated_titles = defaultdict(str)
+    for key, item in series.items():
+        # First iterate through the list to find title that can be updated
+        if len(item) > 1:
+            # Split both names on commas, underscores and whitespace
+            name_a = re.split(r'[,_\s]', key)
+            name_b = re.split(r'[,_\s]', item[1].name)
 
-            if title == '':
-                title = key
+            title = ' '.join(x for x in name_a if x in name_b)
+        else:
+            # When we can't compare to a similar title, just remove the same as above
+            title = re.sub(r'[,_\s]', ' ', key)
+        # pull out a few common things that should not be part of a title
+        # Adding detailed comments because coming back to regex after a break is confusing
+        title = re.sub(r'\[[^]]*\]', '', title)  # Removes things between square brackets
+        title = re.sub(r'\..*$', '', title)  # Removes file extensions
+        title = re.sub(r'-\s*[0-9v]*\s*$', '', title)  # Removes trailing episode numbers
 
-            updated_titles[key] = title
+        if title == '':
+            title = key
 
-        for old, new in updated_titles.items():
-            # Then go through and replace the old with the new
-            series[new].extend(series.pop(old))
-        return series
+        updated_titles[key] = title
 
-    def _build_regex(self, name):
-        pattern = '.*'
-        title = name.split(' ')
-        for word in title:
-            pattern += word.lower()
-            pattern += '.*'
-        return re.compile(pattern)
+    for old, new in updated_titles.items():
+        # Then go through and replace the old with the new
+        series[new].extend(series.pop(old))
+    return series
+
+
+def _build_regex(name):
+    pattern = '.*'
+    title = name.split(' ')
+    for word in title:
+        pattern += word.lower()
+        pattern += '.*'
+    return re.compile(pattern)

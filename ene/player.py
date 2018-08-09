@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module handles video playback on different players."""
 import os
 import subprocess
 from abc import ABC, abstractmethod
@@ -29,6 +30,8 @@ from ene.constants import IS_MAC, IS_WIN
 
 
 class AbstractPlayer(ABC):
+    """Base media player class."""
+
     @abstractmethod
     def play(self, path: Union[str, os.PathLike]):
         """
@@ -41,10 +44,12 @@ class AbstractPlayer(ABC):
 
     @abstractmethod
     def stop(self):
+        """Stop playing."""
         raise NotImplementedError()
 
     @abstractmethod
     def wait_for_playback_end(self):
+        """Wait for the playback to end."""
         raise NotImplementedError()
 
 
@@ -60,6 +65,11 @@ class VlcPlayer(AbstractPlayer):
         self.player.video_set_mouse_input(True)
 
     def play(self, path):
+        """
+        Play the media file using vlc by the given path.
+        Args:
+            path: Path to the media file
+        """
         media = self.instance.media_new(path)
         self.player.set_media(media)
         self.player.play()
@@ -97,7 +107,9 @@ class RcVlcPlayer(AbstractPlayer):
         Args:
             cmd:
         """
-        # TODO: Find a better way to prevent this from possibly deadlocking or find a way to use Popen.Communicate() # noqa: E501
+        # TODO: Find a better way to prevent this from possibly deadlocking
+        # TODO: or find a way to use Popen.Communicate()
+
         sleep(1)
         self.process.stdin.write(cmd + '\n')
         self.process.stdin.flush()
@@ -112,6 +124,7 @@ class RcVlcPlayer(AbstractPlayer):
         self.write_cmd('add ' + path)
 
     def get_title(self):
+        """Get the title of the playing media."""
         self.write_cmd('get_title')
 
     def stop(self):
@@ -152,11 +165,11 @@ class MpvPlayer(AbstractPlayer):
         """
 
         @self.player.event_callback('shutdown')
-        def on_shutdown(event):
+        def on_shutdown(event):  # pylint: disable=unused-argument,unused-variable
             self.stop()
 
         @self.player.event_callback('end_file')
-        def on_file_end(event):
+        def on_file_end(event):  # pylint: disable=unused-argument,unused-variable
             self.eof.set()
 
     def wait_for_playback_end(self):

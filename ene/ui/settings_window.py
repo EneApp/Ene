@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module contains the settings window."""
 import PySide2.QtGui
 from PySide2.QtWidgets import QListView, QMdiSubWindow, QPushButton, QStackedWidget
 
@@ -27,6 +28,7 @@ SETTINGS = {
 
 # TODO: Justin finish implementing this
 class SettingsWindow(ParentWindow, QMdiSubWindow):
+    """Class for the settings window."""
     button_OK: QPushButton
     button_cancel: QPushButton
     settings_menu: QStackedWidget
@@ -51,14 +53,15 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         self.settings_list.setModel(model)
         self.settings_list.selectionModel().selectionChanged.connect(self.on_select_setting)
 
-    def populate_settings(self):
+    @staticmethod
+    def populate_settings():
         """
         Builds a model of settings items from the dictionary
         Returns:
             The item model for all settings
         """
         model = PySide2.QtGui.QStandardItemModel()
-        for setting in SETTINGS.keys():
+        for setting in SETTINGS:
             model.appendRow(PySide2.QtGui.QStandardItem(setting))
 
         return model

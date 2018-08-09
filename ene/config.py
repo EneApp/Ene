@@ -14,8 +14,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module contains the config class to hold config data"""
 from collections import Mapping
 from contextlib import contextmanager
+from pathlib import Path
 
 import toml
 
@@ -43,15 +45,14 @@ class Config(Mapping):
             self.apply()
 
     @property
-    def config_file(self):
+    def config_file(self) -> Path:
+        """Returns the path of the config file"""
         return CONFIG_DIR / 'config.toml'
 
     def apply(self):
-        """
-        Writes the config in memory to file
-        """
+        """Writes the config in memory to file."""
         self._old = self.config.copy()
-        with open(self.config_file, 'w+') as f:
+        with self.config_file.open('w+') as f:
             toml.dump(self.config, f)
 
     @contextmanager

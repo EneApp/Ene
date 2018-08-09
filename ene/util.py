@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module contains various helper function"""
 import re
 import webbrowser
 from functools import lru_cache, partial, wraps
@@ -34,6 +35,7 @@ def strip_html(s: str) -> str:
     return re.sub('<[^<]+?>', '', s)
 
 
+# pylint: disable=W0212
 def cache(func=None, *, timeout: Optional[int] = None) -> Callable:
     """
     Decorator to cache a method.
@@ -86,4 +88,5 @@ def cached_property(func=None, *, timeout: Optional[int] = None):
 
 
 def open_source_code():
+    """Opens source code of ene in a webbrowser."""
     webbrowser.open('https://github.com/MaT1g3R/ene/')

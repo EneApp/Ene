@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module contains ways to do OAuth to the anilist API."""
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
@@ -51,7 +52,7 @@ class OAuth:
             self.send_header('Content-type', 'text/html')
             self.end_headers()
 
-        def do_GET(self):
+        def do_GET(self):  # pylint: disable=C0103
             """
             Handle GET request to the http server
 
@@ -90,7 +91,7 @@ class OAuth:
             self._set_headers(200)
             self.wfile.write(index.encode())
 
-        def do_POST(self):
+        def do_POST(self):  # pylint: disable=C0103
             """
             Handle POST request to the http server
 

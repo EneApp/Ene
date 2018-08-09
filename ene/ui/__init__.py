@@ -14,5 +14,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: skip-file
 from .main_window import MainWindow
 from .settings_window import SettingsWindow

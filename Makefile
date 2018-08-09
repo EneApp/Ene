@@ -5,7 +5,9 @@ ci_setup:
 	poetry install
 
 .PHONY: lint
-lint: ; flake8
+lint:
+	python -m flake8
+	python -m pylint --rcfile=.pylintrc ene
 
 .PHONY: tests
 tests: ; pytest -vvv tests

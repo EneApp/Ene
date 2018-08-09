@@ -14,23 +14,29 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module contains custom errors."""
+
 
 class EneError(Exception):
-    pass
+    """Base error class for ene."""
 
 
 class APIError(EneError):
-    pass
+    """Class for API errors."""
 
 
 class APIHTTPError(APIError):
+    """Class for HTTP errors from API calls."""
+
     def __init__(self, status, message=None):
         self.stauts = status
         self.message = message
+        super().__init__()
 
     def __repr__(self):
         return f'APIHTTPError(status={self.stauts}, message={self.message})'
 
 
 class AuthError(EneError):
+    """Class for auth errors."""
     pass

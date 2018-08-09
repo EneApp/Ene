@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""This module conatins common constants."""
 import sys
 from pathlib import Path
 
@@ -21,10 +22,10 @@ IS_37 = sys.version_info >= (3, 7)
 
 if IS_37:
     # noinspection PyUnresolvedReferences
-    from importlib import resources
+    from importlib import resources # pylint: disable=E0611,W0611
 else:
     # noinspection PyUnresolvedReferences
-    import importlib_resources as resources
+    import importlib_resources as resources # pylint: disable=E0611,W0611
 
 IS_WIN = sys.platform in ('win32', 'cygwin')
 IS_LINUX = sys.platform.startswith('linux')
