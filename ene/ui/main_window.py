@@ -47,6 +47,7 @@ class MainWindow(ParentWindow, QMainWindow):
         """Setup all the child widgets of the main window"""
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
+
         self.combobox_genre_tag = ComboCheckbox(self.combobox_genre_tag, ['1', '2', '3'])
         self.combobox_genre_tag.combobox.view().pressed.connect(self.handle_item_pressed)
 
@@ -56,7 +57,6 @@ class MainWindow(ParentWindow, QMainWindow):
         Args:
             index: Index of the item
         """
-        print(index)
         item = self.combobox_genre_tag.combobox.model().itemFromIndex(index)
         if item.checkState() == Qt.Checked:
             item.setCheckState(Qt.Unchecked)
