@@ -31,7 +31,7 @@ from PySide2.QtWidgets import (
 
 from ene.constants import APP_NAME, IS_WIN
 from ene.util import open_source_code
-from .common import CheckmarkDelegate
+from .custom import CheckmarkDelegate
 from .window import ParentWindow
 
 
@@ -59,31 +59,13 @@ class MainWindow(ParentWindow, QMainWindow):
         """
         Initialize the ui files for the application
         """
-        children = {
-            'window': [
-                'action_prefences',
-                'action_open_folder',
-                'action_source_code',
-                'widget_tab',
-            ],
-            'widget_tab': [
-                'combobox_season',
-                'combobox_sort',
-                'combobox_format',
-                'combobox_status',
-                'combobox_streaming',
-                'combobox_genre_tag',
-                'slider_year',
-                'button_sort_order',
-            ],
-        }
-        super().__init__(app, 'main_window.ui', children)
+        super().__init__(app, 'main_window.ui', 'window')
         self.window.setWindowTitle(APP_NAME)
         self.setWindowTitle(APP_NAME)
+        self._setup_children()
 
-    def _setup_children(self, children):
+    def _setup_children(self):
         """Setup all the child widgets of the main window"""
-        super()._setup_children(children)
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
 

@@ -35,19 +35,11 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
     settings_list: QListView
 
     def __init__(self, app):
-        children = {
-            'window': [
-                'button_OK',
-                'button_cancel',
-                'settings_menu',
-                'settings_list',
-            ],
-        }
-        super().__init__(app, 'settings_window.ui', children)
+        super().__init__(app, 'settings_window.ui', 'window')
         self.window.setWindowTitle('Preferences')
+        self._setup_children()
 
-    def _setup_children(self, children):
-        super()._setup_children(children)
+    def _setup_children(self):
         self.button_cancel.clicked.connect(self.window.hide)
         model = self.populate_settings()
         self.settings_list.setModel(model)

@@ -16,8 +16,6 @@
 
 """This module contains common window classes/functions."""
 
-from typing import Dict, List
-
 import ene.ui
 from ene.constants import resources
 from .common import load_ui_widget
@@ -36,40 +34,22 @@ class UIWindowMixin:
 class ChildFinderMixin:
     """Mixin class that provides child finding functions"""
 
-    def __init__(self, children, *args, **kwargs):
-        self._setup_children(children)
+    def __init__(self, parent, *args, **kwargs):
+        if isinstance(parent, str):
+            parent = getattr(self, parent)
+        self._find_children(parent)
         super().__init__(*args, **kwargs)
 
-    def _set_child(self, name: str, parent: str):
-        """
-        Set ``self``'s attribute with name ``name``
-        to a QObject with the same name
-        Args:
-            name: Name of the object
-            parent: Parent of the object
-
-        Raises:
-            RunTimeError if name is not found
-        """
-        parent_widget = getattr(self, parent)
-        typ = self.__annotations__[name]
-        child = parent_widget.findChild(typ, name)
-        if not child:
-            raise RuntimeError(
-                f'Could not find child "{name}" in '
-                f'{parent_widget.windowTitle() or str(parent_widget)}'
-            )
-        setattr(self, name, child)
-
-    def _setup_children(self, children: Dict[str, List[str]]):
+    def _find_children(self, parent):
         """
         Setup all the child widgets of the main window
-        Args:
-            children: Dictionary of parents and children
         """
-        for parent, names in children.items():
-            for name in names:
-                self._set_child(name, parent)
+        children = parent.children()
+        for child in children:
+            name = child.objectName()
+            if name:
+                setattr(self, name, child)
+            self._find_children(child)
 
 
 class ParentWindow(UIWindowMixin, ChildFinderMixin):
