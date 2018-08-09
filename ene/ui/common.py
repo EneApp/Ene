@@ -20,7 +20,7 @@ from typing import Optional
 
 from PySide2 import QtUiTools
 from PySide2.QtCore import QFile
-from PySide2.QtWidgets import QStyleOptionViewItem, QStyledItemDelegate, QWidget
+from PySide2.QtWidgets import QWidget
 
 
 @contextmanager
@@ -56,16 +56,3 @@ def load_ui_widget(ui_file: str, parent: Optional[QWidget] = None) -> QWidget:
         ui = loader.load(uifile, parent)
     uifile.close()
     return ui
-
-
-class CheckmarkDelegate(QStyledItemDelegate):
-    """This subclass makes checkmark appear for some reason"""
-
-    def paint(self, painter_, option_, index_):
-        """
-        Renders the delegate using the given painter and style option for
-        the item specified  by index.
-        """
-        ref_to_non_const_option = QStyleOptionViewItem(option_)
-        ref_to_non_const_option.showDecorationSelected = False
-        super().paint(painter_, option_, index_)
