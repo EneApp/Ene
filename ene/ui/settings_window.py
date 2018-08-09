@@ -16,7 +16,7 @@
 
 """This module contains the settings window."""
 import PySide2.QtGui
-from PySide2.QtWidgets import QListView, QMdiSubWindow, QPushButton, QStackedWidget, QWidget, QMessageBox
+from PySide2.QtWidgets import QMdiSubWindow, QMessageBox
 
 from .window import ParentWindow
 
@@ -29,19 +29,13 @@ SETTINGS = {
 # TODO: Justin finish implementing this
 class SettingsWindow(ParentWindow, QMdiSubWindow):
     """Class for the settings window."""
-    button_OK: QPushButton
-    button_cancel: QPushButton
-    settings_menu: QStackedWidget
-    settings_list: QListView
-    player: QWidget
 
     def __init__(self, app):
         super().__init__(app, 'settings_window.ui', 'window')
+        self.current_page = self.settings_menu.currentIndex()
         self.window.setWindowTitle('Preferences')
         self._setup_children()
-        self.current_page = self.settings_menu.currentIndex()
         self.changes = False
-
 
     def _setup_children(self):
         self.button_cancel.clicked.connect(self.window.hide)
@@ -84,7 +78,7 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         self.changes = False
 
     def save_current_page(self):
-        page = self.settings_menu.childAt(self.current_page)
+        page = self.settings_menu.childAt(self.current_page, 0)
 
     def on_press_okay(self):
         self.save_current_page()

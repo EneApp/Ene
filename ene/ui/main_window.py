@@ -18,20 +18,14 @@
 from pathlib import Path
 
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import (
-    QAction,
-    QComboBox,
     QFileDialog,
     QMainWindow,
-    QSlider,
-    QTabWidget,
-    QToolButton,
 )
 
 from ene.constants import APP_NAME, IS_WIN
 from ene.util import open_source_code
-from .custom import CheckmarkDelegate
+from .custom import ComboCheckbox
 from .window import ParentWindow
 
 
@@ -39,21 +33,6 @@ class MainWindow(ParentWindow, QMainWindow):
     """
     Main form of the application
     """
-
-    action_prefences: QAction
-    action_open_folder: QAction
-    action_source_code: QAction
-    widget_tab: QTabWidget
-
-    combobox_season: QComboBox
-    combobox_sort: QComboBox
-    combobox_format: QComboBox
-    combobox_status: QComboBox
-    combobox_streaming: QComboBox
-    combobox_genre_tag: QComboBox
-
-    slider_year: QSlider
-    button_sort_order: QToolButton
 
     def __init__(self, app):
         """
@@ -68,17 +47,8 @@ class MainWindow(ParentWindow, QMainWindow):
         """Setup all the child widgets of the main window"""
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
-
-        # TODO: make real items
-        genre_model = QStandardItemModel()
-        for i in range(3):
-            item = QStandardItem(str(i))
-            item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-            item.setData(Qt.Unchecked, Qt.CheckStateRole)
-            genre_model.setItem(i, 0, item)
-        self.combobox_genre_tag.setModel(genre_model)
-        self.combobox_genre_tag.setItemDelegate(CheckmarkDelegate())
-        self.combobox_genre_tag.view().pressed.connect(self.handle_item_pressed)
+        self.combobox_genre_tag = ComboCheckbox(self.combobox_genre_tag, ['1', '2', '3'])
+        self.combobox_genre_tag.combobox.view().pressed.connect(self.handle_item_pressed)
 
     def handle_item_pressed(self, index):
         """
@@ -86,7 +56,8 @@ class MainWindow(ParentWindow, QMainWindow):
         Args:
             index: Index of the item
         """
-        item = self.combobox_genre_tag.model().itemFromIndex(index)
+        print(index)
+        item = self.combobox_genre_tag.combobox.model().itemFromIndex(index)
         if item.checkState() == Qt.Checked:
             item.setCheckState(Qt.Unchecked)
         else:
