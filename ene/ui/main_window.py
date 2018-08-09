@@ -31,7 +31,8 @@ from PySide2.QtWidgets import (
 
 from ene.constants import APP_NAME, IS_WIN
 from ene.util import open_source_code
-from .common import CheckmarkDelegate, ParentWindow
+from .common import CheckmarkDelegate
+from .window import ParentWindow
 
 
 class MainWindow(ParentWindow, QMainWindow):

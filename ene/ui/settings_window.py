@@ -18,7 +18,7 @@
 import PySide2.QtGui
 from PySide2.QtWidgets import QListView, QMdiSubWindow, QPushButton, QStackedWidget
 
-from .common import ParentWindow
+from .window import ParentWindow
 
 SETTINGS = {
     'Video Player': 1,

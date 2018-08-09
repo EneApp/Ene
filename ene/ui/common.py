@@ -16,14 +16,11 @@
 
 """This module contains common elements for UI."""
 from contextlib import contextmanager
-from typing import Dict, List, Optional
+from typing import Optional
 
 from PySide2 import QtUiTools
 from PySide2.QtCore import QFile
 from PySide2.QtWidgets import QStyleOptionViewItem, QStyledItemDelegate, QWidget
-
-import ene.ui
-from ene.constants import resources
 
 
 @contextmanager
@@ -72,56 +69,3 @@ class CheckmarkDelegate(QStyledItemDelegate):
         ref_to_non_const_option = QStyleOptionViewItem(option_)
         ref_to_non_const_option.showDecorationSelected = False
         super().paint(painter_, option_, index_)
-
-
-class UIWindowMixin:
-    """Mixin class that represents a window from a ui file"""
-
-    def __init__(self, app, ui_file: str, *args, **kwargs):
-        self.app = app
-        with resources.path(ene.ui, ui_file) as path:
-            self.window = load_ui_widget(path)
-        super().__init__(*args, **kwargs)
-
-
-class ChildFinderMixin:
-    """Mixin class that provides child finding functions"""
-
-    def __init__(self, children, *args, **kwargs):
-        self._setup_children(children)
-        super().__init__(*args, **kwargs)
-
-    def _set_child(self, name: str, parent: str):
-        """
-        Set ``self``'s attribute with name ``name``
-        to a QObject with the same name
-        Args:
-            name: Name of the object
-            parent: Parent of the object
-
-        Raises:
-            RunTimeError if name is not found
-        """
-        parent_widget = getattr(self, parent)
-        typ = self.__annotations__[name]
-        child = parent_widget.findChild(typ, name)
-        if not child:
-            raise RuntimeError(
-                f'Could not find child "{name}" in '
-                f'{parent_widget.windowTitle() or str(parent_widget)}'
-            )
-        setattr(self, name, child)
-
-    def _setup_children(self, children: Dict[str, List[str]]):
-        """
-        Setup all the child widgets of the main window
-        Args:
-            children: Dictionary of parents and children
-        """
-        for parent, names in children.items():
-            for name in names:
-                self._set_child(name, parent)
-
-
-class ParentWindow(UIWindowMixin, ChildFinderMixin):
-    """A UI window from file with children"""
