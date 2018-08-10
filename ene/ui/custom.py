@@ -17,6 +17,7 @@
 """This module contains custom UI widgets/elements."""
 from typing import List, Optional
 
+from PySide2.QtCore import Qt
 from PySide2.QtGui import QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import QComboBox, QStyleOptionViewItem, QStyledItemDelegate
 
@@ -42,5 +43,19 @@ class ComboCheckbox:
         self.model = QStandardItemModel()
         self.combobox.setModel(self.model)
         self.combobox.setItemDelegate(CheckmarkDelegate())
+        self.combobox.view().pressed.connect(self.handle_item_pressed)
         if items:
             self.model.appendColumn(items)
+
+    def handle_item_pressed(self, index):
+        """
+        Handles a checkable item being pressed in a combo box
+        Args:
+            index: Index of the item
+        """
+        item = self.model.itemFromIndex(index)
+        if item.isCheckable():
+            if item.checkState() == Qt.Checked:
+                item.setCheckState(Qt.Unchecked)
+            else:
+                item.setCheckState(Qt.Checked)

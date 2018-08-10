@@ -73,20 +73,6 @@ class MainWindow(ParentWindow, QMainWindow):
             items.append(make_checkable_item(tag))
         self.combobox_genre_tag = ComboCheckbox(self.combobox_genre_tag, items)
         self.combobox_genre_tag.combobox.setCurrentText('Genres & Tags')
-        self.combobox_genre_tag.combobox.view().pressed.connect(self.handle_item_pressed)
-
-    def handle_item_pressed(self, index):
-        """
-        Handles a checkable item being pressed in a combo box
-        Args:
-            index: Index of the item
-        """
-        item = self.combobox_genre_tag.model.itemFromIndex(index)
-        if item.isCheckable():
-            if item.checkState() == Qt.Checked:
-                item.setCheckState(Qt.Unchecked)
-            else:
-                item.setCheckState(Qt.Checked)
 
     def choose_dir(self) -> Path:
         """
