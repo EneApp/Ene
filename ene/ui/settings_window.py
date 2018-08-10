@@ -16,7 +16,12 @@
 
 """This module contains the settings window."""
 import PySide2.QtGui
-from PySide2.QtWidgets import QMdiSubWindow, QMessageBox
+from PySide2.QtWidgets import (QListView,
+                               QMdiSubWindow,
+                               QPushButton,
+                               QStackedWidget,
+                               QWidget,
+                               QMessageBox)
 
 from .window import ParentWindow
 
@@ -29,6 +34,12 @@ SETTINGS = {
 # TODO: Justin finish implementing this
 class SettingsWindow(ParentWindow, QMdiSubWindow):
     """Class for the settings window."""
+    button_OK: QPushButton
+    button_cancel: QPushButton
+    button_apply: QPushButton
+    settings_menu: QStackedWidget
+    settings_list: QListView
+    player: QWidget
 
     def __init__(self, app):
         super().__init__(app, 'settings_window.ui', 'window')
@@ -39,7 +50,8 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
 
     def _setup_children(self):
         self.button_cancel.clicked.connect(self.window.hide)
-        self.button_OK.clicked.connect(self.on_press_okay())
+        self.button_OK.clicked.connect(self.on_press_okay)
+        self.button_apply.clicked.connect(self.save_current_page)
         model = self.populate_settings()
         self.settings_list.setModel(model)
         self.settings_list.selectionModel().selectionChanged.connect(self.on_select_setting)
@@ -78,8 +90,25 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         self.changes = False
 
     def save_current_page(self):
-        page = self.settings_menu.childAt(self.current_page, 0)
+        """
+        Saves the current page to the config file
+        """
+        page = self.settings_menu.widget(self.current_page)
+        for child in page.children():
+            # TODO: if a child has data we want, save it in the Config
+            pass
 
     def on_press_okay(self):
+        """
+        Saves the current page then exits.
+        Triggered by pressing the okay button
+        """
         self.save_current_page()
         self.window.hide()
+
+    def on_changed(self):
+        """
+        Triggered when an item is changed in the settings
+        Flags as changes made for when the user leaves the page
+        """
+        self.changes = True

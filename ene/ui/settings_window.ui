@@ -58,24 +58,25 @@
        <property name="fieldGrowthPolicy">
         <enum>QFormLayout::FieldsStayAtSizeHint</enum>
        </property>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>14</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Video Player</string>
+         </property>
+         <property name="wordWrap">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Video Player for local files:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Path to player: </string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QLineEdit" name="player_path">
-         <property name="frame">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -98,18 +99,17 @@
          </item>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <pointsize>14</pointsize>
-          </font>
-         </property>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Video Player</string>
+          <string>Path to player: </string>
          </property>
-         <property name="wordWrap">
-          <bool>false</bool>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLineEdit" name="player_path">
+         <property name="frame">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -117,6 +117,13 @@
         <widget class="QPushButton" name="browse">
          <property name="text">
           <string>Browse</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Use RC Interface for VLC</string>
          </property>
         </widget>
        </item>
@@ -133,98 +140,99 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Use RC Interface for VLC</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
     </layout>
    </widget>
    <widget class="QWidget" name="local_files">
-    <widget class="QWidget" name="gridLayoutWidget">
+    <widget class="QListView" name="local_paths">
      <property name="geometry">
       <rect>
-       <x>9</x>
-       <y>10</y>
-       <width>431</width>
-       <height>391</height>
+       <x>1</x>
+       <y>44</y>
+       <width>441</width>
+       <height>351</height>
       </rect>
      </property>
-     <layout class="QGridLayout" name="path_labels">
-      <item row="0" column="1">
-       <widget class="QLabel" name="label_5">
-        <property name="font">
-         <font>
-          <pointsize>14</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Local Files</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QListView" name="local_paths"/>
-      </item>
-     </layout>
     </widget>
-    <widget class="QWidget" name="horizontalLayoutWidget">
+    <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>410</y>
-       <width>431</width>
-       <height>36</height>
+       <x>1</x>
+       <y>11</y>
+       <width>91</width>
+       <height>27</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="path_buttons">
-      <item>
-       <widget class="QPushButton" name="path_add">
-        <property name="text">
-         <string>Add</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="path_remove">
-        <property name="text">
-         <string>Remove</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Local Files</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="path_add">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>400</y>
+       <width>84</width>
+       <height>34</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="path_remove">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>400</y>
+       <width>84</width>
+       <height>34</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remove</string>
+     </property>
     </widget>
    </widget>
   </widget>
-  <widget class="QPushButton" name="button_OK">
+  <widget class="QWidget" name="horizontalLayoutWidget_2">
    <property name="geometry">
     <rect>
-     <x>540</x>
+     <x>270</x>
      <y>460</y>
-     <width>84</width>
-     <height>34</height>
+     <width>451</width>
+     <height>41</height>
     </rect>
    </property>
-   <property name="text">
-    <string>OK</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="button_cancel">
-   <property name="geometry">
-    <rect>
-     <x>630</x>
-     <y>460</y>
-     <width>84</width>
-     <height>34</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Cancel</string>
-   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="button_OK">
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="button_apply">
+      <property name="text">
+       <string>Apply</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="button_cancel">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
