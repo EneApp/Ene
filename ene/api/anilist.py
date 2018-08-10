@@ -26,6 +26,8 @@ from .auth import OAuth
 from .enums import MediaSeason, MediaSort
 
 
+# TODO: add caching
+# TODO: add threading
 class API:
     """
     Handles requests to the Anilist API
