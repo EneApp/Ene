@@ -15,7 +15,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains custom UI widgets/elements."""
-from PySide2.QtWidgets import QStyleOptionViewItem, QStyledItemDelegate
+from typing import Optional
+
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QStandardItem, QStandardItemModel
+from PySide2.QtWidgets import QComboBox, QStyleOptionViewItem, QStyledItemDelegate
 
 
 class CheckmarkDelegate(QStyledItemDelegate):
@@ -29,3 +33,22 @@ class CheckmarkDelegate(QStyledItemDelegate):
         ref_to_non_const_option = QStyleOptionViewItem(option_)
         ref_to_non_const_option.showDecorationSelected = False
         super().paint(painter_, option_, index_)
+
+
+class ComboCheckbox:
+    """A combo box with its items as checkboxes."""
+
+    def __init__(self, combobox: Optional[QComboBox], items: Optional[list] = None):
+        self.combobox = combobox if combobox else QComboBox()
+        self.model = QStandardItemModel()
+        self.combobox.setModel(self.model)
+        self.combobox.setItemDelegate(CheckmarkDelegate())
+        if items:
+            self.set_items(items)
+
+    def set_items(self, items: list):
+        for i, item in enumerate(items):
+            item = QStandardItem(item)
+            item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+            item.setData(Qt.Unchecked, Qt.CheckStateRole)
+            self.model.setItem(i, 0, item)

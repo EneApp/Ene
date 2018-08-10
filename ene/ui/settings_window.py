@@ -43,9 +43,9 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
 
     def __init__(self, app):
         super().__init__(app, 'settings_window.ui', 'window')
+        self.current_page = self.settings_menu.currentIndex()
         self.window.setWindowTitle('Preferences')
         self._setup_children()
-        self.current_page = self.settings_menu.currentIndex()
         self.changes = False
 
     def _setup_children(self):
