@@ -16,6 +16,7 @@
 
 """This module contains the main application class."""
 import sys
+from concurrent.futures import ThreadPoolExecutor
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QApplication
@@ -34,6 +35,7 @@ class App(QApplication):
 
     def __init__(self):
         super().__init__([APP_NAME])
+        self.pool = ThreadPoolExecutor()
         self.api = API()
         self.main_window = MainWindow(self)
         self.settings_window = SettingsWindow(self)
