@@ -47,8 +47,13 @@ class MainWindow(ParentWindow, QMainWindow):
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
         # TODO: Make the titles of the comboboxes not selectable
-        genres = self.app.api.get_genres()
-        tags = [tag['name'] for tag in self.app.api.get_tags()]
+
+        genre_future = self.app.pool.submit(self.app.api.get_genres)
+        tags_future = self.app.pool.submit(self.app.api.get_tags)
+
+        tags = [tag['name'] for tag in tags_future.result()]
+        genres = genre_future.result()
+
         self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
         self.streamer_selector = StreamerSelector(self.combobox_streaming)
 
