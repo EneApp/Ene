@@ -22,10 +22,10 @@ IS_37 = sys.version_info >= (3, 7)
 
 if IS_37:
     # noinspection PyUnresolvedReferences
-    from importlib import resources # pylint: disable=E0611,W0611
+    from importlib import resources  # pylint: disable=E0611,W0611
 else:
     # noinspection PyUnresolvedReferences
-    import importlib_resources as resources # pylint: disable=E0611,W0611
+    import importlib_resources as resources  # pylint: disable=E0611,W0611
 
 IS_WIN = sys.platform in ('win32', 'cygwin')
 IS_LINUX = sys.platform.startswith('linux')
@@ -36,3 +36,5 @@ CLIENT_ID = 584
 
 CONFIG_DIR = Path.home() / '.config' / 'ene'
 GRAPHQL_URL = 'https://graphql.anilist.co'
+
+STREAMERS = ['Crunchyroll', 'Funimation', 'Netflix', 'Amazaon', 'Hidive', 'Hulu', 'Animelab']
