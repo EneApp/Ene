@@ -26,15 +26,14 @@ from ene.constants import APP_NAME
 from ene.ui import MainWindow, SettingsWindow
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
+config = Config()
 
 
 class App(QApplication):
     """Main Application class"""
-    config: Config
 
     def __init__(self):
         super().__init__([APP_NAME])
-        self.config = Config()
         self.api = API()
         self.main_window = MainWindow(self)
         self.settings_window = SettingsWindow(self)

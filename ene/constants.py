@@ -36,3 +36,9 @@ CLIENT_ID = 584
 
 CONFIG_DIR = Path.home() / '.config' / 'ene'
 GRAPHQL_URL = 'https://graphql.anilist.co'
+
+CONFIG_ITEM = {
+    'player_type': 'Player',
+    'player_path': 'Player Path',
+    'use_rc': 'VLC RC Interface'
+}

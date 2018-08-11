@@ -16,13 +16,18 @@
 
 """This module contains the settings window."""
 import PySide2.QtGui
-from PySide2.QtWidgets import (QListView,
+from PySide2.QtWidgets import (QCheckBox,
+                               QComboBox,
+                               QLineEdit,
+                               QListView,
                                QMdiSubWindow,
                                QPushButton,
                                QStackedWidget,
                                QWidget,
                                QMessageBox)
 
+import ene.app
+from ene.constants import CONFIG_ITEM
 from .window import ParentWindow
 
 SETTINGS = {
@@ -31,7 +36,6 @@ SETTINGS = {
 }
 
 
-# TODO: Justin finish implementing this
 class SettingsWindow(ParentWindow, QMdiSubWindow):
     """Class for the settings window."""
     button_OK: QPushButton
@@ -52,6 +56,8 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         self.button_cancel.clicked.connect(self.window.hide)
         self.button_OK.clicked.connect(self.on_press_okay)
         self.button_apply.clicked.connect(self.save_current_page)
+        self.player_type.currentIndexChanged.connect(self.pick_player)
+        self.local_paths.setModel(self.populate_paths())
         model = self.populate_settings()
         self.settings_list.setModel(model)
         self.settings_list.selectionModel().selectionChanged.connect(self.on_select_setting)
@@ -67,6 +73,20 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         for setting in SETTINGS:
             model.appendRow(PySide2.QtGui.QStandardItem(setting))
 
+        return model
+
+    @staticmethod
+    def populate_paths():
+        """
+        Grabs the list of user specified paths from the config and adds them to
+        the model for the path list
+        """
+        paths = ene.app.config.get('Local Paths')
+        model = PySide2.QtGui.QStandardItemModel()
+        if paths is None:
+            return model
+        for path in paths:
+            model.appendRow(PySide2.QtGui.QStandardItem(path))
         return model
 
     def on_select_setting(self, selected):
@@ -94,16 +114,40 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         Saves the current page to the config file
         """
         page = self.settings_menu.widget(self.current_page)
-        for child in page.children():
-            # TODO: if a child has data we want, save it in the Config
-            pass
+        with ene.app.config.change() as config:
+            for child in page.children():
+                if child.objectName() in CONFIG_ITEM:
+                    config[CONFIG_ITEM[child.objectName()]] = self.get_setting_from_child(child)
+            ene.app.config.apply()
+        self.changes = False
+
+    @staticmethod
+    def get_setting_from_child(child):
+        """
+        Gets the setting value the user has input into the child
+        Args:
+            child:
+                The child to read a setting from
+        Returns:
+            The setting value
+        """
+        if isinstance(child, QComboBox):
+            val = child.currentText()
+        elif isinstance(child, QListView):
+            val = None
+        elif isinstance(child, QLineEdit):
+            val = child.text()
+        elif isinstance(child, QCheckBox):
+            val = child.isChecked()
+        return val
 
     def on_press_okay(self):
         """
         Saves the current page then exits.
         Triggered by pressing the okay button
         """
-        self.save_current_page()
+        if self.changes:
+            self.save_current_page()
         self.window.hide()
 
     def on_changed(self):
@@ -112,3 +156,19 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         Flags as changes made for when the user leaves the page
         """
         self.changes = True
+
+    def pick_player(self, selection):
+        """
+        Hides or show player specific settings upon picking a player from the
+        combo box
+        Args:
+            selection:
+                The index of the selected item
+        """
+        self.on_changed()
+        if selection is not 0:
+            self.label_rc.hide()
+            self.use_rc.hide()
+        else:
+            self.label_rc.show()
+            self.use_rc.show()
