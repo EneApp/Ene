@@ -45,4 +45,3 @@ CONFIG_ITEM = {
 }
 
 STREAMERS = ['Crunchyroll', 'Funimation', 'Netflix', 'Amazaon', 'Hidive', 'Hulu', 'Animelab']
-
