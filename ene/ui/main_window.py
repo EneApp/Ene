@@ -17,10 +17,7 @@
 """This module contains the main window."""
 from pathlib import Path
 
-from PySide2.QtWidgets import (
-    QFileDialog,
-    QMainWindow,
-)
+from PySide2.QtWidgets import QFileDialog, QMainWindow
 
 from ene.constants import APP_NAME, IS_WIN
 from ene.util import open_source_code
@@ -46,7 +43,12 @@ class MainWindow(ParentWindow, QMainWindow):
         """Setup all the child widgets of the main window"""
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
-        # TODO: Make the titles of the comboboxes not selectable
+
+        for box in (self.combobox_sort, self.combobox_format, self.combobox_status):
+            model = box.model()
+            model.itemFromIndex(
+                model.index(0, box.modelColumn(), box.rootModelIndex())
+            ).setSelectable(False)
 
         genre_future = self.app.pool.submit(self.app.api.get_genres)
         tags_future = self.app.pool.submit(self.app.api.get_tags)
