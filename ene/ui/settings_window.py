@@ -53,14 +53,43 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         self.changes = False
 
     def _setup_children(self):
+        self.player_type.currentIndexChanged.connect(self.pick_player)
+        self.reset_page()
+        self.setup_listeners()
         self.button_cancel.clicked.connect(self.window.hide)
         self.button_OK.clicked.connect(self.on_press_okay)
         self.button_apply.clicked.connect(self.save_current_page)
-        self.player_type.currentIndexChanged.connect(self.pick_player)
-        self.local_paths.setModel(self.populate_paths())
+        self.button_apply.setEnabled(False)
+        path_model = self.populate_paths()
+        path_model.itemChanged.connect(self.on_changed)
+        self.local_paths.setModel(path_model)
         model = self.populate_settings()
         self.settings_list.setModel(model)
         self.settings_list.selectionModel().selectionChanged.connect(self.on_select_setting)
+
+    def setup_listeners(self):
+        """
+        Sets up listeners for children to trigger events
+        """
+        page = self.settings_menu.widget(self.current_page)
+        for child in page.children():
+            if child.objectName() in CONFIG_ITEM:
+                self.attach_change_listener(child)
+
+    def attach_change_listener(self, child):
+        """
+        Connects on_changed to a child's signal, the signal is based on the
+        type of the child
+        Args:
+            child:
+                The child to connect the listener to
+        """
+        if isinstance(child, QComboBox):
+            child.currentIndexChanged.connect(self.on_changed)
+        elif isinstance(child, QLineEdit):
+            child.textEdited.connect(self.on_changed)
+        elif isinstance(child, QCheckBox):
+            child.stateChanged.connect(self.on_changed)
 
     @staticmethod
     def populate_settings():
@@ -103,11 +132,24 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
                                         "Changes detected. Save current page?")
             if save == QMessageBox.Yes:
                 self.save_current_page()
-        # reset the page
+        self.reset_page()
         index = selected.indexes()[0].data()
         self.settings_menu.setCurrentIndex(SETTINGS[index])
         self.current_page = SETTINGS[index]
         self.changes = False
+        self.button_apply.setEnabled(False)
+
+    def reset_page(self):
+        """
+        Resets settings items on the page to the value in the config
+        """
+        page = self.settings_menu.widget(self.current_page)
+        for child in page.children():
+            if child.objectName() in CONFIG_ITEM:
+                setting = ene.app.config.get(CONFIG_ITEM[child.objectName()])
+                if setting is None:
+                    continue
+                self.set_setting_for_child(child, setting)
 
     def save_current_page(self):
         """
@@ -120,6 +162,7 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
                     config[CONFIG_ITEM[child.objectName()]] = self.get_setting_from_child(child)
             ene.app.config.apply()
         self.changes = False
+        self.button_apply.setEnabled(False)
 
     @staticmethod
     def get_setting_from_child(child):
@@ -139,7 +182,26 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
             val = child.text()
         elif isinstance(child, QCheckBox):
             val = child.isChecked()
+        else:
+            raise NotImplementedError
         return val
+
+    @staticmethod
+    def set_setting_for_child(child, setting):
+        """
+        Populates a child with the setting value from the config
+        Args:
+            child:
+                The child to modify
+            setting:
+                The saved setting value
+        """
+        if isinstance(child, QComboBox):
+            child.setCurrentText(setting)
+        elif isinstance(child, QLineEdit):
+            child.setText(setting)
+        elif isinstance(child, QCheckBox):
+            child.setChecked(setting)
 
     def on_press_okay(self):
         """
@@ -156,6 +218,7 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         Flags as changes made for when the user leaves the page
         """
         self.changes = True
+        self.button_apply.setEnabled(True)
 
     def pick_player(self, selection):
         """
