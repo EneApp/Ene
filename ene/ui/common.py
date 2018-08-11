@@ -16,11 +16,10 @@
 
 """This module contains common elements for UI."""
 from contextlib import contextmanager
-from typing import Any, Optional
+from typing import Optional
 
 from PySide2 import QtUiTools
-from PySide2.QtCore import QFile, Qt
-from PySide2.QtGui import QStandardItem
+from PySide2.QtCore import QFile
 from PySide2.QtWidgets import QWidget
 
 
@@ -57,17 +56,3 @@ def load_ui_widget(ui_file: str, parent: Optional[QWidget] = None) -> QWidget:
         ui = loader.load(uifile, parent)
     uifile.close()
     return ui
-
-
-def make_checkable_item(val: Any) -> QStandardItem:
-    """
-    Make a checkable QStandardItem.
-    Args:
-        val: the item value
-    Returns:
-        The checkable item
-    """
-    item = QStandardItem(val)
-    item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
-    item.setData(Qt.Unchecked, Qt.CheckStateRole)
-    return item
