@@ -21,7 +21,7 @@ from typing import Any, Iterable, List, Optional, Union
 
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QStandardItem, QStandardItemModel
-from PySide2.QtWidgets import QComboBox, QStyleOptionViewItem, QStyledItemDelegate
+from PySide2.QtWidgets import QComboBox, QStyleOptionViewItem, QStyledItemDelegate, QToolButton
 
 from ene.constants import STREAMERS
 
@@ -177,3 +177,31 @@ class StreamerSelector(ComboCheckbox):
         items.appendleft(self._make_item(streaming_on, False))
         super().__init__(combobox, items)
         self.combobox.setCurrentText(streaming_on)
+
+
+class ToggleToolButton:
+    """A toggable tool button"""
+
+    def __init__(self, button: Optional[QToolButton] = None):
+        """
+        Initialize instance
+        Args:
+            button: The underlying tool button
+        """
+        self.button = button or QToolButton()
+        self.button.clicked.connect(self._handle_toggle)
+
+    def _on_up(self):
+        """Handles when the button becomes up arrow"""
+        self.button.setArrowType(Qt.UpArrow)
+
+    def _on_down(self):
+        """Handles when the button becomes down arrow"""
+        self.button.setArrowType(Qt.DownArrow)
+
+    def _handle_toggle(self):
+        """Handles when the button is toggled"""
+        if self.button.arrowType() == Qt.UpArrow:
+            self._on_down()
+        else:
+            self._on_up()

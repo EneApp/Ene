@@ -21,7 +21,7 @@ from PySide2.QtWidgets import QFileDialog, QMainWindow
 
 from ene.constants import APP_NAME, IS_WIN
 from ene.util import open_source_code
-from .custom import GenreTagSelector, StreamerSelector
+from .custom import GenreTagSelector, StreamerSelector, ToggleToolButton
 from .window import ParentWindow
 
 
@@ -43,6 +43,7 @@ class MainWindow(ParentWindow, QMainWindow):
         """Setup all the child widgets of the main window"""
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
+        self.sort_toggle = ToggleToolButton(self.button_sort_order)
 
         for box in (self.combobox_sort, self.combobox_format, self.combobox_status):
             model = box.model()
