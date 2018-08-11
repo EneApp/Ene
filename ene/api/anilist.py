@@ -15,6 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains anilist API class."""
+from functools import lru_cache
 from typing import Iterable, List, Optional
 
 from requests import HTTPError, post
@@ -147,6 +148,7 @@ class API:
             for anime in page['data']['Page']['media']:
                 yield anime
 
+    @lru_cache(maxsize=None)
     def get_genres(self) -> List[str]:
         """
         Get all genres
@@ -157,6 +159,7 @@ class API:
         res = self.query(query)
         return res['data']['GenreCollection']
 
+    @lru_cache(maxsize=None)
     def get_tags(self) -> List[dict]:
         """
         Get all tags
