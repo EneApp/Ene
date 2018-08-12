@@ -18,7 +18,7 @@
 from functools import lru_cache
 from typing import Iterable, List, Optional
 
-from requests import HTTPError, post
+from requests import HTTPError, Session
 
 import ene.api
 from ene.constants import CLIENT_ID, GRAPHQL_URL, resources
@@ -34,11 +34,12 @@ class API:
 
     def __init__(self):
         self.token = OAuth.get_token(CLIENT_ID, '127.0.0.1', 50000)
-        self.headers = {
+        self.session = Session()
+        self.session.headers.update({
             'Authorization': f'Bearer {self.token}',
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-        }
+        })
         self.queries = {}
         for name in resources.contents(ene.api):
             if name.endswith('.graphql'):
@@ -62,7 +63,7 @@ class API:
         if variables:
             post_json['variables'] = variables
 
-        res = post(GRAPHQL_URL, json=post_json, headers=self.headers)
+        res = self.session.post(GRAPHQL_URL, json=post_json)
         try:
             res.raise_for_status()
         except HTTPError as http_ex:
