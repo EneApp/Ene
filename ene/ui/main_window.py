@@ -45,12 +45,6 @@ class MainWindow(ParentWindow, QMainWindow):
         self.action_source_code.triggered.connect(open_source_code)
         self.sort_toggle = ToggleToolButton(self.button_sort_order)
 
-        for box in (self.combobox_sort, self.combobox_format, self.combobox_status):
-            model = box.model()
-            model.itemFromIndex(
-                model.index(0, box.modelColumn(), box.rootModelIndex())
-            ).setSelectable(False)
-
         genre_future = self.app.pool.submit(self.app.api.get_genres)
         tags_future = self.app.pool.submit(self.app.api.get_tags)
 
