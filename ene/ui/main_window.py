@@ -48,7 +48,7 @@ class MainWindow(ParentWindow, QMainWindow):
         genre_future = self.app.pool.submit(self.app.api.get_genres)
         tags_future = self.app.pool.submit(self.app.api.get_tags)
 
-        tags = [tag['name'] for tag in tags_future.result()]
+        tags = (tag['name'] for tag in tags_future.result())
         genres = genre_future.result()
 
         self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)

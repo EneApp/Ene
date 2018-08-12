@@ -17,7 +17,7 @@
 """This module contains custom UI widgets/elements."""
 from collections import deque
 from itertools import chain
-from typing import Any, Iterable, List, Optional, Union
+from typing import Any, Iterable, Optional, Union
 
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QStandardItem, QStandardItemModel
@@ -142,7 +142,7 @@ class ComboCheckbox:
 class GenreTagSelector(ComboCheckbox):
     """Class for the genres/tags selector."""
 
-    def __init__(self, combobox: QComboBox, genres: List[str], tags: List[str]):
+    def __init__(self, combobox: QComboBox, genres: Iterable[str], tags: Iterable[str]):
         """
         Initialize instance
         Args:
