@@ -413,6 +413,17 @@
        </property>
       </item>
      </widget>
+     <widget class="QWidget" name="gridLayoutWidget_2">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>10</y>
+        <width>1231</width>
+        <height>781</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridlayout_season"/>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
