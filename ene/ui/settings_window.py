@@ -16,15 +16,17 @@
 
 """This module contains the settings window."""
 import PySide2.QtGui
-from PySide2.QtWidgets import (QCheckBox,
-                               QComboBox,
-                               QLineEdit,
-                               QListView,
-                               QMdiSubWindow,
-                               QPushButton,
-                               QStackedWidget,
-                               QWidget,
-                               QMessageBox)
+from PySide2.QtWidgets import (
+    QCheckBox,
+    QComboBox,
+    QLineEdit,
+    QListView,
+    QMdiSubWindow,
+    QMessageBox,
+    QPushButton,
+    QStackedWidget,
+    QWidget
+)
 
 import ene.app
 from ene.constants import CONFIG_ITEM
