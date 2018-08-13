@@ -21,7 +21,7 @@ from PySide2.QtWidgets import QFileDialog, QMainWindow
 
 from ene.constants import APP_NAME, IS_WIN
 from ene.util import open_source_code
-from .custom import GenreTagSelector, StreamerSelector, ToggleToolButton
+from .custom import AnimeDisplay, GenreTagSelector, StreamerSelector, ToggleToolButton
 from .window import ParentWindow
 
 
@@ -53,6 +53,16 @@ class MainWindow(ParentWindow, QMainWindow):
 
         self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
         self.streamer_selector = StreamerSelector(self.combobox_streaming)
+
+        self.weird = AnimeDisplay(
+            0,
+            Path(__file__).parent
+            / '..' / '..' / 'tests' / 'resource' / 'shingeki_no_kyojin_3.jpg',
+            'Shingeki no Kyojin 3',
+            'Wit Studio',
+            parent=self.widget_tab
+        )
+        self.weird.move(200, 50)
 
     def choose_dir(self) -> Path:
         """

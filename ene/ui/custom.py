@@ -17,11 +17,13 @@
 """This module contains custom UI widgets/elements."""
 from collections import deque
 from itertools import chain
+from pathlib import Path
 from typing import Any, Iterable, Optional, Union
 
-from PySide2.QtCore import QModelIndex, Qt
-from PySide2.QtGui import QStandardItem, QStandardItemModel
-from PySide2.QtWidgets import QComboBox, QStyleOptionViewItem, QStyledItemDelegate, QToolButton
+from PySide2.QtCore import QModelIndex, QRect, Qt
+from PySide2.QtGui import QPixmap, QStandardItem, QStandardItemModel
+from PySide2.QtWidgets import (QComboBox, QFrame, QLabel, QSizePolicy, QStyleOptionViewItem,
+                               QStyledItemDelegate, QToolButton)
 
 from ene.constants import STREAMERS
 
@@ -205,3 +207,77 @@ class ToggleToolButton:
             self._on_down()
         else:
             self._on_up()
+
+
+class FlexLabel(QLabel):
+    policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.MinimumExpanding)
+
+    def __init__(self, fix_w=None, fix_h=None, font_size=None, stylesheet=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if fix_w:
+            self.setFixedWidth(fix_w)
+        if fix_h:
+            self.setFixedHeight(fix_h)
+        if font_size:
+            font = self.font()
+            font.setPointSize(font_size)
+            self.setFont(font)
+        if stylesheet:
+            self.setStyleSheet(stylesheet)
+        self.setSizePolicy(self.policy)
+        self.setWordWrap(True)
+        self.adjustSize()
+
+
+class AnimeDisplay(QFrame):
+
+    def __init__(
+            self,
+            anime_id: int,
+            image_path: Union[Path, str],
+            title: str,
+            studio: str,
+            *args,
+            **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+
+        self.image_w, self.image_h = 230, 315
+        self.anime_id = anime_id
+        self.title = title
+        self.studio = studio
+        self.image = QPixmap(str(image_path)).scaled(
+            self.image_w, self.image_h, Qt.KeepAspectRatio
+        )
+
+        self.image_label = QLabel(parent=self)
+        self.image_label.setPixmap(self.image)
+        self.image_label.setGeometry(QRect(0, 0, self.image_w, self.image_h))
+
+        stylesheet_template = """QLabel {
+            color: %s;
+            background-color: rgba(40,40,40,0.75); 
+            padding: %s;
+        }"""
+        self.studio_label = FlexLabel(
+            fix_w=self.image_w,
+            font_size=12,
+            stylesheet=stylesheet_template % ('DeepSkyBlue', '0px 5px 5px 5px'),
+            text=self.studio,
+            parent=self.image_label
+        )
+        self.studio_label.move(0, self.image_h - self.studio_label.height())
+        self.title_label = FlexLabel(
+            fix_w=self.image_w,
+            font_size=14,
+            stylesheet=stylesheet_template % ('White', '5px 5px 0px 5px'),
+            text=self.title,
+            parent=self.image_label
+        )
+        self.title_label.move(0, self.studio_label.y() - self.title_label.height())
+
+    def _title_studio_label(self, text, stylesheet):
+        pass
+
+    def __hash__(self):
+        return hash(self.anime_id)
