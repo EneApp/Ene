@@ -137,7 +137,7 @@ class API:
         Raises:
             APIHTTPError if request failed
         """
-        sort = sort or [MediaSort.POPULARITY_DESC.name]
+        sort = sort or [MediaSort.POPULARITY_DESC]
         variables = {
             'season': season.name,
             'seasonYear': year,
