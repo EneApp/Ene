@@ -18,12 +18,13 @@
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
-from PySide2.QtCore import Qt
+from PySide2.QtCore import QFile, QTextStream, Qt
 from PySide2.QtWidgets import QApplication
 
+import ene.resources
 from ene.api import API
 from ene.config import Config
-from ene.constants import APP_NAME
+from ene.constants import APP_NAME, resources
 from ene.ui import MainWindow, SettingsWindow
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
@@ -34,7 +35,9 @@ class App(QApplication):
     """Main Application class"""
 
     def __init__(self):
-        super().__init__([APP_NAME])
+        args = [APP_NAME]
+        args.extend(sys.argv[1:])
+        super().__init__(args)
         self.pool = ThreadPoolExecutor()
         self.api = API()
         self.main_window = MainWindow(self)
@@ -46,7 +49,13 @@ def launch():
     """
     Launch the Application
     """
+    ene.resources.style_rc.qInitResources()
     app = App()
+    with resources.path(ene.resources, 'style.qss') as path:
+        file = QFile(str(path))
+    file.open(QFile.ReadOnly | QFile.Text)
+    stream = QTextStream(file)
+    app.setStyleSheet(stream.readAll())
     app.main_window.window.show()
     sys.exit(app.exec_())
 

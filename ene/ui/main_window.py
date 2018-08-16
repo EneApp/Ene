@@ -19,9 +19,10 @@ from pathlib import Path
 
 from PySide2.QtWidgets import QFileDialog, QMainWindow
 
+from ene.api import MediaFormat
 from ene.constants import APP_NAME, IS_WIN
 from ene.util import open_source_code
-from .custom import AnimeDisplay, GenreTagSelector, StreamerSelector, ToggleToolButton
+from .custom import GenreTagSelector, MediaDisplay, StreamerSelector, ToggleToolButton
 from .window import ParentWindow
 
 
@@ -45,21 +46,26 @@ class MainWindow(ParentWindow, QMainWindow):
         self.action_source_code.triggered.connect(open_source_code)
         self.sort_toggle = ToggleToolButton(self.button_sort_order)
 
-        genre_future = self.app.pool.submit(self.app.api.get_genres)
-        tags_future = self.app.pool.submit(self.app.api.get_tags)
+        # genre_future = self.app.pool.submit(self.app.api.get_genres)
+        # tags_future = self.app.pool.submit(self.app.api.get_tags)
+        #
+        # tags = (tag['name'] for tag in tags_future.result())
+        # genres = genre_future.result()
+        #
+        # self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
+        # self.streamer_selector = StreamerSelector(self.combobox_streaming)
 
-        tags = (tag['name'] for tag in tags_future.result())
-        genres = genre_future.result()
-
-        self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
-        self.streamer_selector = StreamerSelector(self.combobox_streaming)
-
-        self.weird = AnimeDisplay(
+        self.weird = MediaDisplay(
             0,
             Path(__file__).parent
             / '..' / '..' / 'tests' / 'resource' / 'shingeki_no_kyojin_3.jpg',
             'Shingeki no Kyojin 3',
             'Wit Studio',
+            {'episode': 5, 'timeUntilAiring': 320580},
+            MediaFormat.TV,
+            81,
+            '',
+            [],
             parent=self.widget_tab
         )
         self.weird.move(200, 50)

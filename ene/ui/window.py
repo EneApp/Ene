@@ -16,7 +16,7 @@
 
 """This module contains common window classes/functions."""
 
-import ene.ui
+import ene.resources
 from ene.constants import resources
 from .common import load_ui_widget
 
@@ -26,7 +26,7 @@ class UIWindowMixin:
 
     def __init__(self, app, ui_file: str, *args, **kwargs):
         self.app = app
-        with resources.path(ene.ui, ui_file) as path:
+        with resources.path(ene.resources, ui_file) as path:
             self.window = load_ui_widget(path)
         super().__init__(*args, **kwargs)
 
