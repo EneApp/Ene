@@ -18,13 +18,21 @@
 from collections import deque
 from itertools import chain
 from pathlib import Path
-from typing import Any, Iterable, Optional, Union
+from typing import Any, Iterable, List, Optional, Union
 
 from PySide2.QtCore import QModelIndex, QRect, Qt
 from PySide2.QtGui import QPixmap, QStandardItem, QStandardItemModel
-from PySide2.QtWidgets import (QComboBox, QFrame, QLabel, QSizePolicy, QStyleOptionViewItem,
-                               QStyledItemDelegate, QToolButton)
+from PySide2.QtWidgets import (
+    QComboBox,
+    QFrame,
+    QLabel,
+    QSizePolicy,
+    QStyleOptionViewItem,
+    QStyledItemDelegate,
+    QToolButton,
+)
 
+from ene.api import MediaFormat
 from ene.constants import STREAMERS
 
 
@@ -229,7 +237,7 @@ class FlexLabel(QLabel):
         self.adjustSize()
 
 
-class AnimeDisplay(QFrame):
+class MediaDisplay(QFrame):
 
     def __init__(
             self,
@@ -237,6 +245,11 @@ class AnimeDisplay(QFrame):
             image_path: Union[Path, str],
             title: str,
             studio: str,
+            next_airing_episode: dict,
+            media_format: MediaFormat,
+            score: int,
+            description: str,
+            genres: List[str],
             *args,
             **kwargs
     ):
@@ -256,13 +269,14 @@ class AnimeDisplay(QFrame):
 
         stylesheet_template = """QLabel {
             color: %s;
-            background-color: rgba(40,40,40,0.75); 
+            background-color: %s; 
             padding: %s;
         }"""
+        transparent_grey = 'rgba(40,40,40,0.75)'
         self.studio_label = FlexLabel(
             fix_w=self.image_w,
             font_size=12,
-            stylesheet=stylesheet_template % ('DeepSkyBlue', '0px 5px 5px 5px'),
+            stylesheet=stylesheet_template % ('DeepSkyBlue', transparent_grey, '0px 5px 5px 5px'),
             text=self.studio,
             parent=self.image_label
         )
@@ -270,11 +284,34 @@ class AnimeDisplay(QFrame):
         self.title_label = FlexLabel(
             fix_w=self.image_w,
             font_size=14,
-            stylesheet=stylesheet_template % ('White', '5px 5px 0px 5px'),
+            stylesheet=stylesheet_template % ('White', transparent_grey, '5px 5px 0px 5px'),
             text=self.title,
             parent=self.image_label
         )
         self.title_label.move(0, self.studio_label.y() - self.title_label.height())
+
+        next_episode = next_airing_episode.get('episode')
+        time_until = next_airing_episode.get('timeUntilAiring')
+        days, seconds = divmod(time_until, 86400)
+        hours, seconds = divmod(seconds, 3600)
+        minutes = seconds // 60
+        time_parts = []
+        if days:
+            time_parts.append(f'{days}d')
+        if hours:
+            time_parts.append(f'{hours}h')
+        time_parts.append(f'{minutes}m')
+        time_str = ' '.join(time_parts)
+
+        self.next_airing_label = QLabel(parent=self)
+        self.next_airing_label.setGeometry(
+            self.image_w, 0, self.image_w, 20
+        )
+        self.next_airing_label.setText(f'Ep {next_episode} - {time_str}')
+        self.next_airing_label.setStyleSheet(
+            stylesheet_template % ('DeepSkyBlue', 'Black', '5px 5px 5px 5px')
+        )
+        self.next_airing_label.setAlignment(Qt.AlignCenter)
 
     def _title_studio_label(self, text, stylesheet):
         pass
