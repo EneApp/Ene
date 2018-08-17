@@ -15,6 +15,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains the settings window."""
+from pathlib import Path
+from shutil import which
+
 import PySide2.QtGui
 from PySide2.QtWidgets import (
     QCheckBox,
@@ -23,17 +26,12 @@ from PySide2.QtWidgets import (
     QLineEdit,
     QListView,
     QMdiSubWindow,
-    QMessageBox,
-    QPushButton,
-    QStackedWidget,
-    QWidget
+    QMessageBox
 )
 
-from pathlib import Path
-from shutil import which
 import ene.app
 from ene.constants import CONFIG_ITEM, IS_WIN
-from .window import ParentWindow
+from ene.resources import Ui_window_settings
 
 SETTINGS = {
     'Video Player': 1,
@@ -41,19 +39,14 @@ SETTINGS = {
 }
 
 
-class SettingsWindow(ParentWindow, QMdiSubWindow):
+class SettingsWindow(QMdiSubWindow, Ui_window_settings):
     """Class for the settings window."""
-    button_OK: QPushButton
-    button_cancel: QPushButton
-    button_apply: QPushButton
-    settings_menu: QStackedWidget
-    settings_list: QListView
-    player: QWidget
 
     def __init__(self, app):
-        super().__init__(app, 'settings_window.ui', 'window')
+        super().__init__()
+        self.app = app
+        self.setupUi(self)
         self.current_page = self.settings_menu.currentIndex()
-        self.window.setWindowTitle('Preferences')
         self._setup_children()
         self.changes = False
 
@@ -61,7 +54,7 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         self.player_type.currentIndexChanged.connect(self.pick_player)
         self.reset_page()
         self.setup_listeners()
-        self.button_cancel.clicked.connect(self.window.hide)
+        self.button_cancel.clicked.connect(self.hide)
         self.button_OK.clicked.connect(self.on_press_okay)
         self.button_apply.clicked.connect(self.save_current_page)
         self.button_apply.setEnabled(False)
@@ -137,7 +130,7 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
                 The selected item
         """
         if self.changes:
-            save = QMessageBox.question(self.window,
+            save = QMessageBox.question(self,
                                         "Save",
                                         "Changes detected. Save current page?")
             if save == QMessageBox.Yes:
@@ -223,7 +216,7 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         """
         if self.changes:
             self.save_current_page()
-        self.window.hide()
+        self.hide()
 
     def on_changed(self):
         """

@@ -18,7 +18,7 @@
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
-from PySide2.QtCore import QFile, QTextStream, Qt
+from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QApplication
 
 import ene.resources
@@ -42,7 +42,7 @@ class App(QApplication):
         self.api = API()
         self.main_window = MainWindow(self)
         self.settings_window = SettingsWindow(self)
-        self.main_window.action_prefences.triggered.connect(self.settings_window.window.show)
+        self.main_window.action_prefences.triggered.connect(self.settings_window.show)
 
 
 def launch():
@@ -52,11 +52,9 @@ def launch():
     ene.resources.style_rc.qInitResources()
     app = App()
     with resources.path(ene.resources, 'style.qss') as path:
-        file = QFile(str(path))
-    file.open(QFile.ReadOnly | QFile.Text)
-    stream = QTextStream(file)
-    app.setStyleSheet(stream.readAll())
-    app.main_window.window.show()
+        with open(path) as f:
+            app.setStyleSheet(f.read())
+    app.main_window.show()
     sys.exit(app.exec_())
 
 

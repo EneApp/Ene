@@ -20,13 +20,13 @@ from pathlib import Path
 from PySide2.QtWidgets import QFileDialog, QMainWindow
 
 from ene.api import MediaFormat
-from ene.constants import APP_NAME, IS_WIN
+from ene.constants import IS_WIN
+from ene.resources import Ui_window_main
 from ene.util import open_source_code
 from .custom import GenreTagSelector, MediaDisplay, StreamerSelector, ToggleToolButton
-from .window import ParentWindow
 
 
-class MainWindow(ParentWindow, QMainWindow):
+class MainWindow(QMainWindow, Ui_window_main):
     """
     Main form of the application
     """
@@ -35,9 +35,9 @@ class MainWindow(ParentWindow, QMainWindow):
         """
         Initialize the ui files for the application
         """
-        super().__init__(app, 'main_window.ui', 'window')
-        self.window.setWindowTitle(APP_NAME)
-        self.setWindowTitle(APP_NAME)
+        super().__init__()
+        self.app = app
+        self.setupUi(self)
         self._setup_children()
 
     def _setup_children(self):
@@ -46,14 +46,14 @@ class MainWindow(ParentWindow, QMainWindow):
         self.action_source_code.triggered.connect(open_source_code)
         self.sort_toggle = ToggleToolButton(self.button_sort_order)
 
-        # genre_future = self.app.pool.submit(self.app.api.get_genres)
-        # tags_future = self.app.pool.submit(self.app.api.get_tags)
-        #
-        # tags = (tag['name'] for tag in tags_future.result())
-        # genres = genre_future.result()
-        #
-        # self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
-        # self.streamer_selector = StreamerSelector(self.combobox_streaming)
+        genre_future = self.app.pool.submit(self.app.api.get_genres)
+        tags_future = self.app.pool.submit(self.app.api.get_tags)
+
+        tags = (tag['name'] for tag in tags_future.result())
+        genres = genre_future.result()
+
+        self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
+        self.streamer_selector = StreamerSelector(self.combobox_streaming)
 
         self.weird = MediaDisplay(
             0,
