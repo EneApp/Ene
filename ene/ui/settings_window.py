@@ -19,6 +19,7 @@ import PySide2.QtGui
 from PySide2.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QFileDialog,
     QLineEdit,
     QListView,
     QMdiSubWindow,
@@ -28,8 +29,10 @@ from PySide2.QtWidgets import (
     QWidget
 )
 
+from pathlib import Path
+from shutil import which
 import ene.app
-from ene.constants import CONFIG_ITEM
+from ene.constants import CONFIG_ITEM, IS_WIN
 from .window import ParentWindow
 
 SETTINGS = {
@@ -62,9 +65,14 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         self.button_OK.clicked.connect(self.on_press_okay)
         self.button_apply.clicked.connect(self.save_current_page)
         self.button_apply.setEnabled(False)
-        path_model = self.populate_paths()
-        path_model.itemChanged.connect(self.on_changed)
-        self.local_paths.setModel(path_model)
+        self.path_add.clicked.connect(self.add_path)
+        self.path_remove.clicked.connect(self.remove_path)
+        self.path_model = self.populate_paths()
+        self.path_model.itemChanged.connect(self.on_changed)
+        if self.path_model.rowCount() is 0:
+            self.path_remove.setEnabled(False)
+        self.local_paths.setModel(self.path_model)
+        self.button_browse_player.clicked.connect(self.pick_player_path)
         model = self.populate_settings()
         self.settings_list.setModel(model)
         self.settings_list.selectionModel().selectionChanged.connect(self.on_select_setting)
@@ -179,7 +187,10 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         if isinstance(child, QComboBox):
             val = child.currentText()
         elif isinstance(child, QListView):
-            val = None
+            val = []
+            for x in range(child.model().rowCount()):
+                val.append(child.model().item(x).text())
+            return val
         elif isinstance(child, QLineEdit):
             val = child.text()
         elif isinstance(child, QCheckBox):
@@ -237,3 +248,35 @@ class SettingsWindow(ParentWindow, QMdiSubWindow):
         else:
             self.label_rc.show()
             self.use_rc.show()
+        self.player_path.setText(which(self.player_type.currentText()))
+
+    def pick_player_path(self):
+        file, x = QFileDialog.getOpenFileName()
+        if file:
+            self.player_path.setText(file)
+            self.on_changed()
+
+    def remove_path(self):
+        self.path_model.removeRow(self.local_paths.selectionModel().selectedIndexes()[0].row())
+        self.on_changed()
+        if self.path_model.rowCount() is 0:
+            self.path_remove.setEnabled(False)
+
+    def add_path(self):
+        path = PySide2.QtGui.QStandardItem(self.choose_dir())
+        if path:
+            self.path_model.appendRow(path)
+            self.on_changed()
+            self.path_remove.setEnabled(True)
+
+    def choose_dir(self) -> Path:
+        """
+        Choose a directory from a file dialog
+
+        Returns: The directory path
+        """
+        args = [self, self.tr("Open Directory"), str(Path.home())]
+        if IS_WIN:
+            args.append(QFileDialog.DontUseNativeDialog)
+        dir_ = QFileDialog.getExistingDirectory(*args)
+        return dir_

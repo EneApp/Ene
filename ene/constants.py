@@ -41,7 +41,8 @@ GRAPHQL_URL = 'https://graphql.anilist.co'
 CONFIG_ITEM = {
     'player_type': 'Player',
     'player_path': 'Player Path',
-    'use_rc': 'VLC RC Interface'
+    'use_rc': 'VLC RC Interface',
+    'local_paths': 'Local Paths'
 }
 
 STREAMERS = ['Crunchyroll', 'Funimation', 'Netflix', 'Amazaon', 'Hidive', 'Hulu', 'Animelab']
