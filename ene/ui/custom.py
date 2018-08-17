@@ -269,7 +269,7 @@ class MediaDisplay(QFrame):
 
         stylesheet_template = """QLabel {
             color: %s;
-            background-color: %s; 
+            background-color: %s;
             padding: %s;
         }"""
         transparent_grey = 'rgba(40,40,40,0.75)'

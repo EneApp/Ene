@@ -14,7 +14,8 @@ exclude =
     pyside-setup,
     ene/lib,
     /**/__init__.py,
-    ene/constants.py
+    ene/constants.py,
+    ene/resources,
 
 max-line-length = 99
 ignore = E402 E731

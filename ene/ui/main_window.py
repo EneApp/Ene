@@ -57,8 +57,8 @@ class MainWindow(QMainWindow, Ui_window_main):
 
         self.weird = MediaDisplay(
             0,
-            Path(__file__).parent
-            / '..' / '..' / 'tests' / 'resource' / 'shingeki_no_kyojin_3.jpg',
+            Path(__file__).parent /
+            '..' / '..' / 'tests' / 'resource' / 'shingeki_no_kyojin_3.jpg',
             'Shingeki no Kyojin 3',
             'Wit Studio',
             {'episode': 5, 'timeUntilAiring': 320580},
