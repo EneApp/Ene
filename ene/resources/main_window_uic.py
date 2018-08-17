@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main_window.ui',
-# licensing of 'main_window.ui' applies.
+# Form implementation generated from reading ui file 'ene/resources/main_window.ui',
+# licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Fri Aug 17 15:09:12 2018
+# Created: Fri Aug 17 15:23:01 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
