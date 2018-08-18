@@ -22,9 +22,20 @@ from typing import Any, Iterable, List, Optional, Union
 
 from PySide2.QtCore import QModelIndex, Qt
 from PySide2.QtGui import QPixmap, QStandardItem, QStandardItemModel
-from PySide2.QtWidgets import (QBoxLayout, QComboBox, QHBoxLayout, QLabel, QScrollArea,
-                               QSizePolicy, QSpacerItem, QStyleOptionViewItem, QStyledItemDelegate,
-                               QToolButton, QVBoxLayout, QWidget)
+from PySide2.QtWidgets import (
+    QBoxLayout,
+    QComboBox,
+    QHBoxLayout,
+    QLabel,
+    QScrollArea,
+    QSizePolicy,
+    QSpacerItem,
+    QStyleOptionViewItem,
+    QStyledItemDelegate,
+    QToolButton,
+    QVBoxLayout,
+    QWidget
+)
 
 from ene.api import MediaFormat
 from ene.constants import STREAMERS
@@ -347,6 +358,7 @@ class MediaDisplay(QWidget):
         font = self.next_airing_label.font()
         font.setPointSize(11)
         self.next_airing_label.setFont(font)
+        # TODO handle when there's no next airing
         self.next_airing_label.setText(f'Ep {next_episode} - {time_str}')
         self.next_airing_label.setStyleSheet(
             stylesheet_template % (
@@ -363,6 +375,7 @@ class MediaDisplay(QWidget):
             )
         )
 
+        # TODO handle when there's no score
         self.score_label = QLabel(f'{score}%')
         self.score_label.setFont(font)
         self.score_label.setStyleSheet(
@@ -387,6 +400,7 @@ class MediaDisplay(QWidget):
         self.desc_scroll.setWidget(self.desc_label)
         self.right_layout.addWidget(self.desc_scroll)
 
+        # TODO Need to show buttons on hover
         self.genre_label = QLabel(' '.join(genres))
         self.genre_label.setStyleSheet(
             stylesheet_template % (
