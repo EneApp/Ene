@@ -23,7 +23,8 @@ from ene.api import MediaFormat
 from ene.constants import IS_WIN
 from ene.resources import Ui_window_main
 from ene.util import open_source_code
-from .custom import MediaDisplay, ToggleToolButton
+from .custom import ToggleToolButton
+from .media_browser import MediaDisplay
 
 
 class MainWindow(QMainWindow, Ui_window_main):
