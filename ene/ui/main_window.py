@@ -66,7 +66,7 @@ class MainWindow(QMainWindow, Ui_window_main):
             81,
             '',
             [],
-            parent=self.widget_tab
+            parent=self.tab
         )
         self.weird.move(200, 50)
 

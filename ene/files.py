@@ -23,6 +23,8 @@ from pathlib import Path
 
 from fuzzywuzzy import fuzz
 
+from ene.database import Database
+
 
 class FileManager:
     """
@@ -31,9 +33,57 @@ class FileManager:
 
     def __init__(self, cfg):
         self.config = cfg
-        self.dir = Path(self.config.get('Local Files', default=Path.home() / 'Videos'))
+        self.dirs = self.config.get('Local Paths', default=[Path.home() / 'Videos'])
+        self.db = Database(self.config.get('Database Path'))
+        self.series = defaultdict(list)
 
-    def find_episodes(self, name, directory=None):
+    def build_shows_from_db(self):
+        """
+        Fetches all shows from the database and adds them to the series
+        dictionary without episode paths
+        """
+        shows = self.db.get_all_shows()
+        for show in shows:
+            self.series[show[0]] = []
+
+    def build_all_from_db(self):
+        """
+        Fetches all shows and episodes from the database and builds up the full
+        dictionary of series
+        """
+        shows = self.db.get_all()
+        for show in shows:
+            self.series[show[0]].append(Path(show[1]))
+
+    def fetch_db_episodes_for_show(self, show):
+        """
+        Fetches all the episodes for a given show from the database and adds
+        them to the episode list for that show in the dictionary
+        Args:
+            show:
+                The show to fetch episodes for
+        """
+        episodes = self.db.get_episodes_by_show_name(show)
+        for episode in episodes:
+            self.series[show].append(Path(episode[0]))
+
+    def dump_to_db(self):
+        """
+        Dumps the current dictionary to the database
+        """
+        self.db.write_all_shows_delta(self.series.keys())
+        self.db.write_all_episodes_delta(self.series)
+
+    def refresh_shows(self):
+        """
+        Discovers episodes from each path defined in the config and tidies up
+        their titles
+        """
+        for directory in self.dirs:
+            self.discover_episodes(directory)
+        self.series = clean_titles(self.series)
+
+    def find_episodes(self, name, directory):
         """
         Finds all episodes in the set directory that match the given name
         Args:
@@ -44,8 +94,6 @@ class FileManager:
             episodes: A list of all episodes found
         """
         regex = _build_regex(name)
-        if directory is None:
-            directory = self.dir
         episodes = []
         for path in directory.iterdir():
             # check each file in the set directory
@@ -63,27 +111,21 @@ class FileManager:
 
         return episodes
 
-    def discover_episodes(self):
+    def discover_episodes(self, directory):
         """
         Search through a directory to find all files which have a close enough
         name to be considered a part of the same series
-        Returns:
-            A dictionary with the series name as a key and a list of episodes
-            in that series
         """
-        series = defaultdict(list)
-        for path, dirs, files in walk(self.dir):  # pylint: disable=W0612
+        for path, dirs, files in walk(directory):  # pylint: disable=W0612
             for file in files:
                 matched = False
-                for show in series:
+                for show in self.series:
                     if fuzz.token_set_ratio(show, file) > 90:
-                        series[show].append(Path(path) / file)
+                        self.series[show].append(Path(path) / file)
                         matched = True
                         break
                 if not matched:
-                    series[file].append(Path(path) / file)
-        series = clean_titles(series)
-        return series
+                    self.series[file].append(Path(path) / file)
 
 
 def clean_titles(series):
