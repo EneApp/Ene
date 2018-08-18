@@ -23,7 +23,7 @@ from ene.api import MediaFormat
 from ene.constants import IS_WIN
 from ene.resources import Ui_window_main
 from ene.util import open_source_code
-from .custom import GenreTagSelector, MediaDisplay, StreamerSelector, ToggleToolButton
+from .custom import MediaDisplay, ToggleToolButton
 
 
 class MainWindow(QMainWindow, Ui_window_main):
@@ -46,29 +46,29 @@ class MainWindow(QMainWindow, Ui_window_main):
         self.action_source_code.triggered.connect(open_source_code)
         self.sort_toggle = ToggleToolButton(self.button_sort_order)
 
-        genre_future = self.app.pool.submit(self.app.api.get_genres)
-        tags_future = self.app.pool.submit(self.app.api.get_tags)
-
-        tags = (tag['name'] for tag in tags_future.result())
-        genres = genre_future.result()
-
-        self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
-        self.streamer_selector = StreamerSelector(self.combobox_streaming)
+        # genre_future = self.app.pool.submit(self.app.api.get_genres)
+        # tags_future = self.app.pool.submit(self.app.api.get_tags)
+        #
+        # tags = (tag['name'] for tag in tags_future.result())
+        # genres = genre_future.result()
+        #
+        # self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
+        # self.streamer_selector = StreamerSelector(self.combobox_streaming)
 
         self.weird = MediaDisplay(
             0,
             Path(__file__).parent /
             '..' / '..' / 'tests' / 'resource' / 'shingeki_no_kyojin_3.jpg',
             'Shingeki no Kyojin 3',
-            'Wit Studio',
+            'Wit Studio' * 10,
             {'episode': 5, 'timeUntilAiring': 320580},
             MediaFormat.TV,
             81,
-            '',
-            [],
-            parent=self.tab
+            'descon ' * 200,
+            ['Genre'],
+
         )
-        self.weird.move(200, 50)
+        self.gridlayout_season.addWidget(self.weird)
 
     def choose_dir(self) -> Path:
         """
