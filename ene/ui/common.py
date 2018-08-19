@@ -58,7 +58,7 @@ def load_ui_widget(ui_file: str, parent: Optional[QWidget] = None) -> QWidget:
     return ui
 
 
-def stylesheet(rules: Dict[str, str], selector: Union[str, List[str]] = None) -> str:
+def mk_stylesheet(rules: Dict[str, str], selector: Union[str, List[str]] = None) -> str:
     """
     Make a stylesheet
     Args:
@@ -75,3 +75,19 @@ def stylesheet(rules: Dict[str, str], selector: Union[str, List[str]] = None) ->
         return f'{", ".join(selector)} {body}'
     else:
         return body
+
+
+def mk_padding(top=0, right=0, bottom=0, left=0, unit='px') -> str:
+    """
+    Make padding value for stylesheet
+    Args:
+        top: Top padding
+        right: Right padding
+        bottom: Bottom padding
+        left: Left padding
+        unit: Padding unit
+
+    Returns:
+        Padding stylesheet rule
+    """
+    return f'{top}{unit} {right}{unit} {bottom}{unit} {left}{unit}'
