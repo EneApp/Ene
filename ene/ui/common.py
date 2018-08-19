@@ -73,8 +73,7 @@ def mk_stylesheet(rules: Dict[str, str], selector: Union[str, List[str]] = None)
         if isinstance(selector, str):
             selector = (selector,)
         return f'{", ".join(selector)} {body}'
-    else:
-        return body
+    return body
 
 
 def mk_padding(top=0, right=0, bottom=0, left=0, unit='px') -> str:
