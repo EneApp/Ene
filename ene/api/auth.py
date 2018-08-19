@@ -21,7 +21,7 @@ from threading import Thread
 from time import time
 from urllib.parse import parse_qsl, urlencode, urlparse
 
-from ene.constants import CONFIG_DIR
+from ene.constants import DATA_HOME
 from ene.errors import AuthError
 
 
@@ -38,7 +38,7 @@ class OAuth:
         https://anilist.gitbooks.io/anilist-apiv2-docs/oauth/implicit-grant.html
     """
     TOKEN = None
-    TOKEN_FILE = CONFIG_DIR / 'token'
+    TOKEN_FILE = DATA_HOME / 'token'
 
     class _RedirectHandler(BaseHTTPRequestHandler):
         """
@@ -172,7 +172,7 @@ class OAuth:
         if not cls.TOKEN:
             raise AuthError()
         else:
-            CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+            DATA_HOME.mkdir(parents=True, exist_ok=True)
             cls.TOKEN_FILE.touch()
             cls.TOKEN_FILE.write_text(cls.TOKEN)
             return cls.TOKEN
