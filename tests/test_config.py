@@ -14,16 +14,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from os import environ
 from pathlib import Path
 
-Path.home = lambda: Path(__file__).parent
+environ['XDG_CONFIG_HOME'] = str(Path(__file__).parent.resolve())
 
 import pytest
 from toml import dump, loads
 from . import rmdir
-from ene.config import Config, CONFIG_DIR
+from ene.config import Config
+from ene.constants import CONFIG_HOME
 
-CONFIG_FILE = CONFIG_DIR / 'config.toml'
+CONFIG_FILE = CONFIG_HOME / 'config.toml'
 
 MOCK_SETTINGS = {
     'foo': 1,
@@ -37,19 +39,19 @@ MOCK_SETTINGS = {
 
 @pytest.fixture()
 def path():
-    rmdir(CONFIG_DIR, True)
-    CONFIG_DIR.mkdir(parents=True)
+    rmdir(CONFIG_HOME, True)
+    CONFIG_HOME.mkdir(parents=True)
     with CONFIG_FILE.open('w+') as f:
         dump(MOCK_SETTINGS, f)
-    yield CONFIG_DIR
-    rmdir(CONFIG_DIR, False)
+    yield CONFIG_HOME
+    rmdir(CONFIG_HOME, False)
 
 
 @pytest.fixture()
 def path_empty():
-    rmdir(CONFIG_DIR, True)
-    yield CONFIG_DIR
-    rmdir(CONFIG_DIR, False)
+    rmdir(CONFIG_HOME, True)
+    yield CONFIG_HOME
+    rmdir(CONFIG_HOME, False)
 
 
 def test_config_read(path):

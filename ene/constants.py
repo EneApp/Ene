@@ -67,7 +67,6 @@ else:
 APP_NAME = 'ENE'
 CLIENT_ID = 584
 
-CONFIG_DIR = Path.home() / '.config' / 'ene'
 GRAPHQL_URL = 'https://graphql.anilist.co'
 
 CONFIG_ITEM = {

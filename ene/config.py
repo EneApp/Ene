@@ -21,7 +21,7 @@ from pathlib import Path
 
 import toml
 
-from ene.constants import CONFIG_DIR
+from ene.constants import CONFIG_HOME
 
 
 class Config(Mapping):
@@ -35,7 +35,7 @@ class Config(Mapping):
         """
         Create the config directory and files if they do not exist already
         """
-        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        CONFIG_HOME.mkdir(parents=True, exist_ok=True)
 
         self.config = self._read_config() if self.config_file.is_file() else {}
         self._old = None
@@ -47,7 +47,7 @@ class Config(Mapping):
     @property
     def config_file(self) -> Path:
         """Returns the path of the config file"""
-        return CONFIG_DIR / 'config.toml'
+        return CONFIG_HOME / 'config.toml'
 
     def apply(self):
         """Writes the config in memory to file."""
