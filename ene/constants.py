@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""This module conatins common constants."""
+"""This module contains common constants."""
 import sys
 from pathlib import Path
 
@@ -37,7 +37,6 @@ CLIENT_ID = 584
 CONFIG_DIR = Path.home() / '.config' / 'ene'
 GRAPHQL_URL = 'https://graphql.anilist.co'
 
-
 CONFIG_ITEM = {
     'player_type': 'Player',
     'player_path': 'Player Path',
@@ -45,4 +44,4 @@ CONFIG_ITEM = {
     'local_paths': 'Local Paths'
 }
 
-STREAMERS = ['Crunchyroll', 'Funimation', 'Netflix', 'Amazaon', 'Hidive', 'Hulu', 'Animelab']
+STREAMERS = ('Crunchyroll', 'Funimation', 'Netflix', 'Amazaon', 'Hidive', 'Hulu', 'Animelab')
