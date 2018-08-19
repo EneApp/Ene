@@ -16,7 +16,7 @@
 
 """This module contains common elements for UI."""
 from contextlib import contextmanager
-from typing import Optional
+from typing import Dict, List, Optional, Union
 
 from PySide2 import QtUiTools
 from PySide2.QtCore import QFile
@@ -56,3 +56,22 @@ def load_ui_widget(ui_file: str, parent: Optional[QWidget] = None) -> QWidget:
         ui = loader.load(uifile, parent)
     uifile.close()
     return ui
+
+
+def stylesheet(rules: Dict[str, str], selector: Union[str, List[str]] = None) -> str:
+    """
+    Make a stylesheet
+    Args:
+        rules: The key value pairs for the rules of the stylesheet
+        selector: The selector(s) of the stylesheet
+
+    Returns:
+        The stylesheet string
+    """
+    body = '{%s}' % ' '.join(f'{key}: {val};' for key, val in rules.items())
+    if selector:
+        if isinstance(selector, str):
+            selector = (selector,)
+        return f'{", ".join(selector)} {body}'
+    else:
+        return body
