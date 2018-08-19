@@ -151,6 +151,7 @@ class API:
     def get_genres(self) -> List[str]:
         """
         Get all genres
+
         Returns:
             List of genres
         """
@@ -162,6 +163,7 @@ class API:
     def get_tags(self) -> List[dict]:
         """
         Get all tags
+
         Returns:
             List of tags
         """

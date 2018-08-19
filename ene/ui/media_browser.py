@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""This module contains the media browser"""
+"""This module contains the media browser."""
 from pathlib import Path
 from typing import List, Union
 
@@ -31,10 +31,21 @@ from PySide2.QtWidgets import (
 )
 
 from ene.api import MediaFormat
+from .common import mk_padding, mk_stylesheet
 from .custom import FlexLabel
 
 
 class MediaDisplay(QWidget):
+    image_w = 230
+    image_h = 315
+
+    transparent_grey = 'rgba(43,48,52,0.75)'
+    aqua = '#3DB4F2'
+    dark_grey = '#13171D'
+    grey = '#191D26'
+    light_grey = '#1F232D'
+    dark_white = '#818C99'
+    light_white = '#9FADBD'
 
     def __init__(
             self,
@@ -52,40 +63,16 @@ class MediaDisplay(QWidget):
     ):
         # TODO: Refactor this shit
         super().__init__(*args, **kwargs)
-        self.master_layout = QHBoxLayout()
-        self.setLayout(self.master_layout)
-        self.left_layout = QBoxLayout(QBoxLayout.BottomToTop)
-        self.right_layout = QVBoxLayout()
-        self.right_mid_layout = QHBoxLayout()
-        self.bottom_right_layout = QHBoxLayout()
-
-        quad_0 = 0, 0, 0, 0
-        transparent_grey = 'rgba(43,48,52,0.75)'
-        aqua = '#3DB4F2'
-        dark_grey = '#13171D'
-        grey = '#191D26'
-        light_grey = '#1F232D'
-        dark_white = '#818C99'
-        light_white = '#9FADBD'
-
-        self.master_layout.setSpacing(0)
-        self.master_layout.setContentsMargins(*quad_0)
-        self.left_layout.setSpacing(0)
-        self.left_layout.setContentsMargins(*quad_0)
-        self.right_mid_layout.setSpacing(0)
-        self.right_mid_layout.setContentsMargins(*quad_0)
-        self.right_layout.setSpacing(0)
-        self.right_layout.setContentsMargins(*quad_0)
-        self.bottom_right_layout.setSpacing(0)
-        self.bottom_right_layout.setContentsMargins(*quad_0)
-
-        self.image_w, self.image_h = 230, 315
         self.setFixedWidth(self.image_w * 2)
         self.setFixedHeight(self.image_h)
-        self.image = QPixmap(str(image_path)).scaled(
-            self.image_w, self.image_h, Qt.KeepAspectRatio
-        )
 
+        self.anime_id = anime_id
+        self.title = title
+        self.studio = studio
+        self.image = QPixmap(str(image_path)) \
+            .scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
+
+        self._setup_layouts()
         v_spacer = QSpacerItem(self.image_w, self.image_h)
 
         self.left_widget = QLabel()
@@ -96,39 +83,34 @@ class MediaDisplay(QWidget):
         self.master_layout.addWidget(self.left_widget)
         self.master_layout.addLayout(self.right_layout)
 
-        self.anime_id = anime_id
-        self.title = title
-        self.studio = studio
-        stylesheet_template = """QLabel {
-            color: %s;
-            background-color: %s;
-            padding: %s;
-            qproperty-alignment: '%s';
-            qproperty-wordWrap: true;
-        }"""
-
         self.studio_label = FlexLabel(
             fix_w=self.image_w,
             font_size=12,
-            stylesheet=stylesheet_template % (
-                aqua,
-                transparent_grey,
-                '10px 0px 10px 10px',
-                'AlignVCenter | AlignLeft'
+            stylesheet=mk_stylesheet(
+                {
+                    'color': self.aqua,
+                    'background-color': self.transparent_grey,
+                    'padding': mk_padding(10, 0, 10, 10),
+                },
+                'QLabel'
             ),
             text=self.studio,
         )
+        self.studio_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
         self.title_label = FlexLabel(
             fix_w=self.image_w,
             font_size=14,
-            stylesheet=stylesheet_template % (
-                'White',
-                transparent_grey,
-                '10px 10px 0px 10px',
-                'AlignVCenter | AlignLeft'
+            stylesheet=mk_stylesheet(
+                {
+                    'color': 'White',
+                    'background-color': self.transparent_grey,
+                    'padding': mk_padding(10, 10, 0, 10),
+                },
+                'QLabel'
             ),
             text=self.title,
         )
+        self.title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
         self.left_layout.addWidget(self.studio_label)
         self.left_layout.addWidget(self.title_label)
         self.left_layout.addItem(v_spacer)
@@ -153,36 +135,46 @@ class MediaDisplay(QWidget):
         # TODO handle when there's no next airing
         self.next_airing_label.setText(f'Ep {next_episode} - {time_str}')
         self.next_airing_label.setStyleSheet(
-            stylesheet_template % (
-                aqua, dark_grey, '5px', 'AlignVCenter | AlignCenter')
+            mk_stylesheet(
+                {'color': self.aqua, 'background-color': self.dark_grey, 'padding': '5px'},
+                'QLabel'
+            )
         )
+        self.next_airing_label.setAlignment(Qt.AlignCenter)
         self.right_layout.addWidget(self.next_airing_label)
         self.right_layout.addLayout(self.right_mid_layout)
 
         self.format_label = QLabel(media_format.name)
         self.format_label.setFont(font)
         self.format_label.setStyleSheet(
-            stylesheet_template % (
-                dark_white, grey, '5px', 'AlignVCenter | AlignCenter'
+            mk_stylesheet(
+                {'color': self.dark_white, 'background-color': self.grey, 'padding': '5px'},
+                'QLabel'
             )
         )
+        self.format_label.setAlignment(Qt.AlignCenter)
 
         # TODO handle when there's no score
         self.score_label = QLabel(f'{score}%')
         self.score_label.setFont(font)
         self.score_label.setStyleSheet(
-            stylesheet_template % (
-                dark_white, grey, '5px', 'AlignVCenter | AlignCenter'
+            mk_stylesheet(
+                {'color': self.dark_white, 'background-color': self.grey, 'padding': '5px'},
+                'QLabel'
             )
         )
+        self.score_label.setAlignment(Qt.AlignCenter)
         self.right_mid_layout.addWidget(self.format_label)
         self.right_mid_layout.addWidget(self.score_label)
         self.desc_label = QLabel(description)
         self.desc_label.setStyleSheet(
-            stylesheet_template % (
-                dark_white, light_grey, '5px', 'AlignLeft'
-            ),
+            mk_stylesheet(
+                {'color': self.dark_white, 'background-color': self.light_grey, 'padding': '5px'},
+                'QLabel'
+            )
         )
+        self.desc_label.setAlignment(Qt.AlignLeft)
+        self.desc_label.setWordWrap(True)
         self.desc_scroll = QScrollArea()
         self.desc_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.desc_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -195,15 +187,33 @@ class MediaDisplay(QWidget):
         # TODO Need to show buttons on hover
         self.genre_label = QLabel(' '.join(genres))
         self.genre_label.setStyleSheet(
-            stylesheet_template % (
-                dark_white, grey, '5px', 'AlignVCenter | AlignCenter'
+            mk_stylesheet(
+                {'color': self.dark_white, 'background-color': self.grey, 'padding': '5px'},
+                'QLabel'
             )
         )
+        self.genre_label.setAlignment(Qt.AlignCenter)
         self.bottom_right_layout.addWidget(self.genre_label)
         self.right_layout.addWidget(self.genre_label)
 
-    def _title_studio_label(self, text, stylesheet):
-        pass
+    def _setup_layouts(self):
+        self.master_layout = QHBoxLayout()
+        self.setLayout(self.master_layout)
+
+        self.left_layout = QBoxLayout(QBoxLayout.BottomToTop)
+        self.right_layout = QVBoxLayout()
+        self.right_mid_layout = QHBoxLayout()
+        self.bottom_right_layout = QHBoxLayout()
+
+        for layout in (
+                self.master_layout,
+                self.left_layout,
+                self.right_layout,
+                self.right_mid_layout,
+                self.bottom_right_layout
+        ):
+            layout.setSpacing(0)
+            layout.setContentsMargins(0, 0, 0, 0)
 
     def __hash__(self):
         return hash(self.anime_id)

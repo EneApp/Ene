@@ -48,6 +48,7 @@ class Database:
     def add_show(self, show):
         """
         Inserts a show into the database
+
         Args:
             show:
                 The show to insert into the database
@@ -60,11 +61,13 @@ class Database:
     def add_episode_by_show_name(self, episode, show):
         """
         Adds an episode to the database based on its shows name
+
         Args:
             episode:
                 The path of the episode to add
             show:
                 The show the episode belongs to
+
         Returns:
             The row ID of the newly inserted episode
         """
@@ -76,11 +79,13 @@ class Database:
     def add_episode_by_show_id(self, episode, show_id):
         """
         Adds an episode to the database based on its shows ID
+
         Args:
             episode:
                 The path of the episode to add
             show_id:
                 The ID of the show the episode belongs to
+
         Returns:
             The row ID of the newly insert episode
         """
@@ -92,6 +97,7 @@ class Database:
         """
         Finds the delta of the input shows compared to what is already in the
         database and writes the newly added shows to the database
+
         Args:
             shows:
                 A list of shows to compare and add
@@ -105,6 +111,7 @@ class Database:
         """
         Finds the delta of the input episodes for each show compared to what is
         already in the database and adds any newly added episodes
+
         Args:
             series:
                 A dictionary with show names as keys and lists of episodes
@@ -120,9 +127,11 @@ class Database:
     def get_show_id_by_name(self, show):
         """
         Looks up the show ID for a given show name
+
         Args:
             show:
                 The show to find the ID of
+
         Returns:
             The show ID for the show
         """
@@ -135,9 +144,11 @@ class Database:
     def get_episodes_by_show_name(self, show):
         """
         Gets all episodes for a given show using the shows name
+
         Args:
             show:
                 The name of the show
+
         Returns:
             A list of episodes or None if the show does not exist
         """
@@ -149,9 +160,11 @@ class Database:
     def get_episodes_by_show_id(self, show_id):
         """
         Gets all episodes for a given show using the shows ID
+
         Args:
             show_id:
                 The ID of the show
+
         Returns:
             A list of episodes for the given show
         """
@@ -161,6 +174,7 @@ class Database:
     def get_all(self):
         """
         Gets all episodes and shows from the database
+
         Returns:
             A list of tuples with the show name as the first element and the
             episode path as the second element
@@ -174,6 +188,7 @@ class Database:
     def get_all_shows(self):
         """
         Gets all the shows from the database
+
         Returns:
             A list of tuples containing all shows in the database
         """
@@ -183,6 +198,7 @@ class Database:
     def get_all_episodes(self):
         """
         Gets all the episodes from the database
+
         Returns:
             A list of tuples containing all the episodes in the database
         """

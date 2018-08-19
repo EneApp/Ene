@@ -34,7 +34,7 @@ from ene.constants import STREAMERS
 
 
 class CheckmarkDelegate(QStyledItemDelegate):
-    """This subclass makes checkmark appear for some reason"""
+    """This subclass makes check mark appear for some reason"""
 
     def paint(self, painter_, option_, index_):
         """
@@ -56,6 +56,7 @@ class ComboCheckbox:
     ):
         """
         Initialize instance
+
         Args:
             combobox: The underlying combobox, None to create a new one
             items: Items to put in the combobox, if any
@@ -72,9 +73,10 @@ class ComboCheckbox:
     def _make_item(val: Any, checkable: bool) -> QStandardItem:
         """
         Make an item for the combobox
+
         Args:
             val: The value for the item
-            checkable: Wether the item is checkable
+            checkable: Whether the item is checkable
 
         Returns:
             The item created
@@ -91,6 +93,7 @@ class ComboCheckbox:
     def _on_check(self, item: QStandardItem):
         """
         Handles checking an item.
+
         Args:
             item: Item checked
         """
@@ -100,6 +103,7 @@ class ComboCheckbox:
     def _on_uncheck(self, item: QStandardItem):
         """
         Handles unchecking an item.
+
         Args:
             item: Item unchecked
         """
@@ -108,6 +112,7 @@ class ComboCheckbox:
     def __getitem__(self, i: Union[int, QModelIndex]) -> QStandardItem:
         """
         Get item by index
+
         Args:
             i: The index
         Returns:
@@ -135,6 +140,7 @@ class ComboCheckbox:
     def handle_item_pressed(self, index):
         """
         Handles a checkable item being pressed in a combo box
+
         Args:
             index: Index of the item
         """
@@ -152,6 +158,7 @@ class GenreTagSelector(ComboCheckbox):
     def __init__(self, combobox: QComboBox, genres: Iterable[str], tags: Iterable[str]):
         """
         Initialize instance
+
         Args:
             combobox: The underlying combobox
             genres: List of genre names
@@ -187,11 +194,12 @@ class StreamerSelector(ComboCheckbox):
 
 
 class ToggleToolButton:
-    """A toggable tool button"""
+    """A toggleable tool button"""
 
     def __init__(self, button: Optional[QToolButton] = None):
         """
         Initialize instance
+
         Args:
             button: The underlying tool button
         """

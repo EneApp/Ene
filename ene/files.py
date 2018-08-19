@@ -59,6 +59,7 @@ class FileManager:
         """
         Fetches all the episodes for a given show from the database and adds
         them to the episode list for that show in the dictionary
+
         Args:
             show:
                 The show to fetch episodes for
@@ -86,9 +87,10 @@ class FileManager:
     def find_episodes(self, name, directory):
         """
         Finds all episodes in the set directory that match the given name
+
         Args:
             name: Name of the show to find episodes for
-            directory: None for default directory, otherwise searches a subfolder
+            directory: None for default directory, otherwise searches a sub folder
 
         Returns:
             episodes: A list of all episodes found
@@ -132,9 +134,11 @@ def clean_titles(series):
     """
     Attempts to clean up the title in the series dictionary by comparing
     the names of two files
+
     Args:
         series:
             A dictionary with the series name as a key and a list of files
+
     Returns:
         A dictionary with a slightly more well formatted name
     """

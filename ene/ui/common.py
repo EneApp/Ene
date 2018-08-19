@@ -27,6 +27,7 @@ from PySide2.QtWidgets import QWidget
 def open_ui_file(filename: str) -> QFile:
     """
     Context manager to open a Qt ui file
+
     Args:
         filename: Filename of the ui file
 
@@ -44,6 +45,7 @@ def open_ui_file(filename: str) -> QFile:
 def load_ui_widget(ui_file: str, parent: Optional[QWidget] = None) -> QWidget:
     """
     Load a ui widget from file
+
     Args:
         ui_file: The ui file name
         parent: The parent of that widget
@@ -61,6 +63,7 @@ def load_ui_widget(ui_file: str, parent: Optional[QWidget] = None) -> QWidget:
 def mk_stylesheet(rules: Dict[str, str], selector: Union[str, List[str]] = None) -> str:
     """
     Make a stylesheet
+
     Args:
         rules: The key value pairs for the rules of the stylesheet
         selector: The selector(s) of the stylesheet
@@ -79,6 +82,7 @@ def mk_stylesheet(rules: Dict[str, str], selector: Union[str, List[str]] = None)
 def mk_padding(top=0, right=0, bottom=0, left=0, unit='px') -> str:
     """
     Make padding value for stylesheet
+
     Args:
         top: Top padding
         right: Right padding

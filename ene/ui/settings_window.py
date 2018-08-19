@@ -83,6 +83,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         """
         Connects on_changed to a child's signal, the signal is based on the
         type of the child
+
         Args:
             child:
                 The child to connect the listener to
@@ -98,6 +99,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
     def populate_settings():
         """
         Builds a model of settings items from the dictionary
+
         Returns:
             The item model for all settings
         """
@@ -125,6 +127,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         """
         Triggered when a new settings item is selected from the list. Updates
         the stacked widget to the appropriate page for the selected item
+
         Args:
             selected:
                 The selected item
@@ -171,6 +174,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
     def get_setting_from_child(child):
         """
         Gets the setting value the user has input into the child
+
         Args:
             child:
                 The child to read a setting from
@@ -196,6 +200,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
     def set_setting_for_child(child, setting):
         """
         Populates a child with the setting value from the config
+
         Args:
             child:
                 The child to modify
@@ -230,6 +235,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         """
         Hides or show player specific settings upon picking a player from the
         combo box
+
         Args:
             selection:
                 The index of the selected item

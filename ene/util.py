@@ -24,6 +24,7 @@ from functools import lru_cache
 def strip_html(s: str) -> str:
     """
     Strip html tags from a string
+
     Args:
         s: The string
 
@@ -34,5 +35,5 @@ def strip_html(s: str) -> str:
 
 
 def open_source_code():
-    """Opens source code of ene in a webbrowser."""
+    """Opens source code of ene in a web browser."""
     webbrowser.open('https://github.com/MaT1g3R/ene/')

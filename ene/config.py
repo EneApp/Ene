@@ -69,6 +69,7 @@ class Config(Mapping):
     def _read_config(self) -> dict:
         """
         Reads the config from file
+
         Returns:
             dict containing the config
         """
