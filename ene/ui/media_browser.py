@@ -25,14 +25,12 @@ from PySide2.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QScrollArea,
-    QSpacerItem,
     QVBoxLayout,
     QWidget,
 )
 
 from ene.api import MediaFormat
 from .common import mk_padding, mk_stylesheet
-from .custom import FlexLabel
 
 
 class MediaDisplay(QWidget):
@@ -73,47 +71,43 @@ class MediaDisplay(QWidget):
             .scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
 
         self._setup_layouts()
-        v_spacer = QSpacerItem(self.image_w, self.image_h)
 
-        self.left_widget = QLabel()
-        self.left_widget.setPixmap(self.image)
-        self.left_widget.setGeometry(0, 0, self.image_w, self.image_h)
+        self.left_label = QLabel()
+        self.left_label.setPixmap(self.image)
+        self.left_label.setLayout(self.left_layout)
 
-        self.left_widget.setLayout(self.left_layout)
-        self.master_layout.addWidget(self.left_widget)
+        self.master_layout.addWidget(self.left_label)
         self.master_layout.addLayout(self.right_layout)
 
-        self.studio_label = FlexLabel(
-            fix_w=self.image_w,
-            font_size=12,
-            stylesheet=mk_stylesheet(
-                {
-                    'color': self.aqua,
-                    'background-color': self.transparent_grey,
-                    'padding': mk_padding(10, 0, 10, 10),
-                },
-                'QLabel'
-            ),
-            text=self.studio,
-        )
-        self.studio_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
-        self.title_label = FlexLabel(
-            fix_w=self.image_w,
-            font_size=14,
-            stylesheet=mk_stylesheet(
-                {
-                    'color': 'White',
-                    'background-color': self.transparent_grey,
-                    'padding': mk_padding(10, 10, 0, 10),
-                },
-                'QLabel'
-            ),
-            text=self.title,
-        )
-        self.title_label.setAlignment(Qt.AlignVCenter | Qt.AlignLeft)
+        self.studio_label = QLabel(self.studio)
+        self.studio_label.setStyleSheet(mk_stylesheet(
+            {
+                'color': self.aqua,
+                'background-color': self.transparent_grey,
+                'padding': mk_padding(10, 0, 10, 10),
+                'font-size': '12pt',
+                'qproperty-wordWrap': 'true',
+                'qproperty-alignment': '"AlignVCenter | AlignLeft"',
+            },
+            'QLabel'
+        ))
+
+        self.title_label = QLabel(self.title)
+        self.title_label.setStyleSheet(mk_stylesheet(
+            {
+                'color': 'White',
+                'background-color': self.transparent_grey,
+                'padding': mk_padding(10, 10, 0, 10),
+                'font-size': '14pt',
+                'qproperty-wordWrap': 'true',
+                'qproperty-alignment': '"AlignVCenter | AlignLeft"'
+            },
+            'QLabel'
+        ))
+
         self.left_layout.addWidget(self.studio_label)
         self.left_layout.addWidget(self.title_label)
-        self.left_layout.addItem(v_spacer)
+        self.left_layout.addSpacing(self.studio_label.height() + self.title_label.height())
 
         next_episode = next_airing_episode.get('episode')
         time_until = next_airing_episode.get('timeUntilAiring')

@@ -60,7 +60,7 @@ class MainWindow(QMainWindow, Ui_window_main):
             0,
             Path(__file__).parent /
             '..' / '..' / 'tests' / 'resource' / 'shingeki_no_kyojin_3.jpg',
-            'Shingeki no Kyojin 3',
+            'Shingeki no Kyojin 3' * 3,
             'Wit Studio' * 10,
             {'episode': 5, 'timeUntilAiring': 320580},
             MediaFormat.TV,
