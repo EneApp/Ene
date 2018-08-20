@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Fri Aug 17 15:23:01 2018
+# Created: Mon Aug 20 15:52:27 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -76,7 +76,7 @@ class Ui_window_main(object):
         self.label_filter.setFont(font)
         self.label_filter.setObjectName("label_filter")
         self.combobox_sort = QtWidgets.QComboBox(self.tab)
-        self.combobox_sort.setGeometry(QtCore.QRect(0, 180, 141, 31))
+        self.combobox_sort.setGeometry(QtCore.QRect(0, 180, 136, 31))
         self.combobox_sort.setObjectName("combobox_sort")
         self.combobox_sort.addItem("")
         self.combobox_sort.addItem("")
@@ -85,7 +85,7 @@ class Ui_window_main(object):
         self.combobox_sort.addItem("")
         self.combobox_sort.addItem("")
         self.button_sort_order = QtWidgets.QToolButton(self.tab)
-        self.button_sort_order.setGeometry(QtCore.QRect(140, 183, 21, 21))
+        self.button_sort_order.setGeometry(QtCore.QRect(135, 180, 31, 31))
         self.button_sort_order.setArrowType(QtCore.Qt.DownArrow)
         self.button_sort_order.setObjectName("button_sort_order")
         self.combobox_format = QtWidgets.QComboBox(self.tab)
