@@ -223,10 +223,21 @@ class ToggleToolButton:
 
 
 class FlexLabel(QLabel):
+    """A label that automatically resizes"""
     policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.MinimumExpanding)
 
-    def __init__(self, fix_w=None, fix_h=None, font_size=None, stylesheet=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, fix_w=None, fix_h=None, font_size=None, stylesheet=None, **kwargs):
+        """
+        A label that automatically resizes
+
+        Args:
+            fix_w: Optional fixed width
+            fix_h: Optional fixed height
+            font_size: Optional font size
+            stylesheet: Optional stylesheet
+            **kwargs: Any other key word arguments that's passed to super
+        """
+        super().__init__(**kwargs)
         if fix_w:
             self.setFixedWidth(fix_w)
         if fix_h:
