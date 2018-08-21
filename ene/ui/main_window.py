@@ -20,14 +20,11 @@ from pathlib import Path
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
     QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLayout, QMainWindow,
-    QPushButton, QScrollArea, QVBoxLayout, QWidget, QSpacerItem,
+    QPushButton, QScrollArea, QVBoxLayout, QWidget,
 )
 
-
-import ene.app
-from ene.api import MediaFormat
+from ene.api import MediaFormat, MediaSeason
 from ene.constants import IS_WIN
-from ene.files import FileManager
 from ene.resources import Ui_window_main
 from ene.util import open_source_code
 from .custom import FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
@@ -45,7 +42,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         """
         super().__init__()
         self.app = app
-        self.files = FileManager(ene.app.config)
+        # self.files = FileManager(ene.app.config)
         self.setupUi(self)
         self._setup_children()
 
@@ -54,7 +51,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         self._setup_tab_browser()
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
-        self._setup_tab_files()
+        # self._setup_tab_files()
 
     def _setup_tab_browser(self):
         master_layout = QHBoxLayout()
@@ -102,12 +99,14 @@ class MainWindow(QMainWindow, Ui_window_main):
                 Path(__file__).parent /
                 '..' / '..' / 'tests' / 'resource' / 'shingeki_no_kyojin_3.jpg',
                 'Shingeki no Kyojin 3' * 3,
+                MediaSeason.SUMMER,
+                2018,
                 'Wit Studio' * 10,
                 {'episode': 5, 'timeUntilAiring': 320580},
                 MediaFormat.TV,
                 81,
                 'descon ' * 200,
-                ['Genre']
+                ['Genre'],
             ) for i in range(20)
         ]
 
