@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Mon Aug 20 15:52:27 2018
+# Created: Mon Aug 20 21:20:27 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,15 +21,18 @@ class Ui_window_main(object):
         self.widget_tab.setCursor(QtCore.Qt.ArrowCursor)
         self.widget_tab.setMouseTracking(True)
         self.widget_tab.setObjectName("widget_tab")
-        self.tabLocalFiles = QtWidgets.QWidget()
-        self.tabLocalFiles.setObjectName("tabLocalFiles")
-        self.gridLayoutWidget = QtWidgets.QWidget(self.tabLocalFiles)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 10, 1391, 771))
-        self.gridLayoutWidget.setObjectName("gridLayoutWidget")
-        self.gridLayout_2 = QtWidgets.QGridLayout(self.gridLayoutWidget)
-        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.widget_tab.addTab(self.tabLocalFiles, "")
+        self.tab_local_files = QtWidgets.QWidget()
+        self.tab_local_files.setObjectName("tab_local_files")
+        self.stack_local_files = QtWidgets.QStackedWidget(self.tab_local_files)
+        self.stack_local_files.setGeometry(QtCore.QRect(0, 0, 1411, 801))
+        self.stack_local_files.setObjectName("stack_local_files")
+        self.page = QtWidgets.QWidget()
+        self.page.setObjectName("page")
+        self.stack_local_files.addWidget(self.page)
+        self.page_2 = QtWidgets.QWidget()
+        self.page_2.setObjectName("page_2")
+        self.stack_local_files.addWidget(self.page_2)
+        self.widget_tab.addTab(self.tab_local_files, "")
         self.tabWidgetPage2 = QtWidgets.QWidget()
         self.tabWidgetPage2.setObjectName("tabWidgetPage2")
         self.widget_tab.addTab(self.tabWidgetPage2, "")
@@ -76,7 +79,7 @@ class Ui_window_main(object):
         self.label_filter.setFont(font)
         self.label_filter.setObjectName("label_filter")
         self.combobox_sort = QtWidgets.QComboBox(self.tab)
-        self.combobox_sort.setGeometry(QtCore.QRect(0, 180, 136, 31))
+        self.combobox_sort.setGeometry(QtCore.QRect(0, 180, 141, 31))
         self.combobox_sort.setObjectName("combobox_sort")
         self.combobox_sort.addItem("")
         self.combobox_sort.addItem("")
@@ -85,7 +88,7 @@ class Ui_window_main(object):
         self.combobox_sort.addItem("")
         self.combobox_sort.addItem("")
         self.button_sort_order = QtWidgets.QToolButton(self.tab)
-        self.button_sort_order.setGeometry(QtCore.QRect(135, 180, 31, 31))
+        self.button_sort_order.setGeometry(QtCore.QRect(140, 183, 21, 21))
         self.button_sort_order.setArrowType(QtCore.Qt.DownArrow)
         self.button_sort_order.setObjectName("button_sort_order")
         self.combobox_format = QtWidgets.QComboBox(self.tab)
@@ -134,7 +137,7 @@ class Ui_window_main(object):
         self.widget_tab.addTab(self.tab_2, "")
         window_main.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(window_main)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 29))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 30))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -167,12 +170,12 @@ class Ui_window_main(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(window_main)
-        self.widget_tab.setCurrentIndex(2)
+        self.widget_tab.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(window_main)
 
     def retranslateUi(self, window_main):
         window_main.setWindowTitle(QtWidgets.QApplication.translate("window_main", "ENE", None, -1))
-        self.widget_tab.setTabText(self.widget_tab.indexOf(self.tabLocalFiles), QtWidgets.QApplication.translate("window_main", "Local Files", None, -1))
+        self.widget_tab.setTabText(self.widget_tab.indexOf(self.tab_local_files), QtWidgets.QApplication.translate("window_main", "Local Files", None, -1))
         self.widget_tab.setTabText(self.widget_tab.indexOf(self.tabWidgetPage2), QtWidgets.QApplication.translate("window_main", "Streams", None, -1))
         self.combobox_season.setCurrentText(QtWidgets.QApplication.translate("window_main", "All", None, -1))
         self.combobox_season.setItemText(0, QtWidgets.QApplication.translate("window_main", "All", None, -1))

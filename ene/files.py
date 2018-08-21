@@ -129,6 +129,9 @@ class FileManager:
                 if not matched:
                     self.series[file].append(Path(path) / file)
 
+    def get_readable_names(self, show):
+        return [x.name for x in self.series[show]]
+
 
 def clean_titles(series):
     """

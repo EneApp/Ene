@@ -30,22 +30,23 @@
      <bool>true</bool>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
-    <widget class="QWidget" name="tabLocalFiles">
+    <widget class="QWidget" name="tab_local_files">
      <attribute name="title">
       <string>Local Files</string>
      </attribute>
-     <widget class="QWidget" name="gridLayoutWidget">
+     <widget class="QStackedWidget" name="stack_local_files">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>1391</width>
-        <height>771</height>
+        <x>0</x>
+        <y>0</y>
+        <width>1411</width>
+        <height>801</height>
        </rect>
       </property>
-      <layout class="QGridLayout" name="gridLayout_2"/>
+      <widget class="QWidget" name="page"/>
+      <widget class="QWidget" name="page_2"/>
      </widget>
     </widget>
     <widget class="QWidget" name="tabWidgetPage2">
@@ -197,7 +198,7 @@
        <rect>
         <x>0</x>
         <y>180</y>
-        <width>136</width>
+        <width>141</width>
         <height>31</height>
        </rect>
       </property>
@@ -238,10 +239,10 @@
      <widget class="QToolButton" name="button_sort_order">
       <property name="geometry">
        <rect>
-        <x>135</x>
-        <y>180</y>
-        <width>31</width>
-        <height>31</height>
+        <x>140</x>
+        <y>183</y>
+        <width>21</width>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -438,7 +439,7 @@
      <x>0</x>
      <y>0</y>
      <width>1440</width>
-     <height>29</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
