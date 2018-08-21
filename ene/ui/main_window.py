@@ -17,7 +17,12 @@
 """This module contains the main window."""
 from pathlib import Path
 
-from PySide2.QtWidgets import QFileDialog, QGridLayout, QLabel, QMainWindow, QPushButton
+from PySide2.QtCore import Qt
+from PySide2.QtWidgets import (
+    QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLayout, QMainWindow,
+    QPushButton, QScrollArea, QVBoxLayout, QWidget, QSpacerItem,
+)
+
 
 import ene.app
 from ene.api import MediaFormat
@@ -25,7 +30,7 @@ from ene.constants import IS_WIN
 from ene.files import FileManager
 from ene.resources import Ui_window_main
 from ene.util import open_source_code
-from .custom import ToggleToolButton
+from .custom import FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
 from .media_browser import MediaDisplay
 
 
@@ -46,34 +51,80 @@ class MainWindow(QMainWindow, Ui_window_main):
 
     def _setup_children(self):
         """Setup all the child widgets of the main window"""
+        self._setup_tab_browser()
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
-        self.sort_toggle = ToggleToolButton(self.button_sort_order)
         self._setup_tab_files()
 
+    def _setup_tab_browser(self):
+        master_layout = QHBoxLayout()
+        left_layout = QVBoxLayout()
+        right_layout = FlowLayout(None, 10, 10, 10)
+        left_mid_top_layout = QHBoxLayout()
+        left_mid_bot_layout = QHBoxLayout()
+
+        left_layout.setAlignment(Qt.AlignTop)
+
+        left_layout_control = QWidget()
+        left_layout_control.setLayout(left_layout)
+        right_layout_control = QWidget()
+        right_layout_control.setLayout(right_layout)
+        self.tab_browser.setLayout(master_layout)
         # genre_future = self.app.pool.submit(self.app.api.get_genres)
         # tags_future = self.app.pool.submit(self.app.api.get_tags)
-        #
-        # tags = (tag['name'] for tag in tags_future.result())
+
+        # tags = [tag['name'] for tag in tags_future.result()]
         # genres = genre_future.result()
-        #
-        # self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
-        # self.streamer_selector = StreamerSelector(self.combobox_streaming)
+        tags = ['']
+        genres = ['']
 
-        self.weird = MediaDisplay(
-            0,
-            Path(__file__).parent /
-            '..' / '..' / 'tests' / 'resource' / 'shingeki_no_kyojin_3.jpg',
-            'Shingeki no Kyojin 3' * 3,
-            'Wit Studio' * 10,
-            {'episode': 5, 'timeUntilAiring': 320580},
-            MediaFormat.TV,
-            81,
-            'descon ' * 200,
-            ['Genre'],
+        left_layout.addWidget(self.label_season)
+        left_layout.addWidget(self.combobox_season)
+        left_mid_top_layout.addWidget(self.label_year)
+        left_mid_top_layout.addWidget(self.label_year_number)
+        left_layout.addLayout(left_mid_top_layout)
+        left_layout.addWidget(self.slider_year)
+        left_layout.addWidget(self.label_filter)
+        left_mid_bot_layout.addWidget(self.combobox_sort)
+        left_mid_bot_layout.addWidget(self.button_sort_order)
+        left_layout.addLayout(left_mid_bot_layout)
+        left_layout.addWidget(self.combobox_format)
+        left_layout.addWidget(self.combobox_status)
+        left_layout.addWidget(self.combobox_streaming)
+        left_layout.addWidget(self.combobox_genre_tag)
+        self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
+        self.streamer_selector = StreamerSelector(self.combobox_streaming)
+        self.sort_toggle = ToggleToolButton(self.button_sort_order)
 
-        )
-        self.gridlayout_season.addWidget(self.weird)
+        self.weirds = [
+            MediaDisplay(
+                i,
+                Path(__file__).parent /
+                '..' / '..' / 'tests' / 'resource' / 'shingeki_no_kyojin_3.jpg',
+                'Shingeki no Kyojin 3' * 3,
+                'Wit Studio' * 10,
+                {'episode': 5, 'timeUntilAiring': 320580},
+                MediaFormat.TV,
+                81,
+                'descon ' * 200,
+                ['Genre']
+            ) for i in range(20)
+        ]
+
+        self.weird_scroll = QScrollArea()
+        self.weird_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.weird_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.weird_scroll.setWidget(right_layout_control)
+        self.weird_scroll.setWidgetResizable(True)
+
+        left_layout_control.setMaximumWidth(self.slider_year.width())
+        master_layout.addWidget(left_layout_control)
+        master_layout.addWidget(self.weird_scroll)
+        right_layout.setSizeConstraint(QLayout.SetMinimumSize)
+        for i, weird in enumerate(self.weirds):
+            right_layout.addWidget(weird)
+        left_layout.setSpacing(0)
+        left_layout.setMargin(0)
 
     def _setup_tab_files(self):
         """
