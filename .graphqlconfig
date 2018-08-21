@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "ene": {
+      "schemaPath": "schema.graphql",
+      "extensions": {
+        "endpoints": {
+          "default": "https://graphql.anilist.co"
+        }
+      }
+    }
+  }
+}

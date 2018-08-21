@@ -10,6 +10,13 @@ ui:
 rcc:
 	pyside2-rcc -py3 ene/resources/style.qrc -o ene/resources/style_rc.py
 
+.PHONY: gql
+gql:
+	graphql get-schema
+	tools/format_graphql_schema.py schema.graphql > ene/api/schema.graphqls
+	rm schema.graphql
+	tools/make_enums.py ene/api/schema.graphqls > ene/api/enums.py
+
 .PHONY: ci_setup
 ci_setup:
 	pip install -U pip
