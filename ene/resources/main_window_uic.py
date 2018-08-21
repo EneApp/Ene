@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Mon Aug 20 22:18:00 2018
+# Created: Tue Aug 21 14:56:15 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -24,8 +24,9 @@ class Ui_window_main(object):
         self.widget_tab.setObjectName("widget_tab")
         self.tab_local_files = QtWidgets.QWidget()
         self.tab_local_files.setObjectName("tab_local_files")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.tab_local_files)
+        self.horizontalLayout.setObjectName("horizontalLayout")
         self.stack_local_files = QtWidgets.QStackedWidget(self.tab_local_files)
-        self.stack_local_files.setGeometry(QtCore.QRect(0, 0, 1411, 801))
         self.stack_local_files.setObjectName("stack_local_files")
         self.page = QtWidgets.QWidget()
         self.page.setObjectName("page")
@@ -33,6 +34,7 @@ class Ui_window_main(object):
         self.page_2 = QtWidgets.QWidget()
         self.page_2.setObjectName("page_2")
         self.stack_local_files.addWidget(self.page_2)
+        self.horizontalLayout.addWidget(self.stack_local_files)
         self.widget_tab.addTab(self.tab_local_files, "")
         self.tabWidgetPage2 = QtWidgets.QWidget()
         self.tabWidgetPage2.setObjectName("tabWidgetPage2")
@@ -139,7 +141,7 @@ class Ui_window_main(object):
         self.verticalLayout_2.addWidget(self.widget_tab)
         window_main.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(window_main)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 30))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 29))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")

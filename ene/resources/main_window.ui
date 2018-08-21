@@ -30,18 +30,14 @@
        <attribute name="title">
         <string>Local Files</string>
        </attribute>
-       <widget class="QStackedWidget" name="stack_local_files">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>1411</width>
-          <height>801</height>
-         </rect>
-        </property>
-        <widget class="QWidget" name="page"/>
-        <widget class="QWidget" name="page_2"/>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QStackedWidget" name="stack_local_files">
+          <widget class="QWidget" name="page"/>
+          <widget class="QWidget" name="page_2"/>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tabWidgetPage2">
        <attribute name="title">
@@ -435,7 +431,7 @@
      <x>0</x>
      <y>0</y>
      <width>1440</width>
-     <height>30</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
