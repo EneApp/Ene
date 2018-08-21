@@ -20,14 +20,7 @@ from typing import List, Union
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap
-from PySide2.QtWidgets import (
-    QBoxLayout,
-    QHBoxLayout,
-    QLabel,
-    QScrollArea,
-    QVBoxLayout,
-    QWidget,
-)
+from PySide2.QtWidgets import (QHBoxLayout, QLabel, QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 from ene.api import MediaFormat
 from .common import mk_padding, mk_stylesheet
@@ -67,8 +60,8 @@ class MediaDisplay(QWidget):
         self.anime_id = anime_id
         self.title = title
         self.studio = studio
-        self.image = QPixmap(str(image_path)) \
-            .scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
+        self.image = (QPixmap(str(image_path))
+                      .scaled(self.image_w, self.image_h, Qt.KeepAspectRatio))
 
         self._setup_layouts()
 
@@ -78,19 +71,6 @@ class MediaDisplay(QWidget):
 
         self.master_layout.addWidget(self.left_label)
         self.master_layout.addLayout(self.right_layout)
-
-        self.studio_label = QLabel(self.studio)
-        self.studio_label.setStyleSheet(mk_stylesheet(
-            {
-                'color': self.aqua,
-                'background-color': self.transparent_grey,
-                'padding': mk_padding(10, 0, 10, 10),
-                'font-size': '12pt',
-                'qproperty-wordWrap': 'true',
-                'qproperty-alignment': '"AlignVCenter | AlignLeft"',
-            },
-            'QLabel'
-        ))
 
         self.title_label = QLabel(self.title)
         self.title_label.setStyleSheet(mk_stylesheet(
@@ -105,9 +85,22 @@ class MediaDisplay(QWidget):
             'QLabel'
         ))
 
-        self.left_layout.addWidget(self.studio_label)
+        self.studio_label = QLabel(self.studio)
+        self.studio_label.setStyleSheet(mk_stylesheet(
+            {
+                'color': self.aqua,
+                'background-color': self.transparent_grey,
+                'padding': mk_padding(10, 0, 10, 10),
+                'font-size': '12pt',
+                'qproperty-wordWrap': 'true',
+                'qproperty-alignment': '"AlignVCenter | AlignLeft"',
+            },
+            'QLabel'
+        ))
+        self.title_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.studio_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.left_layout.addWidget(self.title_label)
-        self.left_layout.addSpacing(self.studio_label.height() + self.title_label.height())
+        self.left_layout.addWidget(self.studio_label)
 
         next_episode = next_airing_episode.get('episode')
         time_until = next_airing_episode.get('timeUntilAiring')
@@ -194,11 +187,12 @@ class MediaDisplay(QWidget):
         self.master_layout = QHBoxLayout()
         self.setLayout(self.master_layout)
 
-        self.left_layout = QBoxLayout(QBoxLayout.BottomToTop)
+        self.left_layout = QVBoxLayout()
         self.right_layout = QVBoxLayout()
         self.right_mid_layout = QHBoxLayout()
         self.bottom_right_layout = QHBoxLayout()
 
+        self.left_layout.setAlignment(Qt.AlignBottom)
         for layout in (
                 self.master_layout,
                 self.left_layout,
@@ -207,7 +201,4 @@ class MediaDisplay(QWidget):
                 self.bottom_right_layout
         ):
             layout.setSpacing(0)
-            layout.setContentsMargins(0, 0, 0, 0)
-
-    def __hash__(self):
-        return hash(self.anime_id)
+            layout.setMargin(0)
