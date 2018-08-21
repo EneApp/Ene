@@ -23,6 +23,7 @@ from pathlib import Path
 
 from fuzzywuzzy import fuzz
 
+from ene.constants import DATA_HOME
 from ene.database import Database
 
 
@@ -34,7 +35,7 @@ class FileManager:
     def __init__(self, cfg):
         self.config = cfg
         self.dirs = self.config.get('Local Paths', default=[Path.home() / 'Videos'])
-        self.db = Database(self.config.get('Database Path'))
+        self.db = Database(self.config.get('Database Path', default=DATA_HOME / 'ene.db'))
         self.series = defaultdict(list)
 
     def build_shows_from_db(self):
