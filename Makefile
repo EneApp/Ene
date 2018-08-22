@@ -46,5 +46,9 @@ lint:
 	python -m flake8
 	python -m pylint --rcfile=.pylintrc ene
 
-.PHONY: tests
-tests: ; pytest -vvv tests
+.PHONY: test
+test: ; pytest -vvv tests --cov=ene
+
+.PHONY: coverage
+	pip install codecov
+	codecov

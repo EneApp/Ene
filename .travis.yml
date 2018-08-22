@@ -12,7 +12,8 @@ install: "make ci_setup"
 
 script:
   - make lint
-  - make tests
+  - make test
+  - make coverage
 
 notifications:
   email: false
