@@ -50,5 +50,6 @@ lint:
 test: ; pytest -vvv tests --cov=ene
 
 .PHONY: coverage
+coverage:
 	pip install codecov
 	codecov
