@@ -1,5 +1,5 @@
 # source: https://graphql.anilist.co
-# timestamp: Tue Aug 21 2018 17:55:45 GMT-0400 (Eastern Daylight Time)
+# timestamp: Tue Aug 21 2018 18:34:12 GMT-0400 (Eastern Daylight Time)
 
 # Notification for when a activity is liked
 type ActivityLikeNotification {
