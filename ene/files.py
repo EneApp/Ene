@@ -65,9 +65,11 @@ class FileManager:
             show:
                 The show to fetch episodes for
         """
-        episodes = self.db.get_episodes_by_show_name(show)
-        for episode in episodes:
-            self.series[show].append(Path(episode[0]))
+        if len(self.series[show]) is 0:
+            episodes = self.db.get_episodes_by_show_name(show)
+            episodes.sort()
+            for episode in episodes:
+                self.series[show].append(Path(episode[0]))
 
     def dump_to_db(self):
         """

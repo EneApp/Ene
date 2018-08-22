@@ -27,9 +27,10 @@ import ene.app
 from ene.api import MediaFormat, MediaSeason
 from ene.constants import IS_WIN
 from ene.files import FileManager
+import ene.player
 from ene.resources import Ui_window_main
 from ene.util import open_source_code
-from .custom import FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
+from .custom import EpisodeButton, FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
 from .media_browser import MediaDisplay
 
 
@@ -45,6 +46,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         super().__init__()
         self.app = app
         self.files = FileManager(ene.app.config)
+        self.player = None
         self.setupUi(self)
         self._setup_children()
 
@@ -132,12 +134,13 @@ class MainWindow(QMainWindow, Ui_window_main):
         Sets up the local files tab. Triggered when the tab is selected
         """
         self.files.build_shows_from_db()
-        layout = QGridLayout()
+        layout = FlowLayout()
+        layout.setAlignment(Qt.AlignTop)
 
         for i, show in enumerate(self.files.series):
             button = QPushButton(show)
             button.clicked.connect(self.on_series_click)
-            layout.addWidget(button, i / 3, i % 3)
+            layout.addWidget(button)
 
         self.stack_local_files.currentWidget().setLayout(layout)
 
@@ -146,19 +149,45 @@ class MainWindow(QMainWindow, Ui_window_main):
         Sets up the window for the episodes of a show. Triggered when a show is
         clicked from the local files page
         """
+        show = self.sender().text()
         self.stack_local_files.setCurrentIndex(1)
-        layout = QGridLayout()
+        menu_layout = QGridLayout()
+        menu = QWidget()
+        layout = FlowLayout()
+        layout.setAlignment(Qt.AlignTop)
         back_button = QPushButton("Back")
         back_button.clicked.connect(self.on_back_click)
-        layout.addWidget(back_button, 0, 0)
-        label = QLabel(self.sender().text())
-        layout.addWidget(label, 0, 1, 1, 2)
-        self.files.fetch_db_episodes_for_show(self.sender().text())
-        episodes = self.files.get_readable_names(self.sender().text())
-        for i, episode in enumerate(episodes):
-            button = QPushButton(episode)
-            layout.addWidget(button, (i / 3) + 1, i % 3)
+        menu_layout.addWidget(back_button, 0, 0)
+        refresh_button = QPushButton("Refresh")
+        menu_layout.addWidget(refresh_button, 1, 0)
+        label = QLabel(show)
+        menu_layout.addWidget(label, 0, 1, 2, 2)
+        menu.setLayout(menu_layout)
+        menu.setMaximumWidth(self.stack_local_files.width())
+        menu.setMinimumWidth(self.stack_local_files.width() / 2)
+        layout.addWidget(menu)
+        self.files.fetch_db_episodes_for_show(show)
+        for i, episode in enumerate(self.files.series[show]):
+            print(episode)
+            button = EpisodeButton(episode)
+            button.clicked.connect(self.play_episode)
+            layout.addWidget(button)
         self.stack_local_files.currentWidget().setLayout(layout)
+
+    def play_episode(self):
+        """
+        Plays the selected episode with the users player of choice
+        """
+        if isinstance(self.player, ene.player.GenericPlayer):
+            # GenericPlayer doesn't have controls, so stop it and get rid of it
+            self.player.stop()
+            self.player = None
+
+        if self.player is None:
+            self.player = ene.player.get_player(ene.app.config)
+        episode = self.sender().path
+        print(episode)
+        self.player.play(str(episode))
 
     def on_back_click(self):
         """

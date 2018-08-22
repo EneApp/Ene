@@ -22,8 +22,8 @@ from typing import Any, Iterable, Optional, Union
 from PySide2.QtCore import QModelIndex, QPoint, QRect, QSize, Qt
 from PySide2.QtGui import QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import (
-    QComboBox, QLayout, QSizePolicy, QStyle, QStyleOptionViewItem, QStyledItemDelegate,
-    QToolButton,
+    QComboBox, QLayout, QPushButton, QSizePolicy, QStyle, QStyleOptionViewItem,
+    QStyledItemDelegate, QToolButton,
 )
 
 from ene.constants import STREAMERS
@@ -320,3 +320,9 @@ class FlowLayout(QLayout):
             return parent.style().pixelMetric(pm, None, parent)
         else:
             return parent.spacing()
+
+
+class EpisodeButton(QPushButton):
+    def __init__(self, file):
+        super().__init__(file.name)
+        self.path = file

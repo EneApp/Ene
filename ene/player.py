@@ -23,7 +23,6 @@ from threading import Event
 from time import sleep
 from typing import Union
 
-import mpv
 import vlc
 
 from ene.constants import IS_MAC, IS_WIN
@@ -143,6 +142,9 @@ class MpvPlayer(AbstractPlayer):
         """
         Sets up a new MPV instance with the default keybindings
         """
+        # Importing mpv at the top causes a segfault when creating an MpvPlayer
+        # from Ene, so it's here now
+        import mpv
         self.player = mpv.MPV(input_default_bindings=True, input_vo_keyboard=True)
         self.eof = Event()
         self.setup_listeners()
@@ -206,3 +208,25 @@ class GenericPlayer(AbstractPlayer):
     def wait_for_playback_end(self):
         if self.player is not None:
             self.player.wait()
+
+
+def get_player(config):
+    """
+    Gets the appropriate player for the user based off the config option
+
+    Args:
+        config:
+            The configuration to pull options from
+
+    Returns:
+        A player class based off AbstractPlayer
+    """
+    option = config.get('Player')
+    if option == 'vlc':
+        if config.get('VLC RC Interface'):
+            return RcVlcPlayer()
+        return VlcPlayer()
+    elif option == 'mpv':
+        return MpvPlayer()
+
+    return GenericPlayer(config.get('Player Path'))
