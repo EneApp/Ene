@@ -18,7 +18,7 @@
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
-from PySide2.QtCore import Qt
+from PySide2.QtCore import QTimer, Qt
 from PySide2.QtWidgets import QApplication
 
 import ene.resources
@@ -45,9 +45,12 @@ class App(QApplication):
         self.main_window.action_prefences.triggered.connect(self.settings_window.show)
 
 
-def launch():
+def launch(test=False):
     """
     Launch the Application
+
+    Args:
+        test: True to use test mode, default False
     """
     ene.resources.style_rc.qInitResources()
     app = App()
@@ -55,6 +58,8 @@ def launch():
         with open(path) as f:
             app.setStyleSheet(f.read())
     app.main_window.show()
+    if test:
+        QTimer.singleShot(5000, app.quit)
     sys.exit(app.exec_())
 
 
