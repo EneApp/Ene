@@ -1,8 +1,11 @@
 language: python
+
 cache:
   directories:
     - "$HOME/.cache/pip"
     - "$HOME/.pyenv"
+    - "$HOME/Library/Caches/Homebrew"
+
 matrix:
   include:
     - os: linux
