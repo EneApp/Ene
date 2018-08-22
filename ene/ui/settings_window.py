@@ -26,10 +26,9 @@ from PySide2.QtWidgets import (
     QLineEdit,
     QListView,
     QMdiSubWindow,
-    QMessageBox
+    QMessageBox,
 )
 
-import ene.app
 from ene.constants import CONFIG_ITEM, IS_WIN
 from ene.resources import Ui_window_settings
 
@@ -109,13 +108,12 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
 
         return model
 
-    @staticmethod
-    def populate_paths():
+    def populate_paths(self):
         """
         Grabs the list of user specified paths from the config and adds them to
         the model for the path list
         """
-        paths = ene.app.config.get('Local Paths')
+        paths = self.app.config.get('Local Paths')
         model = PySide2.QtGui.QStandardItemModel()
         if paths is None:
             return model
@@ -133,9 +131,10 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
                 The selected item
         """
         if self.changes:
-            save = QMessageBox.question(self,
-                                        "Save",
-                                        "Changes detected. Save current page?")
+            save = QMessageBox().question(
+                "Save",
+                "Changes detected. Save current page?"
+            )
             if save == QMessageBox.Yes:
                 self.save_current_page()
         self.reset_page()
@@ -152,7 +151,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         page = self.settings_menu.widget(self.current_page)
         for child in page.children():
             if child.objectName() in CONFIG_ITEM:
-                setting = ene.app.config.get(CONFIG_ITEM[child.objectName()])
+                setting = self.app.config.get(CONFIG_ITEM[child.objectName()])
                 if setting is None:
                     continue
                 self.set_setting_for_child(child, setting)
@@ -162,11 +161,11 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         Saves the current page to the config file
         """
         page = self.settings_menu.widget(self.current_page)
-        with ene.app.config.change() as config:
+        with self.app.config.change() as config:
             for child in page.children():
                 if child.objectName() in CONFIG_ITEM:
                     config[CONFIG_ITEM[child.objectName()]] = self.get_setting_from_child(child)
-            ene.app.config.apply()
+            self.app.config.apply()
         self.changes = False
         self.button_apply.setEnabled(False)
 
@@ -185,15 +184,15 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
             val = child.currentText()
         elif isinstance(child, QListView):
             val = []
-            for x in range(child.model().rowCount()):
-                val.append(child.model().item(x).text())
+            for i in range(child.model().rowCount()):
+                val.append(child.model().item(i).text())
             return val
         elif isinstance(child, QLineEdit):
             val = child.text()
         elif isinstance(child, QCheckBox):
             val = child.isChecked()
         else:
-            raise NotImplementedError
+            return NotImplemented
         return val
 
     @staticmethod
@@ -250,18 +249,21 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         self.player_path.setText(which(self.player_type.currentText()))
 
     def pick_player_path(self):
-        file, x = QFileDialog.getOpenFileName()
+        """Set the player path."""
+        file, _ = QFileDialog().getOpenFileName()
         if file:
             self.player_path.setText(file)
             self.on_changed()
 
     def remove_path(self):
+        """Remove a path from the user specified path list."""
         self.path_model.removeRow(self.local_paths.selectionModel().selectedIndexes()[0].row())
         self.on_changed()
         if self.path_model.rowCount() is 0:
             self.path_remove.setEnabled(False)
 
     def add_path(self):
+        """Add a path to the user specified path list. """
         path = PySide2.QtGui.QStandardItem(self.choose_dir())
         if path:
             self.path_model.appendRow(path)

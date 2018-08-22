@@ -143,6 +143,9 @@ disable=print-statement,
         c-extension-no-member,
         no-name-in-module,
         too-few-public-methods,
+        no-else-return,
+        attribute-defined-outside-init,
+        too-many-instance-attributes,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -262,7 +265,7 @@ ignore-on-opaque-inference=yes
 # List of class names for which member attributes should not be checked (useful
 # for classes with dynamically set attributes). This supports the use of
 # qualified names.
-ignored-classes=optparse.Values,thread._local,_thread._local
+ignored-classes=optparse.Values,thread._local,_thread._local,
 
 # List of module names for which member attributes should not be checked
 # (useful for modules/projects where namespaces are manipulated during runtime

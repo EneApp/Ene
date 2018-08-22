@@ -29,7 +29,7 @@ from PySide2.QtWidgets import (
 from ene.constants import STREAMERS
 
 
-class CheckmarkDelegate(QStyledItemDelegate):
+class CheckMarkDelegate(QStyledItemDelegate):
     """This subclass makes check mark appear for some reason"""
 
     def paint(self, painter_, option_, index_):
@@ -60,7 +60,7 @@ class ComboCheckbox:
         self.combobox = combobox if combobox else QComboBox()
         self.model = QStandardItemModel()
         self.combobox.setModel(self.model)
-        self.combobox.setItemDelegate(CheckmarkDelegate())
+        self.combobox.setItemDelegate(CheckMarkDelegate())
         self.combobox.view().pressed.connect(self.handle_item_pressed)
         if items:
             self.model.appendColumn(items)
@@ -218,7 +218,17 @@ class ToggleToolButton:
             self._on_up()
 
 
+class EpisodeButton(QPushButton):
+    """Button that represents a local episode file."""
+
+    def __init__(self, file):
+        super().__init__(file.name)
+        self.path = file
+
+
 class FlowLayout(QLayout):
+    """A grid like layout that goes from top left to bottom right."""
+
     def __init__(self, parent=None, margin=-1, hspacing=-1, vspacing=-1):
         super(FlowLayout, self).__init__(parent)
         self._hspacing = hspacing
@@ -229,51 +239,56 @@ class FlowLayout(QLayout):
     def __del__(self):
         del self._items[:]
 
-    def addItem(self, item):
+    def addItem(self, item):  # pylint: disable=all
         self._items.append(item)
 
-    def horizontalSpacing(self):
+    @property
+    def horizontal_spacing(self):  # pylint: disable=all
         if self._hspacing >= 0:
             return self._hspacing
         else:
-            return self.smartSpacing(
-                QStyle.PM_LayoutHorizontalSpacing)
+            return self.smart_spacing(QStyle.PM_LayoutHorizontalSpacing)
 
-    def verticalSpacing(self):
+    @property
+    def vertical_spacing(self):  # pylint: disable=all
         if self._vspacing >= 0:
             return self._vspacing
         else:
-            return self.smartSpacing(
-                QStyle.PM_LayoutVerticalSpacing)
+            return self.smart_spacing(QStyle.PM_LayoutVerticalSpacing)
 
-    def count(self):
+    def __len__(self):
         return len(self._items)
 
-    def itemAt(self, index):
+    def count(self):  # pylint: disable=all
+        return len(self)
+
+    def itemAt(self, index):  # pylint: disable=all
         if 0 <= index < len(self._items):
             return self._items[index]
+        return None
 
-    def takeAt(self, index):
+    def takeAt(self, index):  # pylint: disable=all
         if 0 <= index < len(self._items):
             return self._items.pop(index)
+        return None
 
-    def expandingDirections(self):
+    def expandingDirections(self):  # pylint: disable=all
         return Qt.Orientations(0)
 
-    def hasHeightForWidth(self):
+    def hasHeightForWidth(self):  # pylint: disable=all
         return True
 
-    def heightForWidth(self, width):
-        return self.doLayout(QRect(0, 0, width, 0), True)
+    def heightForWidth(self, width):  # pylint: disable=all
+        return self.do_layout(QRect(0, 0, width, 0), True)
 
-    def setGeometry(self, rect):
+    def setGeometry(self, rect):  # pylint: disable=all
         super(FlowLayout, self).setGeometry(rect)
-        self.doLayout(rect, False)
+        self.do_layout(rect, False)
 
-    def sizeHint(self):
+    def sizeHint(self):  # pylint: disable=all
         return self.minimumSize()
 
-    def minimumSize(self):
+    def minimumSize(self):  # pylint: disable=all
         size = QSize()
         for item in self._items:
             size = size.expandedTo(item.minimumSize())
@@ -281,38 +296,38 @@ class FlowLayout(QLayout):
         size += QSize(left + right, top + bottom)
         return size
 
-    def doLayout(self, rect, testonly):
+    def do_layout(self, rect, test_only):  # pylint: disable=all
         left, top, right, bottom = self.getContentsMargins()
         effective = rect.adjusted(+left, +top, -right, -bottom)
         x = effective.x()
         y = effective.y()
-        lineheight = 0
+        line_height = 0
         for item in self._items:
             widget = item.widget()
-            hspace = self.horizontalSpacing()
+            hspace = self.horizontal_spacing
             if hspace == -1:
                 hspace = widget.style().layoutSpacing(
                     QSizePolicy.PushButton,
                     QSizePolicy.PushButton, Qt.Horizontal)
-            vspace = self.verticalSpacing()
+            vspace = self.vertical_spacing
             if vspace == -1:
                 vspace = widget.style().layoutSpacing(
                     QSizePolicy.PushButton,
                     QSizePolicy.PushButton, Qt.Vertical)
-            nextX = x + item.sizeHint().width() + hspace
-            if nextX - hspace > effective.right() and lineheight > 0:
+            next_x = x + item.sizeHint().width() + hspace
+            if next_x - hspace > effective.right() and line_height > 0:
                 x = effective.x()
-                y = y + lineheight + vspace
-                nextX = x + item.sizeHint().width() + hspace
-                lineheight = 0
-            if not testonly:
+                y = y + line_height + vspace
+                next_x = x + item.sizeHint().width() + hspace
+                line_height = 0
+            if not test_only:
                 item.setGeometry(
                     QRect(QPoint(x, y), item.sizeHint()))
-            x = nextX
-            lineheight = max(lineheight, item.sizeHint().height())
-        return y + lineheight - rect.y() + bottom
+            x = next_x
+            line_height = max(line_height, item.sizeHint().height())
+        return y + line_height - rect.y() + bottom
 
-    def smartSpacing(self, pm):
+    def smart_spacing(self, pm):  # pylint: disable=all
         parent = self.parent()
         if parent is None:
             return -1
@@ -320,9 +335,3 @@ class FlowLayout(QLayout):
             return parent.style().pixelMetric(pm, None, parent)
         else:
             return parent.spacing()
-
-
-class EpisodeButton(QPushButton):
-    def __init__(self, file):
-        super().__init__(file.name)
-        self.path = file

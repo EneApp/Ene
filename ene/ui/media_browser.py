@@ -35,6 +35,7 @@ from .common import mk_padding, mk_stylesheet
 
 
 class MediaDisplay(QWidget):
+    """A widget that displays a media in the media browser."""
     image_w = 230
     image_h = 315
 
@@ -47,6 +48,7 @@ class MediaDisplay(QWidget):
     light_white = '#9FADBD'
     lighter_white = '#EDF1F5'
 
+    # pylint: disable=R0913,R0914
     def __init__(
             self,
             anime_id: int,

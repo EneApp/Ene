@@ -228,5 +228,5 @@ def get_player(config):
         return VlcPlayer()
     elif option == 'mpv':
         return MpvPlayer()
-
-    return GenericPlayer(config.get('Player Path'))
+    else:
+        return GenericPlayer(config.get('Player Path'))

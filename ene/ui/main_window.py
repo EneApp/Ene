@@ -19,11 +19,18 @@ from pathlib import Path
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
-    QFileDialog, QGridLayout, QHBoxLayout, QLabel, QLayout, QMainWindow,
-    QPushButton, QScrollArea, QVBoxLayout, QWidget,
+    QFileDialog,
+    QGridLayout,
+    QHBoxLayout,
+    QLabel,
+    QLayout,
+    QMainWindow,
+    QPushButton,
+    QScrollArea,
+    QVBoxLayout,
+    QWidget,
 )
 
-import ene.app
 import ene.player
 from ene.api import MediaFormat, MediaSeason
 from ene.constants import IS_WIN
@@ -35,9 +42,7 @@ from .media_browser import MediaDisplay
 
 
 class MainWindow(QMainWindow, Ui_window_main):
-    """
-    Main form of the application
-    """
+    """Main window of the application."""
 
     def __init__(self, app):
         """
@@ -45,7 +50,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         """
         super().__init__()
         self.app = app
-        self.files = FileManager(ene.app.config)
+        self.files = FileManager(self.app.config)
         self.player = None
         self.setupUi(self)
         self._setup_children()
@@ -183,7 +188,7 @@ class MainWindow(QMainWindow, Ui_window_main):
             self.player = None
 
         if self.player is None:
-            self.player = ene.player.get_player(ene.app.config)
+            self.player = ene.player.get_player(self.app.config)
         episode = self.sender().path
         print(episode)
         self.player.play(str(episode))
