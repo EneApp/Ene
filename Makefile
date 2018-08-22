@@ -47,9 +47,11 @@ lint:
 	python -m pylint --rcfile=.pylintrc ene
 
 .PHONY: test
-test: ; pytest -vvv tests --cov=ene
+test:
+	pytest -vvv tests
 
 .PHONY: coverage
 coverage:
+	pytest -vvv tests --cov=ene
 	pip install codecov
 	codecov
