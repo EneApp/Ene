@@ -23,10 +23,16 @@ class Database:
     Class to manage database access
     """
 
-    def __init__(self, location):
+    def __init__(self, location, setup=False):
         self.connection = sqlite3.connect(location, isolation_level=None)
         self.cursor = self.connection.cursor()
-        self.initial_setup()
+        if setup:
+            self.initial_setup()
+
+    def __del__(self):
+        self.cursor.close()
+        self.connection.close()
+
 
     def initial_setup(self):
         """
