@@ -15,6 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains the media browser."""
+from functools import partial
 from pathlib import Path
 from typing import List, Optional, Union
 
@@ -66,25 +67,15 @@ class MediaDisplay(QWidget):
         super().__init__(*args, **kwargs)
         self.setFixedWidth(self.image_w * 2)
         self.setFixedHeight(self.image_h)
-
         self.anime_id = anime_id
-        self.season = season
-        self.year = year
-        self.next_airing_episode = next_airing_episode
-        self.media_format = media_format
-        self.score = score
-        self.description = description
-        self.genres = genres
+
+        img = QPixmap(str(image_path)).scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
 
         self._setup_layouts()
-        self._setup_left(
-            (QPixmap(str(image_path)).scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)),
-            title,
-            studio
-        )
-        self._setup_airing()
-        self._setup_format()
-        self._setup_des()
+        self._setup_left(img, title, studio)
+        self._setup_airing(next_airing_episode, season, year)
+        self._setup_format(media_format, score)
+        self._setup_des(description)(genres)
 
     def _setup_layouts(self):
         self.master_layout = QHBoxLayout()
@@ -107,8 +98,8 @@ class MediaDisplay(QWidget):
             layout.setMargin(0)
 
     def _setup_left(self, image, title, studio):
-        self.left_label = QLabel()
-        self.left_label.setPixmap(image)
+        left_label = QLabel()
+        left_label.setPixmap(image)
         stylesheet = {
             'color': self.lighter_white,
             'background-color': self.transparent_grey,
@@ -118,35 +109,33 @@ class MediaDisplay(QWidget):
             'qproperty-alignment': '"AlignVCenter | AlignLeft"',
         }
 
-        self.title_label = QLabel(title)
-        self.title_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
+        title_label = QLabel(title)
+        title_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
 
         if studio:
-            self.studio_label = QLabel(studio)
+            studio_label = QLabel(studio)
             stylesheet['color'] = self.aqua
             stylesheet['padding'] = mk_padding(0, 10, 10, 10)
             stylesheet['font-size'] = '12pt'
-            self.studio_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
+            studio_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
         else:
-            self.studio_label = None
+            studio_label = None
 
-        for lbl in filter(None, (self.title_label, self.studio_label)):
+        for lbl in filter(None, (title_label, studio_label)):
             lbl.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
-        self.left_label.setLayout(self.left_layout)
+        left_label.setLayout(self.left_layout)
+        self.left_layout.addWidget(title_label)
+        if studio_label:
+            self.left_layout.addWidget(studio_label)
 
-        self.master_layout.addWidget(self.left_label)
+        self.master_layout.addWidget(left_label)
         self.master_layout.addLayout(self.right_layout)
 
-        self.left_layout.addWidget(self.title_label)
-        if self.studio_label:
-            self.left_layout.addWidget(self.studio_label)
-
-    def _setup_airing(self):
-        next_airing_episode = self.next_airing_episode or {}
+    def _setup_airing(self, next_airing_episode, season, year):
+        next_airing_episode = next_airing_episode or {}
         next_episode = next_airing_episode.get('episode')
         time_until = next_airing_episode.get('timeUntilAiring')
-
         if next_episode and time_until:
             days, seconds = divmod(time_until, 86400)
             hours, seconds = divmod(seconds, 3600)
@@ -158,88 +147,62 @@ class MediaDisplay(QWidget):
                 time_parts.append(f'{hours}h')
             time_parts.append(f'{minutes}m')
             time_str = ' '.join(time_parts)
-
-            self.next_airing_label = QLabel(f'Ep {next_episode} - {time_str}')
+            next_airing_label = QLabel(f'Ep {next_episode} - {time_str}')
         else:
-            self.next_airing_label = QLabel(f'{self.season.name.title()} {self.year}')
-        self.next_airing_label.setStyleSheet(mk_stylesheet(
-            {
-                'color': self.aqua,
-                'background-color': self.dark_grey,
-                'padding': '5px',
-                'font-size': '11pt',
-                'qproperty-alignment': '"AlignCenter"'
-            },
-            'QLabel'
-        ))
-        self.right_layout.addWidget(self.next_airing_label)
+            next_airing_label = QLabel(f'{season.name.title()} {year}')
+
+        next_airing_label.setStyleSheet(mk_stylesheet({
+            'color': self.aqua,
+            'background-color': self.dark_grey,
+            'padding': '5px',
+            'font-size': '11pt',
+            'qproperty-alignment': '"AlignCenter"'
+        }, 'QLabel'))
+        self.right_layout.addWidget(next_airing_label)
         self.right_layout.addLayout(self.right_mid_layout)
 
-    def _setup_format(self):
-        self.format_label = QLabel(self.media_format.name)
-        self.format_label.setStyleSheet(mk_stylesheet(
-            {
-                'color': self.dark_white,
-                'background-color': self.grey,
-                'padding': '5px',
-                'font-size': '11pt',
-                'qproperty-alignment': '"AlignCenter"'
-            },
-            'QLabel'
-        ))
-        self.right_mid_layout.addWidget(self.format_label)
+    def _setup_format(self, media_format, score):
+        format_label = QLabel(media_format.name)
+        stylesheet = mk_stylesheet({
+            'color': self.dark_white,
+            'background-color': self.grey,
+            'padding': '5px',
+            'font-size': '11pt',
+            'qproperty-alignment': '"AlignCenter"',
+            'qproperty-wordWrap': 'true'
+        }, 'QLabel')
+        format_label.setStyleSheet(stylesheet)
+        self.right_mid_layout.addWidget(format_label)
+        if score is not None:
+            score_label = QLabel(f'{score}%')
+            score_label.setStyleSheet(stylesheet)
+            self.right_mid_layout.addWidget(score_label)
 
-        if self.score is None:
-            self.score_label = None
-        else:
-            self.score_label = QLabel(f'{self.score}%')
-            self.score_label.setStyleSheet(mk_stylesheet(
-                {
-                    'color': self.dark_white,
-                    'background-color': self.grey,
-                    'padding': '5px',
-                    'font-size': '11pt',
-                    'qproperty-alignment': '"AlignCenter"'
-                },
-                'QLabel'
-            ))
-            self.right_mid_layout.addWidget(self.score_label)
+    def _setup_des(self, description):
+        desc_label = QLabel(description)
+        stylesheet = {
+            'color': self.dark_white,
+            'background-color': self.light_grey,
+            'padding': '5px',
+            'font-size': '10pt',
+            'qproperty-alignment': '"AlignLeft"',
+            'qproperty-wordWrap': 'true'
+        }
+        desc_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
+        desc_scroll = QScrollArea()
+        desc_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        desc_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        desc_scroll.setWidgetResizable(True)
+        desc_scroll.setStyleSheet(mk_stylesheet({'border': 'none'}, 'QScrollArea'))
+        desc_scroll.setWidget(desc_label)
 
-    def _setup_des(self):
-        self.desc_label = QLabel(self.description)
-        self.desc_label.setStyleSheet(mk_stylesheet(
-            {
-                'color': self.dark_white,
-                'background-color': self.light_grey,
-                'padding': '5px',
-                'font-size': '10pt',
-                'qproperty-alignment': '"AlignLeft"',
-                'qproperty-wordWrap': 'true'
-            },
-            'QLabel'
-        ))
-        self.desc_scroll = QScrollArea()
-        self.desc_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.desc_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.desc_scroll.setWidgetResizable(True)
-        self.desc_scroll.setStyleSheet(mk_stylesheet({'border': 'none'}, 'QScrollArea'))
-        self.desc_scroll.setWidget(self.desc_label)
+        self.right_layout.addWidget(desc_scroll)
+        return partial(self._setup_bottom_bar, stylesheet=stylesheet)
 
-        self.right_layout.addWidget(self.desc_scroll)
-
-    def _setup_bottom_bar(self):
+    def _setup_bottom_bar(self, genres, stylesheet):
         # TODO Need to show buttons on hover
-        self.genre_label = QLabel(', '.join(self.genres))
-        self.genre_label.setStyleSheet(mk_stylesheet(
-            {
-                'color': self.dark_white,
-                'background-color': self.grey,
-                'padding': '5px',
-                'qproperty-wordWrap': 'true'
-            },
-            'QLabel'
-        ))
-        self.genre_label.setAlignment(Qt.AlignCenter)
-
-        self.bottom_right_layout.addWidget(self.genre_label)
-        self.right_layout.addWidget(self.genre_label)
+        genre_label = QLabel(', '.join(genres))
+        stylesheet['qproperty-alignment'] = '"AlignCenter"'
+        genre_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
+        self.bottom_right_layout.addWidget(genre_label)
+        self.right_layout.addWidget(genre_label)
