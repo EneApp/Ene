@@ -24,10 +24,10 @@ from PySide2.QtWidgets import (
 )
 
 import ene.app
+import ene.player
 from ene.api import MediaFormat, MediaSeason
 from ene.constants import IS_WIN
 from ene.files import FileManager
-import ene.player
 from ene.resources import Ui_window_main
 from ene.util import open_source_code
 from .custom import EpisodeButton, FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
@@ -100,8 +100,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         self.weirds = [
             MediaDisplay(
                 i,
-                Path(__file__).parent /
-                '..' / '..' / 'tests' / 'resource' / 'shingeki_no_kyojin_3.jpg',
+                'https://cdn.anilist.co/img/dir/anime/reg/99147-tbXmbeLCtfAw.jpg',
                 'Shingeki no Kyojin 3' * 3,
                 MediaSeason.SUMMER,
                 2018,

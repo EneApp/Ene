@@ -16,8 +16,7 @@
 
 """This module contains the media browser."""
 from functools import partial
-from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap
@@ -31,6 +30,7 @@ from PySide2.QtWidgets import (
 )
 
 from ene.api import MediaFormat, MediaSeason
+from ene.util import get_resource
 from .common import mk_padding, mk_stylesheet
 
 
@@ -50,7 +50,7 @@ class MediaDisplay(QWidget):
     def __init__(
             self,
             anime_id: int,
-            image_path: Union[Path, str],
+            image_url: str,
             title: str,
             season: MediaSeason,
             year: int,
@@ -68,8 +68,9 @@ class MediaDisplay(QWidget):
         self.setFixedWidth(self.image_w * 2)
         self.setFixedHeight(self.image_h)
         self.anime_id = anime_id
+        image_path = str(get_resource(image_url))
 
-        img = QPixmap(str(image_path)).scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
+        img = QPixmap(image_path).scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
 
         self._setup_layouts()
         self._setup_left(img, title, studio)

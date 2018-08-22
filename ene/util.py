@@ -18,6 +18,11 @@
 import re
 import webbrowser
 from functools import lru_cache
+from pathlib import Path
+
+from requests import get
+
+from .constants import CACHE_HOME
 
 
 @lru_cache(None)
@@ -37,3 +42,21 @@ def strip_html(s: str) -> str:
 def open_source_code():
     """Opens source code of ene in a web browser."""
     webbrowser.open('https://github.com/MaT1g3R/ene/')
+
+
+def get_resource(url: str) -> Path:
+    """
+    Download and return a path for a resource from url.
+
+    Args:
+        url: The resource url
+
+    Returns:
+        Downloaded resource path
+    """
+    path = Path(CACHE_HOME, url.partition('anilist.co/')[-1])
+    if not path.is_file():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        res = get(url)
+        path.write_bytes(res.content)
+    return path
