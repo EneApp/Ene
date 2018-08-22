@@ -5,8 +5,8 @@ source = ene
 omit =
     */__version__.py
     */__init__.py
-    resources/*
-    api/enums.py
+    ene/resources/*
+    ene/api/enums.py
 
 
 [report]
