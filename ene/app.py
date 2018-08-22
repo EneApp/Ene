@@ -28,13 +28,13 @@ from ene.constants import APP_NAME, resources
 from ene.ui import MainWindow, SettingsWindow
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
-config = Config()
 
 
 class App(QApplication):
     """Main Application class"""
 
     def __init__(self):
+        self.config = Config()
         args = [APP_NAME]
         args.extend(sys.argv[1:])
         super().__init__(args)

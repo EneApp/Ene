@@ -86,6 +86,7 @@ class Config(Mapping):
         return len(self.config)
 
     def get(self, key, default=None):
+        """See Also: `dict.get`"""
         try:
             return self.__getitem__(key)
         except KeyError:

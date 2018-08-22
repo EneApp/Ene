@@ -22,6 +22,7 @@ class Database:
     """
     Class to manage database access
     """
+
     def __init__(self, location):
         self.connection = sqlite3.connect(location, isolation_level=None)
         self.cursor = self.connection.cursor()
@@ -116,9 +117,10 @@ class Database:
             series:
                 A dictionary with show names as keys and lists of episodes
         """
-        for show in series.keys():
+        for show in series:
             key = self.get_show_id_by_name(show)
-            episodes = set([str(x) for x in series[show]])
+            # TODO: This should use get_readable_names method in FileManager
+            episodes = {str(x) for x in series[show]}
             cur = set(x[0] for x in self.get_episodes_by_show_id(key))
             delta = episodes - cur
             for episode in delta:

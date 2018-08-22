@@ -20,6 +20,7 @@ import re
 from collections import defaultdict
 from os import walk
 from pathlib import Path
+from typing import Iterable
 
 from fuzzywuzzy import fuzz
 
@@ -132,8 +133,18 @@ class FileManager:
                 if not matched:
                     self.series[file].append(Path(path) / file)
 
-    def get_readable_names(self, show):
-        return [x.name for x in self.series[show]]
+    def get_readable_names(self, show: str) -> Iterable[str]:
+        """
+        Yields file names of a show
+
+        Args:
+            show: The show name
+
+        Yields:
+            The file names in the show
+        """
+        for path in self.series[show]:
+            yield path.name
 
 
 def clean_titles(series):
