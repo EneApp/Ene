@@ -102,3 +102,14 @@ def test_config_write_revert(path):
     with cfg.change() as cg:
         cg['asd'] = 2121
     assert loads(CONFIG_FILE.read_text()) == test_data
+
+
+def test_config_dunder(path):
+    cfg = Config()
+    assert len(cfg) == len(MOCK_SETTINGS)
+    for expected, actual in zip(iter(MOCK_SETTINGS), iter(cfg)):
+        assert expected == actual
+    for key in MOCK_SETTINGS:
+        assert MOCK_SETTINGS.get(key) == cfg.get(key)
+        assert cfg.get(key * 2) is None
+        assert cfg.get(key * 2, 'blah') == 'blah'
