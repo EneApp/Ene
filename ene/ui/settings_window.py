@@ -29,12 +29,19 @@ from PySide2.QtWidgets import (
     QMessageBox,
 )
 
-from ene.constants import CONFIG_ITEM, IS_WIN
+from ene.constants import IS_WIN
 from ene.resources import Ui_window_settings
 
 SETTINGS = {
     'Video Player': 1,
     'Local Files': 2
+}
+
+CONFIG_ITEM = {
+    'player_type': 'Player',
+    'player_path': 'Player Path',
+    'use_rc': 'VLC RC Interface',
+    'local_paths': 'Local Paths'
 }
 
 
