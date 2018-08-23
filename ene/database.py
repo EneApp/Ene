@@ -24,12 +24,9 @@ class Database:
     Class to manage database access
     """
 
-    def __init__(self, data_home: Path):
-        if data_home.is_file():
-            setup = True
-        else:
-            setup = False
-        self.connection = sqlite3.connect(str(data_home), isolation_level=None)
+    def __init__(self, db_path: Path):
+        setup = not db_path.is_file()
+        self.connection = sqlite3.connect(str(db_path), isolation_level=None)
         self.cursor = self.connection.cursor()
         if setup:
             self.initial_setup()
