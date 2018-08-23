@@ -14,7 +14,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pathlib import Path
 from shutil import rmtree
+
+HERE = Path(__file__).parent.resolve()
+CONFIG_HOME = HERE / '.config'
+DATA_HOME = HERE / '.data'
+CACHE_HOME = HERE / '.cache'
 
 
 def rmdir(path, force):

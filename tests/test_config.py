@@ -14,16 +14,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from os import environ
-from pathlib import Path
-
-environ['XDG_CONFIG_HOME'] = str(Path(__file__).parent.resolve())
 
 import pytest
 from toml import dump, loads
-from . import rmdir
+
 from ene.config import Config
-from ene.constants import CONFIG_HOME
+from . import CONFIG_HOME, rmdir
 
 CONFIG_FILE = CONFIG_HOME / 'config.toml'
 
@@ -55,19 +51,19 @@ def path_empty():
 
 
 def test_config_read(path):
-    cfg = Config()
+    cfg = Config(CONFIG_HOME)
     assert loads(CONFIG_FILE.read_text()) == cfg.config
     assert loads(CONFIG_FILE.read_text()) != cfg.DEFAULT_CONFIG
 
 
 def test_config_read_default(path_empty):
-    cfg = Config()
+    cfg = Config(CONFIG_HOME)
     assert loads(CONFIG_FILE.read_text()) == cfg.config
-    assert cfg.config == Config.DEFAULT_CONFIG
+    assert cfg.config == Config(CONFIG_HOME).DEFAULT_CONFIG
 
 
 def test_write_fail(path):
-    cfg = Config()
+    cfg = Config(CONFIG_HOME)
     test_data = MOCK_SETTINGS.copy()
     with pytest.raises(TypeError):
         cfg['asd'] = 2121
@@ -75,7 +71,7 @@ def test_write_fail(path):
 
 
 def test_config_write(path):
-    cfg = Config()
+    cfg = Config(CONFIG_HOME)
     test_data = MOCK_SETTINGS.copy()
     test_data['asd'] = 2121
     with cfg.change() as cg:
@@ -86,7 +82,7 @@ def test_config_write(path):
 
 
 def test_config_write_default(path_empty):
-    cfg = Config()
+    cfg = Config(CONFIG_HOME)
     test_data = cfg.DEFAULT_CONFIG.copy()
     test_data['asd'] = 2121
     with cfg.change() as cg:
@@ -97,7 +93,7 @@ def test_config_write_default(path_empty):
 
 
 def test_config_write_revert(path):
-    cfg = Config()
+    cfg = Config(CONFIG_HOME)
     test_data = MOCK_SETTINGS.copy()
     with cfg.change() as cg:
         cg['asd'] = 2121
@@ -105,7 +101,7 @@ def test_config_write_revert(path):
 
 
 def test_config_dunder(path):
-    cfg = Config()
+    cfg = Config(CONFIG_HOME)
     assert len(cfg) == len(MOCK_SETTINGS)
     for expected, actual in zip(iter(MOCK_SETTINGS), iter(cfg)):
         assert expected == actual
