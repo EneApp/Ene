@@ -25,13 +25,11 @@ class Database:
     """
 
     def __init__(self, data_home: Path):
-        db_location = data_home / 'ene.db'
-        if db_location.is_file():
+        if data_home.is_file():
             setup = True
         else:
             setup = False
-            db_location.touch()
-        self.connection = sqlite3.connect(str(data_home / 'ene.db'), isolation_level=None)
+        self.connection = sqlite3.connect(str(data_home), isolation_level=None)
         self.cursor = self.connection.cursor()
         if setup:
             self.initial_setup()
@@ -207,7 +205,7 @@ class Database:
             A list of tuples containing all shows in the database
         """
         self.cursor.execute('SELECT show_name FROM Show')
-        return self.cursor.fetchall()
+        return [x[0] for x in self.cursor.fetchall()]
 
     def get_all_episodes(self):
         """

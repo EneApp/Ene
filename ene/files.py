@@ -35,7 +35,7 @@ class FileManager:
     def __init__(self, cfg, data_home: Path):
         self.config = cfg
         self.dirs = self.config.get('Local Paths', default=[Path.home() / 'Videos'])
-        self.db = Database(data_home)
+        self.db = Database(data_home / 'ene.db')
         self.series = defaultdict(list)
 
     def build_shows_from_db(self):
@@ -45,7 +45,7 @@ class FileManager:
         """
         shows = self.db.get_all_shows()
         for show in shows:
-            self.series[show[0]] = []
+            self.series[show] = []
 
     def build_all_from_db(self):
         """
