@@ -75,7 +75,7 @@ def launch(config_home=CONFIG_HOME, data_home=DATA_HOME, cache_home=CACHE_HOME, 
     app.main_window.show()
     if test:
         QTimer.singleShot(5000, app.quit)
-    sys.exit(app.exec_())
+    return app.exec_()
 
 
 if __name__ == '__main__':
