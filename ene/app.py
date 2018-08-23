@@ -17,6 +17,7 @@
 """This module contains the main application class."""
 import sys
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 from PySide2.QtCore import QTimer, Qt
 from PySide2.QtWidgets import QApplication
@@ -24,7 +25,7 @@ from PySide2.QtWidgets import QApplication
 import ene.resources
 from ene.api import API
 from ene.config import Config
-from ene.constants import APP_NAME, resources
+from ene.constants import APP_NAME, CACHE_HOME, CONFIG_HOME, DATA_HOME, resources
 from ene.ui import MainWindow, SettingsWindow
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
@@ -33,27 +34,41 @@ QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 class App(QApplication):
     """Main Application class"""
 
-    def __init__(self):
-        self.config = Config()
+    def __init__(self, config_home: Path, data_home: Path, cache_home: Path):
+        """
+        Args:
+            config_home:
+            data_home:
+            cache_home:
+        """
         args = [APP_NAME]
         args.extend(sys.argv[1:])
         super().__init__(args)
+        self.config_home = config_home
+        self.data_home = data_home
+        self.cache_home = cache_home
+        for path in (self.config_home, self.data_home, self.cache_home):
+            path.mkdir(parents=True, exist_ok=True)
+        self.config = Config(config_home)
         self.pool = ThreadPoolExecutor()
-        self.api = API()
+        self.api = API(data_home)
         self.main_window = MainWindow(self)
         self.settings_window = SettingsWindow(self)
         self.main_window.action_prefences.triggered.connect(self.settings_window.show)
 
 
-def launch(test=False):
+def launch(config_home=CONFIG_HOME, data_home=DATA_HOME, cache_home=CACHE_HOME, test=False):
     """
     Launch the Application
 
     Args:
+        config_home:
+        data_home:
+        cache_home:
         test: True to use test mode, default False
     """
     ene.resources.style_rc.qInitResources()
-    app = App()
+    app = App(config_home, data_home, cache_home)
     with resources.path(ene.resources, 'style.qss') as path:
         with open(path) as f:
             app.setStyleSheet(f.read())

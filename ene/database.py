@@ -16,6 +16,7 @@
 
 """ This module handles database access"""
 import sqlite3
+from pathlib import Path
 
 
 class Database:
@@ -23,8 +24,14 @@ class Database:
     Class to manage database access
     """
 
-    def __init__(self, location, setup=False):
-        self.connection = sqlite3.connect(location, isolation_level=None)
+    def __init__(self, data_home: Path):
+        db_location = data_home / 'ene.db'
+        if db_location.is_file():
+            setup = True
+        else:
+            setup = False
+            db_location.touch()
+        self.connection = sqlite3.connect(str(data_home / 'ene.db'), isolation_level=None)
         self.cursor = self.connection.cursor()
         if setup:
             self.initial_setup()
@@ -32,7 +39,6 @@ class Database:
     def __del__(self):
         self.cursor.close()
         self.connection.close()
-
 
     def initial_setup(self):
         """

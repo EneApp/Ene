@@ -16,6 +16,7 @@
 
 """This module contains anilist API class."""
 from functools import lru_cache
+from pathlib import Path
 from typing import Iterable, List, Optional
 
 from requests import HTTPError, Session
@@ -32,8 +33,8 @@ class API:
     Handles requests to the Anilist API
     """
 
-    def __init__(self):
-        self.token = OAuth.get_token(CLIENT_ID, '127.0.0.1', 50000)
+    def __init__(self, data_home: Path):
+        self.token = OAuth.get_token(data_home, CLIENT_ID, '127.0.0.1', 50000)
         self.session = Session()
         self.session.headers.update({
             'Authorization': f'Bearer {self.token}',

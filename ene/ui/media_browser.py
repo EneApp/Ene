@@ -16,6 +16,7 @@
 
 """This module contains the media browser."""
 from functools import partial
+from pathlib import Path
 from typing import List, Optional
 
 from PySide2.QtCore import Qt
@@ -51,6 +52,7 @@ class MediaDisplay(QWidget):
     # pylint: disable=R0913,R0914
     def __init__(
             self,
+            cache_home: Path,
             anime_id: int,
             image_url: str,
             title: str,
@@ -70,7 +72,7 @@ class MediaDisplay(QWidget):
         self.setFixedWidth(self.image_w * 2)
         self.setFixedHeight(self.image_h)
         self.anime_id = anime_id
-        image_path = str(get_resource(image_url))
+        image_path = str(get_resource(image_url, cache_home))
 
         img = QPixmap(image_path).scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
 

@@ -17,11 +17,11 @@
 """This module contains ways to do OAuth to the anilist API."""
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
 from threading import Thread
 from time import time
 from urllib.parse import parse_qsl, urlencode, urlparse
 
-from ene.constants import DATA_HOME
 from ene.errors import AuthError
 
 
@@ -38,7 +38,6 @@ class OAuth:
         https://anilist.gitbooks.io/anilist-apiv2-docs/oauth/implicit-grant.html
     """
     TOKEN = None
-    TOKEN_FILE = DATA_HOME / 'token'
 
     class _RedirectHandler(BaseHTTPRequestHandler):
         """
@@ -132,11 +131,19 @@ class OAuth:
         }
 
     @classmethod
-    def get_token(cls, client_id: int, addr: str, port: int, timeout: int = 300) -> str:
+    def get_token(
+            cls,
+            data_home: Path,
+            client_id: int,
+            addr: str,
+            port: int,
+            timeout: int = 300
+    ) -> str:
         """
         Get the Anilist API access token
 
         Args:
+            data_home: Data directory path
             client_id: The client ID for the application
             addr: The address for the http server to bind to
             port: The port to listen on
@@ -148,8 +155,9 @@ class OAuth:
         Raises:
             APIAuthError if failed to get the token
         """
+        token_file = data_home / 'token'
         try:
-            token = cls.TOKEN_FILE.read_text()
+            token = token_file.read_text()
         except OSError:
             pass
         else:
@@ -172,7 +180,7 @@ class OAuth:
         if not cls.TOKEN:
             raise AuthError()
         else:
-            DATA_HOME.mkdir(parents=True, exist_ok=True)
-            cls.TOKEN_FILE.touch()
-            cls.TOKEN_FILE.write_text(cls.TOKEN)
+            data_home.mkdir(parents=True, exist_ok=True)
+            token_file.touch()
+            token_file.write_text(cls.TOKEN)
             return cls.TOKEN

@@ -50,7 +50,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         """
         super().__init__()
         self.app = app
-        self.files = FileManager(self.app.config)
+        self.files = FileManager(self.app.config, self.app.data_home)
         self.player = None
         self.setupUi(self)
         self._setup_children()
@@ -104,6 +104,7 @@ class MainWindow(QMainWindow, Ui_window_main):
 
         self.weirds = [
             MediaDisplay(
+                self.app.cache_home,
                 i,
                 'https://cdn.anilist.co/img/dir/anime/reg/99147-tbXmbeLCtfAw.jpg',
                 'Shingeki no Kyojin 3' * 3,
