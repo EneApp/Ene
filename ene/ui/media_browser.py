@@ -15,7 +15,6 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains the media browser."""
-from functools import partial
 from pathlib import Path
 from typing import List, Optional
 
@@ -33,6 +32,7 @@ from PySide2.QtWidgets import (
 from ene.api import MediaFormat, MediaSeason
 from ene.util import get_resource
 from .common import mk_padding, mk_stylesheet
+from .custom import FlowLayout
 
 
 class MediaDisplay(QWidget):
@@ -67,7 +67,6 @@ class MediaDisplay(QWidget):
             *args,
             **kwargs
     ):
-        # TODO: Refactor this shit
         super().__init__(*args, **kwargs)
         self.setFixedWidth(self.image_w * 2)
         self.setFixedHeight(self.image_h)
@@ -80,7 +79,8 @@ class MediaDisplay(QWidget):
         self._setup_left(img, title, studio)
         self._setup_airing(next_airing_episode, season, year)
         self._setup_format(media_format, score)
-        self._setup_des(description)(genres)
+        qss = self._setup_des(description)
+        self._setup_bottom_bar(genres, qss)
 
     def _setup_layouts(self):
         self.master_layout = QHBoxLayout()
@@ -202,7 +202,7 @@ class MediaDisplay(QWidget):
         desc_scroll.setWidget(desc_label)
 
         self.right_layout.addWidget(desc_scroll)
-        return partial(self._setup_bottom_bar, stylesheet=stylesheet)
+        return stylesheet
 
     def _setup_bottom_bar(self, genres, stylesheet):
         # TODO Need to show buttons on hover
@@ -211,3 +211,11 @@ class MediaDisplay(QWidget):
         genre_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
         self.bottom_right_layout.addWidget(genre_label)
         self.right_layout.addWidget(genre_label)
+
+
+class MediaBrowser(QScrollArea):
+    def __init__(self):
+        super().__init__()
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.layout = FlowLayout()
