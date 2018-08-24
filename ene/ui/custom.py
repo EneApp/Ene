@@ -18,7 +18,6 @@
 from collections import deque
 from itertools import chain
 from typing import Any, Iterable, Optional, Union
-
 from PySide2.QtCore import QModelIndex, QPoint, QRect, QSize, Qt
 from PySide2.QtGui import QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import (
@@ -227,7 +226,11 @@ class EpisodeButton(QPushButton):
 
 
 class FlowLayout(QLayout):
-    """A grid like layout that goes from top left to bottom right."""
+    """
+    A grid like layout that goes from top left to bottom right.
+
+    Adapted from `PySide2.examples.widgets.layouts.flowlayout`
+    """
 
     def __init__(self, parent=None, margin=-1, hspacing=-1, vspacing=-1):
         super(FlowLayout, self).__init__(parent)
@@ -259,13 +262,19 @@ class FlowLayout(QLayout):
     def __len__(self):
         return len(self._items)
 
+    def __getitem__(self, index):
+        if 0 <= index < len(self._items):
+            return self._items[index]
+        return None
+
+    def __iter__(self):
+        return iter(self._items)
+
     def count(self):  # pylint: disable=all
         return len(self)
 
     def itemAt(self, index):  # pylint: disable=all
-        if 0 <= index < len(self._items):
-            return self._items[index]
-        return None
+        return self[index]
 
     def takeAt(self, index):  # pylint: disable=all
         if 0 <= index < len(self._items):
@@ -302,18 +311,20 @@ class FlowLayout(QLayout):
         x = effective.x()
         y = effective.y()
         line_height = 0
-        for item in self._items:
+        for item in self:
             widget = item.widget()
             hspace = self.horizontal_spacing
             if hspace == -1:
                 hspace = widget.style().layoutSpacing(
                     QSizePolicy.PushButton,
-                    QSizePolicy.PushButton, Qt.Horizontal)
+                    QSizePolicy.PushButton, Qt.Horizontal
+                )
             vspace = self.vertical_spacing
             if vspace == -1:
                 vspace = widget.style().layoutSpacing(
                     QSizePolicy.PushButton,
-                    QSizePolicy.PushButton, Qt.Vertical)
+                    QSizePolicy.PushButton, Qt.Vertical
+                )
             next_x = x + item.sizeHint().width() + hspace
             if next_x - hspace > effective.right() and line_height > 0:
                 x = effective.x()
