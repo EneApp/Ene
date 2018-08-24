@@ -194,7 +194,8 @@ class Database:
             INNER JOIN Episode E
             ON E.show_ID=S.show_ID""")
         res = defaultdict(list)
-        [res[x[0]].append(x[1]) for x in self.cursor.fetchall()]
+        for key, val in self.cursor.fetchall():
+            res[key].append(val)
         return res
 
     def get_all_shows(self):
