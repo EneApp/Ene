@@ -24,7 +24,10 @@ CONFIG_HOME = HERE / '.config'
 DATA_HOME = HERE / '.data'
 CACHE_HOME = HERE / '.cache'
 
-skip_travis_osx = pytest.mark.skipif(getenv('TRAVIS_OS_NAME') == 'osx')
+skip_travis_osx = pytest.mark.skipif(
+    getenv('TRAVIS_OS_NAME') == 'osx',
+    reason='does not run on travis macOS'
+)
 
 
 def rmdir(path, force):
