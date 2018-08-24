@@ -52,9 +52,7 @@ class FileManager:
         Fetches all shows and episodes from the database and builds up the full
         dictionary of series
         """
-        shows = self.db.get_all()
-        for show in shows:
-            self.series[show[0]].append(Path(show[1]))
+        self.series.update(self.db.get_all())
 
     def fetch_db_episodes_for_show(self, show):
         """
@@ -69,7 +67,7 @@ class FileManager:
             episodes = self.db.get_episodes_by_show_name(show)
             episodes.sort()
             for episode in episodes:
-                self.series[show].append(Path(episode[0]))
+                self.series[show].append(Path(episode))
 
     def dump_to_db(self):
         """
