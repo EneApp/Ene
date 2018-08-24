@@ -48,10 +48,10 @@ lint:
 
 .PHONY: test
 test:
-	python -m pytest -vvv tests
+	python -m pytest -s -vvv tests
 
 .PHONY: coverage
 coverage:
-	python -m pytest -vvv tests --cov=ene
+	python -m pytest -vvv -s --cov=ene tests 
 	pip install codecov
 	codecov
