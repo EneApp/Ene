@@ -16,6 +16,7 @@
 
 """ This module handles database access"""
 import sqlite3
+from collections import defaultdict
 from pathlib import Path
 
 
@@ -125,12 +126,12 @@ class Database:
                 A dictionary with show names as keys and lists of episodes
         """
         for show in series:
+            # TODO: This should function without adding shows first
             key = self.get_show_id_by_name(show)
-            # TODO: This should use get_readable_names method in FileManager
             episodes = {str(x) for x in series[show]}
             cur = set(x[0] for x in self.get_episodes_by_show_id(key))
             delta = episodes - cur
-            for episode in delta:
+            for episode in sorted(delta):
                 self.add_episode_by_show_id(str(episode), key)
 
     def get_show_id_by_name(self, show):
@@ -164,7 +165,7 @@ class Database:
         show_id = self.get_show_id_by_name(show)
         if show_id is None:
             return None
-        return self.get_episodes_by_show_id(show_id)
+        return [x[0] for x in self.get_episodes_by_show_id(show_id)]
 
     def get_episodes_by_show_id(self, show_id):
         """
@@ -192,7 +193,9 @@ class Database:
             FROM Show S
             INNER JOIN Episode E
             ON E.show_ID=S.show_ID""")
-        return self.cursor.fetchall()
+        res = defaultdict(list)
+        [res[x[0]].append(x[1]) for x in self.cursor.fetchall()]
+        return res
 
     def get_all_shows(self):
         """
@@ -212,4 +215,4 @@ class Database:
             A list of tuples containing all the episodes in the database
         """
         self.cursor.execute('SELECT episode_path FROM Episode')
-        return self.cursor.fetchall()
+        return [x[0] for x in self.cursor.fetchall()]
