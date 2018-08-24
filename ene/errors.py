@@ -29,12 +29,12 @@ class APIHTTPError(APIError):
     """Class for HTTP errors from API calls."""
 
     def __init__(self, status, message=None):
-        self.stauts = status
+        self.status = status
         self.message = message
         super().__init__()
 
     def __repr__(self):
-        return f'APIHTTPError(status={self.stauts}, message={self.message})'
+        return f'APIHTTPError(status={self.status}, message={self.message})'
 
 
 class AuthError(EneError):
