@@ -79,7 +79,7 @@ def test_write_episode(empty_db):
     assert empty_db.get_episodes_by_show_name('foo') == ['foo episode 1']
 
 
-@pytest.xfail
+@pytest.mark.xfail
 def test_write_all_episodes(empty_db):
     empty_db.write_all_episodes_delta(MOCK_SHOWS)
     assert MOCK_SHOWS == empty_db.get_all()
