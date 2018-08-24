@@ -56,6 +56,6 @@ test:
 
 .PHONY: coverage
 coverage:
-	-python -m pytest -vvv -s --cov=ene tests 
+	python -m pytest -vvv -s --cov=ene tests 
 	pip install codecov
 	codecov
