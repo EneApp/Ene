@@ -109,7 +109,7 @@ logging-modules=logging
 
 
 [DESIGN]
-max-args=5
+max-args=6
 max-attributes=7
 max-bool-expr=5
 max-branches=12
