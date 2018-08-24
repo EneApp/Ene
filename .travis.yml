@@ -44,7 +44,9 @@ install:
 
 script:
   - make lint
-  - if [[ $UPLOAD_COV == 'true' ]]; then
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      make test;
+    elif [[ $UPLOAD_COV == 'true' ]]; then
       make coverage; 
     else
       make test;
