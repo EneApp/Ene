@@ -75,6 +75,7 @@ def launch(config_home=CONFIG_HOME, data_home=DATA_HOME, cache_home=CACHE_HOME, 
     app.main_window.show()
     if test:
         QTimer.singleShot(5000, app.quit)
+    ene.resources.style_rc.qCleanupResources()
     return app.exec_()
 
 
