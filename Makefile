@@ -43,7 +43,7 @@ ci_setup:
 
 .PHONY: lint
 lint:
-	python -m flake8
+	python -m flake8 ene
 	python -m pylint --rcfile=.pylintrc ene
 
 .PHONY: test
