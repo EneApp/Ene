@@ -129,7 +129,7 @@ class API:
             season: The season
             year: The year for the season
             per_page: How many anime per page of the response
-            sort: List of keys to sort by, defaults to popularity decending. See
+            sort: List of keys to sort by, defaults to popularity descending. See
                 https://anilist.github.io/ApiV2-GraphQL-Docs/mediasort.doc.html
 
         Yields:
