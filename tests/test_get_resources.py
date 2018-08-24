@@ -36,8 +36,10 @@ with requests.get('https://httpbin.org/image/jpeg') as image_resp:
 @pytest.fixture()
 def cache_dir():
     rmdir(CACHE_HOME, True)
-    yield CACHE_HOME
-    rmdir(CACHE_HOME, True)
+    try:
+        yield CACHE_HOME
+    finally:
+        rmdir(CACHE_HOME, True)
 
 
 @pytest.fixture()
