@@ -46,7 +46,7 @@ script:
   - make lint
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       make test;
-    elif [[ $UPLOAD_COV == 'true' ]]; then
+    elif [[ $UPLOAD_COV == "true" ]]; then
       xvfb-run --server-args="-screen 0 1920x1080x24" make coverage;
     else
       xvfb-run --server-args="-screen 0 1920x1080x24" make test;
