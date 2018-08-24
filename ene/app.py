@@ -19,13 +19,13 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+import qdarkstyle
 from PySide2.QtCore import QTimer, Qt
 from PySide2.QtWidgets import QApplication
 
-import ene.resources
 from ene.api import API
 from ene.config import Config
-from ene.constants import APP_NAME, CACHE_HOME, CONFIG_HOME, DATA_HOME, resources
+from ene.constants import APP_NAME, CACHE_HOME, CONFIG_HOME, DATA_HOME
 from ene.ui import MainWindow, SettingsWindow
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
@@ -67,15 +67,11 @@ def launch(config_home=CONFIG_HOME, data_home=DATA_HOME, cache_home=CACHE_HOME, 
         cache_home:
         test: True to use test mode, default False
     """
-    ene.resources.style_rc.qInitResources()
     app = App(config_home, data_home, cache_home)
-    with resources.path(ene.resources, 'style.qss') as path:
-        with open(path) as f:
-            app.setStyleSheet(f.read())
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
     app.main_window.show()
     if test:
         QTimer.singleShot(5000, app.quit)
-    ene.resources.style_rc.qCleanupResources()
     return app.exec_()
 
 

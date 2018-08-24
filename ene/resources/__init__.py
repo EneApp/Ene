@@ -14,6 +14,5 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import style_rc
 from .main_window_uic import Ui_window_main
 from .settings_window_uic import Ui_window_settings
