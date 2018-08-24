@@ -60,6 +60,9 @@ def test_get_episodes_for_show(mock_db):
         assert mock_db.get_episodes_by_show_name(show) == MOCK_SHOWS[show]
 
 
+def test_get_episodes_for_nonexistent_show(empty_db):
+    assert None is empty_db.get_episodes_by_show_name('quz')
+
 def test_get_all(mock_db):
     assert mock_db.get_all() == MOCK_SHOWS
 
@@ -76,10 +79,17 @@ def test_write_show(empty_db):
 def test_write_episode(empty_db):
     assert empty_db.add_episode_by_show_name('foo episode 1', 'foo') == 1
     assert empty_db.get_show_id_by_name('foo') == 1
-    assert empty_db.get_episodes_by_show_name('foo') == ['foo episode 1']
+    assert empty_db.add_episode_by_show_name('foo episode 2', 'foo') == 2
+    assert empty_db.get_episodes_by_show_name('foo') == ['foo episode 1',
+                                                         'foo episode 2']
 
 
-@pytest.mark.xfail
 def test_write_all_episodes(empty_db):
+    empty_db.add_show('foo')
     empty_db.write_all_episodes_delta(MOCK_SHOWS)
     assert MOCK_SHOWS == empty_db.get_all()
+
+
+def test_write_all_show(empty_db):
+    empty_db.write_all_shows_delta(MOCK_SHOWS)
+    assert sorted(list(MOCK_SHOWS.keys())) == empty_db.get_all_shows()
