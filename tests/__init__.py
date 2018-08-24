@@ -13,14 +13,18 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from os import getenv
 from pathlib import Path
 from shutil import rmtree
+
+import pytest
 
 HERE = Path(__file__).parent.resolve()
 CONFIG_HOME = HERE / '.config'
 DATA_HOME = HERE / '.data'
 CACHE_HOME = HERE / '.cache'
+
+skip_travis_osx = pytest.mark.skipif(getenv('TRAVIS_OS_NAME') == 'osx')
 
 
 def rmdir(path, force):

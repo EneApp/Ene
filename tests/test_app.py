@@ -26,12 +26,12 @@ import multiprocessing
 import pytest
 import toml
 from requests import post
-from os import getenv
 from ene.app import App, launch
 from ene.constants import APP_NAME
 from ene.database import Database
-from . import CACHE_HOME, CONFIG_HOME, DATA_HOME, rmdir
+from . import CACHE_HOME, CONFIG_HOME, DATA_HOME, rmdir, skip_travis_osx
 
+pytestmark = skip_travis_osx
 MOCK_TOKEN_FILE = 'rm rf'
 MOCK_TOKEN_AUTH = 'as'
 MOCK_CONFIG = {
@@ -98,8 +98,6 @@ def _test_init(results, lock, cfg_exist, data_exist, cache_exist):
     set(itertools.permutations((True, False) * 3, 3))
 )
 def test_init(cfg_exist, data_exist, cache_exist):
-    if getenv('TRAVIS_OS_NAME') == 'osx':
-        return
     teardowns = [set_up_dir(CONFIG_HOME, cfg_exist),
                  set_up_dir(DATA_HOME, data_exist),
                  set_up_dir(CACHE_HOME, cache_exist)]
@@ -120,6 +118,4 @@ def test_init(cfg_exist, data_exist, cache_exist):
 
 
 def test_launch():
-    if getenv('TRAVIS_OS_NAME') == 'osx':
-        return
     assert launch(CONFIG_HOME, DATA_HOME, CACHE_HOME, True) == 0
