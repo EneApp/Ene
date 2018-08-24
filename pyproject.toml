@@ -23,7 +23,6 @@ fuzzywuzzy = "^0.16.0"
 PySide2 = "^5.11"
 python-Levenshtein = "^0.12.0"
 pytest-cov = "^2.5"
-pytest-xvfb = "^1.1"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.5"

@@ -44,10 +44,12 @@ install:
 
 script:
   - make lint
-  - if [[ $UPLOAD_COV == 'true' ]]; then
-      make coverage; 
-    else
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       make test;
+    elif [[ $UPLOAD_COV == 'true' ]]; then
+      xvfb-run make coverage; 
+    else
+      xvfb-run make test;
     fi
 
 notifications:

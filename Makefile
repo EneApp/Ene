@@ -48,7 +48,11 @@ lint:
 
 .PHONY: test
 test:
-	python -m pytest -s -vvv tests
+	if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then\
+		python -m pytest -s -vvv --ignore=tests/test_app.py tests;\
+	else\
+		python -m pytest -s -vvv tests;\
+	fi
 
 .PHONY: coverage
 coverage:
