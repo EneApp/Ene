@@ -15,49 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains common elements for UI."""
-from contextlib import contextmanager
-from typing import Dict, List, Optional, Union
-
-from PySide2 import QtUiTools
-from PySide2.QtCore import QFile
-from PySide2.QtWidgets import QWidget
-
-
-@contextmanager
-def open_ui_file(filename: str) -> QFile:
-    """
-    Context manager to open a Qt ui file
-
-    Args:
-        filename: Filename of the ui file
-
-    Returns:
-        The ui file opened, and closes the file afterwards
-    """
-    uifile = QFile(str(filename))
-    try:
-        uifile.open(QFile.ReadOnly)
-        yield uifile
-    finally:
-        uifile.close()
-
-
-def load_ui_widget(ui_file: str, parent: Optional[QWidget] = None) -> QWidget:
-    """
-    Load a ui widget from file
-
-    Args:
-        ui_file: The ui file name
-        parent: The parent of that widget
-
-    Returns:
-        The loaded ui widget
-    """
-    loader = QtUiTools.QUiLoader()
-    with open_ui_file(ui_file) as uifile:
-        ui = loader.load(uifile, parent)
-    uifile.close()
-    return ui
+from typing import Dict, List, Union
 
 
 def mk_stylesheet(rules: Dict[str, str], selector: Union[str, List[str]] = None) -> str:
