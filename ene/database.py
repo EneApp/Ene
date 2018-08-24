@@ -113,7 +113,7 @@ class Database:
         """
         cur = [x[0] for x in self.get_all_shows()]
         delta = (set(shows) - set(cur))
-        for show in delta:
+        for show in sorted(delta):
             self.add_show(show)
 
     def write_all_episodes_delta(self, series):
@@ -126,8 +126,9 @@ class Database:
                 A dictionary with show names as keys and lists of episodes
         """
         for show in series:
-            # TODO: This should function without adding shows first
             key = self.get_show_id_by_name(show)
+            if key is None:
+                key = self.add_show(show)
             episodes = {str(x) for x in series[show]}
             cur = set(x[0] for x in self.get_episodes_by_show_id(key))
             delta = episodes - cur
