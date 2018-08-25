@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Fri Aug 24 20:48:33 2018
+# Created: Fri Aug 24 20:52:28 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -227,8 +227,8 @@ class Ui_window_main(object):
         self.combobox_genre_tag.setCurrentText(QtWidgets.QApplication.translate("window_main", "Genres & Tags", None, -1))
         self.combobox_genre_tag.setItemText(0, QtWidgets.QApplication.translate("window_main", "Genres & Tags", None, -1))
         self.groupbox_year.setTitle(QtWidgets.QApplication.translate("window_main", "Year", None, -1))
-        self.label.setText(QtWidgets.QApplication.translate("window_main", "Min", None, -1))
-        self.label_2.setText(QtWidgets.QApplication.translate("window_main", "Max", None, -1))
+        self.label.setText(QtWidgets.QApplication.translate("window_main", "From", None, -1))
+        self.label_2.setText(QtWidgets.QApplication.translate("window_main", "To", None, -1))
         self.widget_tab.setTabText(self.widget_tab.indexOf(self.tab_browser), QtWidgets.QApplication.translate("window_main", "This Season", None, -1))
         self.widget_tab.setTabText(self.widget_tab.indexOf(self.tab_2), QtWidgets.QApplication.translate("window_main", "My List", None, -1))
         self.menuFile.setTitle(QtWidgets.QApplication.translate("window_main", "Fi&le", None, -1))
