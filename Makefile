@@ -15,16 +15,13 @@ define graphqlconfig
 endef
 
 .PHONY: resources
-resources: ui rcc
+resources: ui
 
 .PHONY: ui
 ui:
 	pyside2-uic ene/resources/main_window.ui -o ene/resources/main_window_uic.py
 	pyside2-uic ene/resources/settings_window.ui -o ene/resources/settings_window_uic.py
 
-.PHONY: rcc
-rcc:
-	pyside2-rcc -py3 ene/resources/style.qrc -o ene/resources/style_rc.py
 
 .PHONY: gql
 gql:

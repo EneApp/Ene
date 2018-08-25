@@ -41,7 +41,7 @@ name = "certifi"
 optional = false
 platform = "*"
 python-versions = "*"
-version = "2018.8.13"
+version = "2018.8.24"
 
 [[package]]
 category = "main"
@@ -311,6 +311,19 @@ version = "3.0.102"
 
 [[package]]
 category = "main"
+description = ""
+name = "QDarkStyle"
+optional = false
+platform = "*"
+python-versions = "*"
+version = "2.6.0"
+
+[package.source]
+reference = "d089f12f674c78285302e509745a68cc3fa4bb3b"
+type = "git"
+url = "https://github.com/ColinDuquesnoy/QDarkStyleSheet.git"
+[[package]]
+category = "main"
 description = "Python HTTP for Humans."
 name = "requests"
 optional = false
@@ -399,15 +412,16 @@ python-versions = "*"
 version = "1.10.11"
 
 [metadata]
-content-hash = "9fd787a54c6a2c427a8209e014259b978132fec3b7ccbe190001ad1971782ce3"
+content-hash = "575849a4ff5926cac57032e906a5f1e7943fc8f0bc8e9593699929b3e78abc5c"
 platform = "*"
 python-versions = "^3.6"
 
 [metadata.hashes]
+QDarkStyle = []
 astroid = ["292fa429e69d60e4161e7612cb7cc8fa3609e2e309f80c224d93a76d5e7b58be", "c7013d119ec95eb626f7a2011f0b63d0c9a095df9ad06d8507b37084eada1a8d"]
 atomicwrites = ["240831ea22da9ab882b551b31d4225591e5e447a68c5e188db5b89ca1d487585", "a24da68318b08ac9c9c45029f4a10371ab5b20e4226738e150e6e7c571630ae6"]
 attrs = ["4b90b09eeeb9b88c35bc642cbac057e45a5fd85367b985bd2809c62b7b939265", "e0d0eb91441a3b53dab4d9b743eafc1ac44476296a2053b6ca3af0b139faf87b"]
-certifi = ["4c1d68a1408dd090d2f3a869aa94c3947cc1d967821d1ed303208c9f41f0f2f4", "b6e8b28b2b7e771a41ecdd12d4d43262ecab52adebbafa42c77d6b57fb6ad3a4"]
+certifi = ["376690d6f16d32f9d1fe8932551d80b23e9d393a8578c5633a2ed39a64861638", "456048c7e371c089d0a77a5212fb37a2c2dce1e24146e3b7e0261736aaeaa22a"]
 chardet = ["84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae", "fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"]
 colorama = ["463f8483208e921368c9f306094eb6f725c6ca42b0f97e313cb5d5512459feda", "48eb22f4f8461b1df5734a074b57042430fb06e1d61bd1e11b078c0fe6d7a1f1"]
 cookies = ["15bee753002dff684987b8df8c235288eb8d45f8191ae056254812dfd42c81d3", "d6b698788cae4cfa4e62ef8643a9ca332b79bd96cb314294b864ae8d7eb3ee8e"]
