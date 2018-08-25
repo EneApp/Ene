@@ -66,7 +66,6 @@ class MainWindow(QMainWindow, Ui_window_main):
         master_layout = QHBoxLayout()
         left_layout = QVBoxLayout()
         right_layout = FlowLayout(None, 10, 10, 10)
-        left_mid_top_layout = QHBoxLayout()
         left_mid_bot_layout = QHBoxLayout()
 
         left_layout.setAlignment(Qt.AlignTop)
@@ -86,10 +85,7 @@ class MainWindow(QMainWindow, Ui_window_main):
 
         left_layout.addWidget(self.label_season)
         left_layout.addWidget(self.combobox_season)
-        left_mid_top_layout.addWidget(self.label_year)
-        left_mid_top_layout.addWidget(self.label_year_number)
-        left_layout.addLayout(left_mid_top_layout)
-        left_layout.addWidget(self.slider_year)
+        left_layout.addWidget(self.groupbox_year)
         left_layout.addWidget(self.label_filter)
         left_mid_bot_layout.addWidget(self.combobox_sort)
         left_mid_bot_layout.addWidget(self.button_sort_order)
@@ -98,6 +94,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         left_layout.addWidget(self.combobox_status)
         left_layout.addWidget(self.combobox_streaming)
         left_layout.addWidget(self.combobox_genre_tag)
+
         self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
         self.streamer_selector = StreamerSelector(self.combobox_streaming)
         self.sort_toggle = ToggleToolButton(self.button_sort_order)
@@ -125,7 +122,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         self.weird_scroll.setWidget(right_layout_control)
         self.weird_scroll.setWidgetResizable(True)
 
-        left_layout_control.setMaximumWidth(self.slider_year.width())
+        left_layout_control.setMaximumWidth(self.groupbox_year.width())
         master_layout.addWidget(left_layout_control)
         master_layout.addWidget(self.weird_scroll)
         right_layout.setSizeConstraint(QLayout.SetMinimumSize)
