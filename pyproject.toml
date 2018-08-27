@@ -23,7 +23,6 @@ fuzzywuzzy = "^0.16.0"
 PySide2 = "^5.11"
 python-Levenshtein = "^0.12.0"
 qdarkstyle = {git = "https://github.com/ColinDuquesnoy/QDarkStyleSheet.git", branch = "master"}
-html2text = "^2018.1"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.5"

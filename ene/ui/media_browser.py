@@ -204,6 +204,7 @@ class MediaDisplay(QWidget):
         # TODO Need to show buttons on hover
         genre_label = QLabel(', '.join(genres))
         stylesheet['qproperty-alignment'] = '"AlignCenter"'
+        stylesheet['background-color'] = self.dark_grey
         genre_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
         self.bottom_right_layout.addWidget(genre_label)
         self.right_layout.addWidget(genre_label)
