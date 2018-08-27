@@ -25,7 +25,7 @@ from PySide2.QtWidgets import (
 )
 
 from ene.api import MediaFormat, MediaSeason
-from ene.util import get_resource
+from ene.util import get_resource, strip_html
 from .common import mk_padding, mk_stylesheet
 from .custom import FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
 
@@ -148,8 +148,10 @@ class MediaDisplay(QWidget):
             time_parts.append(f'{minutes}m')
             time_str = ' '.join(time_parts)
             next_airing_label = QLabel(f'Ep {next_episode} - {time_str}')
-        else:
+        elif season:
             next_airing_label = QLabel(f'{season.name.title()} {year}')
+        else:
+            next_airing_label = QLabel(str(year))
 
         next_airing_label.setStyleSheet(mk_stylesheet({
             'color': self.aqua,
@@ -179,7 +181,7 @@ class MediaDisplay(QWidget):
             self.right_mid_layout.addWidget(score_label)
 
     def _setup_des(self, description):
-        desc_label = QLabel(description)
+        desc_label = QLabel(strip_html(description))
         stylesheet = {
             'color': self.dark_white,
             'background-color': self.light_grey,
@@ -243,24 +245,25 @@ class MediaBrowser(QScrollArea):
         self.setWidget(self.control_widget)
         self.setWidgetResizable(True)
 
-        self.weirds = [
-            MediaDisplay(
-                self.app.cache_home,
-                i,
-                'https://cdn.anilist.co/img/dir/anime/reg/99147-tbXmbeLCtfAw.jpg',
-                'Shingeki no Kyojin 3' * 3,
-                MediaSeason.SUMMER,
-                2018,
-                'Wit Studio' * 10,
-                {'episode': 5, 'timeUntilAiring': 320580},
-                MediaFormat.TV,
-                81,
-                'descon ' * 200,
-                ['Genre'],
-            ) for i in range(20)
-        ]
-        for i, weird in enumerate(self.weirds):
-            self._layout.addWidget(weird)
+        self.get_media()
 
-    def get_media(self):
-        pass
+    def get_media(self, page=1):
+        for anime in self.api.browse_anime(page):
+            season = anime['season']
+            season = MediaSeason[season] if season else None
+            studios = anime['studios']['edges']
+            studio = studios[0]['node']['name'] if studios else None
+            self._layout.addWidget(MediaDisplay(
+                cache_home=self.app.cache_home,
+                anime_id=anime['id'],
+                image_url=anime['coverImage']['large'],
+                title=anime['title']['userPreferred'],
+                season=season,
+                year=anime['startDate']['year'],
+                studio=studio,
+                next_airing_episode=anime['nextAiringEpisode'],
+                media_format=MediaFormat[anime['format']],
+                score=anime['averageScore'],
+                description=anime['description'],
+                genres=anime['genres']
+            ))

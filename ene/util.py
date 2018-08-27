@@ -15,11 +15,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains various helper function"""
-import re
 import webbrowser
 from functools import lru_cache
 from pathlib import Path
 
+from html2text import html2text
 from requests import get
 
 
@@ -34,7 +34,7 @@ def strip_html(s: str) -> str:
     Returns:
         The string with html tags stripped
     """
-    return re.sub('<[^<]+?>', '', s)
+    return html2text(s)
 
 
 def open_source_code():

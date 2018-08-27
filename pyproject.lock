@@ -119,6 +119,15 @@ version = "0.16.0"
 
 [[package]]
 category = "main"
+description = "Turn HTML into equivalent Markdown-structured text."
+name = "html2text"
+optional = false
+platform = "OS Independent"
+python-versions = "*"
+version = "2018.1.9"
+
+[[package]]
+category = "main"
 description = "Internationalized Domain Names in Applications (IDNA)"
 name = "idna"
 optional = false
@@ -322,6 +331,7 @@ version = "2.6.0"
 reference = "d089f12f674c78285302e509745a68cc3fa4bb3b"
 type = "git"
 url = "https://github.com/ColinDuquesnoy/QDarkStyleSheet.git"
+
 [[package]]
 category = "main"
 description = "Python HTTP for Humans."
@@ -412,7 +422,7 @@ python-versions = "*"
 version = "1.10.11"
 
 [metadata]
-content-hash = "575849a4ff5926cac57032e906a5f1e7943fc8f0bc8e9593699929b3e78abc5c"
+content-hash = "972aad52e826a972da6244e992bdf46bfe69aa24eba4b9bc49aa1c79387d2304"
 platform = "*"
 python-versions = "^3.6"
 
@@ -429,6 +439,7 @@ coverage = ["03481e81d558d30d230bc12999e3edffe392d244349a90f4ef9b88425fac74ba", 
 dataclasses = ["454a69d788c7fda44efd71e259be79577822f5e3f53f029a22d08004e951dc9f", "6988bd2b895eef432d562370bb707d540f32f7360ab13da45340101bc2307d84"]
 flake8 = ["7253265f7abd8b313e3892944044a365e3f4ac3fcdcfb4298f55ee9ddf188ba0", "c7841163e2b576d435799169b78703ad6ac1bbb0f199994fc05f700b2a90ea37"]
 fuzzywuzzy = ["d40c22d2744dff84885b30bbfc07fab7875f641d070374331777a4d1808b8d4e", "ecf490216fb4d76b558a03042ff8f45a8782f17326caca1384d834cbaa2c7e6f"]
+html2text = ["490db40fe5b2cd79c461cf56be4d39eb8ca68191ae41ba3ba79f6cb05b7dd662", "627514fb30e7566b37be6900df26c2c78a030cc9e6211bda604d8181233bcdd4"]
 idna = ["156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e", "684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16"]
 importlib-resources = ["6a01fd2d5b90bd422783719e49528365db6739a1ee762ed8442868fbff80b2b3", "ba9acf2c7c84f29ccce2de61a77b25592fe0357e249f92e3c1333a9f9cccb8d6"]
 isort = ["1153601da39a25b14ddc54955dbbacbb6b2d19135386699e2ad58517953b34af", "b9c40e9750f3d77e6e4d441d8b0266cf555e7cdabdcff33c4fd06366ca761ef8", "ec9ef8f4a9bc6f71eec99e1806bfa2de401650d996c59330782b89a5555c1497"]
