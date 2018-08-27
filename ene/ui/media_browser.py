@@ -19,13 +19,14 @@ from pathlib import Path
 from typing import List, Optional
 
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QPixmap
+from PySide2.QtGui import QPixmap, QTextOption
 from PySide2.QtWidgets import (
-    QHBoxLayout, QLabel, QLayout, QScrollArea, QSizePolicy, QVBoxLayout, QWidget,
+    QFrame, QHBoxLayout, QLabel, QLayout, QScrollArea, QSizePolicy, QTextEdit, QVBoxLayout,
+    QWidget,
 )
 
 from ene.api import MediaFormat, MediaSeason
-from ene.util import get_resource, strip_html
+from ene.util import get_resource
 from .common import mk_padding, mk_stylesheet
 from .custom import FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
 
@@ -181,24 +182,22 @@ class MediaDisplay(QWidget):
             self.right_mid_layout.addWidget(score_label)
 
     def _setup_des(self, description):
-        desc_label = QLabel(strip_html(description))
+        desc_text_edit = QTextEdit()
+        desc_text_edit.setHtml(description)
+        desc_text_edit.setReadOnly(True)
+        desc_text_edit.setFrameStyle(QFrame.NoFrame)
+        desc_text_edit.setLineWrapMode(QTextEdit.WidgetWidth)
+        desc_text_edit.setWordWrapMode(QTextOption.WordWrap)
         stylesheet = {
             'color': self.dark_white,
             'background-color': self.light_grey,
             'padding': '5px',
             'font-size': '10pt',
-            'qproperty-alignment': '"AlignLeft"',
-            'qproperty-wordWrap': 'true'
+            'border': 'none'
         }
-        desc_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
-        desc_scroll = QScrollArea()
-        desc_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        desc_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        desc_scroll.setWidgetResizable(True)
-        desc_scroll.setStyleSheet(mk_stylesheet({'border': 'none'}, 'QScrollArea'))
-        desc_scroll.setWidget(desc_label)
+        desc_text_edit.setStyleSheet(mk_stylesheet(stylesheet, 'QTextEdit'))
 
-        self.right_layout.addWidget(desc_scroll)
+        self.right_layout.addWidget(desc_text_edit)
         return stylesheet
 
     def _setup_bottom_bar(self, genres, stylesheet):
