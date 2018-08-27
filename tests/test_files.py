@@ -8,29 +8,42 @@ from pathlib import Path
 import pytest
 
 TEST_PATH = HERE / 'ene'
+MOCK_FILES = ['foo e1.avi',
+              'foo e2.avi',
+              'foo e3.avi',
+              'foo e4.avi',
+              'foo e5.avi',
+              'bar 01.mkv',
+              'bar 02.mkv',
+              'bar 03.mkv',
+              'baz ep1.mp4',
+              'baz ep2.mp4',
+              'baz ep3.mp4',
+              'baz ep4.mp4'
+              ]
 
 
 @pytest.fixture()
 def mock_shows(directory):
     yield {
-        'foo': [Path(directory / 'foo episode 1'),
-                Path(directory / 'foo episode 2'),
-                Path(directory / 'foo episode 3'),
-                Path(directory / 'foo episode 4'),
-                Path(directory / 'foo episode 5')],
-        'bar': [Path(directory / 'bar episode 1'),
-                Path(directory / 'bar episode 2'),
-                Path(directory / 'bar episode 3')],
-        'baz': [Path(directory / 'baz episode 1'),
-                Path(directory / 'baz episode 2'),
-                Path(directory / 'baz episode 3'),
-                Path(directory / 'baz episode 4')]
+        'foo': [directory / 'foo e1.avi',
+                directory / 'foo e2.avi',
+                directory / 'foo e3.avi',
+                directory / 'foo e4.avi',
+                directory / 'foo e5.avi'],
+        'bar': [directory / 'bar 01.mkv',
+                directory / 'bar 02.mkv',
+                directory / 'bar 03.mkv'],
+        'baz': [directory / 'baz ep1.mp4',
+                directory / 'baz ep2.mp4',
+                directory / 'baz ep3.mp4',
+                directory / 'baz ep4.mp4']
     }
 
 
 @pytest.fixture
 def manager(directory) -> ene.files.FileManager:
-    cfg = {'Local Paths': directory}
+    cfg = {'Local Paths': [directory]}
     files = ene.files.FileManager(cfg, Path(directory))
     yield files
 
@@ -38,9 +51,9 @@ def manager(directory) -> ene.files.FileManager:
 @pytest.fixture()
 def directory():
     with TemporaryDirectory() as path:
-        for episode in chain.from_iterable(MOCK_SHOWS.values()):
+        for episode in MOCK_FILES:
             Path(path, episode).touch()
-        yield path
+        yield Path(path)
 
 
 def test_regex():
@@ -55,12 +68,20 @@ def test_clean_titles():
         '[bar] bar - 01.mp4': [],
         '[baz] bar - 02 [720p].wav': [],
         'foo bar baz': [Path('foo bar baz'),
-                        Path('cat baz dog')]
+                        Path('cat baz dog')],
+        '[Foobar the Film]': []
     })
-    assert set(res.keys()) == {'foo', 'bar', 'baz'}
+    assert set(res.keys()) == {'foo', 'bar', 'baz', '[Foobar the Film]'}
 
 
-def test_discover(manager, directory, mock_shows):
-    # TODO: Actually compare something here properly
-    manager.discover_episodes(directory)
-    assert True
+def test_discover(manager, mock_shows):
+    manager.refresh_shows()
+    for show in mock_shows:
+        assert mock_shows[show] == manager.series[show]
+
+
+def test_find(manager, mock_shows):
+    for show in mock_shows:
+        manager.refresh_single_show(show)
+        assert mock_shows[show] == manager.series[show]
+
