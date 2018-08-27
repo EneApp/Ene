@@ -17,7 +17,7 @@
 """This module contains anilist API class."""
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional, Tuple
 
 from requests import HTTPError, Session
 
@@ -25,7 +25,7 @@ import ene.api
 from ene.constants import CLIENT_ID, GRAPHQL_URL, resources
 from ene.errors import APIError
 from .auth import OAuth
-from .enums import MediaSeason, MediaSort
+from .enums import MediaFormat, MediaSeason, MediaSort, MediaStatus
 
 
 class API:
@@ -115,36 +115,67 @@ class API:
                 return
             variables['page'] += 1
 
-    def get_season_anime(
+    def browse_anime(
             self,
-            season: MediaSeason,
-            year: int,
-            per_page: int = 20,
-            sort: Optional[List[MediaSort]] = None
+            *,
+            is_adult: bool = None,
+            search: str = None,
+            format_: MediaFormat = None,
+            status: MediaStatus = None,
+            season: MediaSeason = None,
+            year_range: Tuple[int, int] = None,
+            on_list: bool = None,
+            licensed_by: List[str] = None,
+            included_genres: List[str] = None,
+            excluded_genres: List[str] = None,
+            included_tags: List[str] = None,
+            excluded_tags: List[str] = None,
+            sort: List[MediaSort] = None
     ) -> Iterable[dict]:
         """
-        Query all anime of a given season
+        Browse anime by the given filters.
 
         Args:
-            season: The season
-            year: The year for the season
-            per_page: How many anime per page of the response
-            sort: List of keys to sort by, defaults to popularity descending. See
-                https://anilist.github.io/ApiV2-GraphQL-Docs/mediasort.doc.html
+            is_adult: Filter by if the media's intended for 18+ adult audiences
+            search: Filter by search query
+            format_: Filter by the media's format
+            status: Filter by the media's current release status
+            season: The season the media was initially released in
+            year_range: The year range the media is ranked within
+            on_list: Filter by the media on the authenticated user's lists
+            licensed_by: Filter media by sites with a online streaming license
+            included_genres: Filter by the media's genres
+            excluded_genres: Filter by the media's genres
+            included_tags: Filter by the media's tags
+            excluded_tags: Filter by the media's tags
+            sort: The order the results will be returned in
 
         Yields:
-            All anime in that season
-
-        Raises:
-            APIHTTPError if request failed
+            The anime returned
         """
-        sort = sort or [MediaSort.POPULARITY_DESC]
-        variables = {
-            'season': season.name,
-            'seasonYear': year,
-            'sort': [s.name for s in sort]
-        }
-        for page in self.query_pages(self.queries['season.graphql'], per_page, variables):
+        variables = {k: v for k, v in {
+            'isAdult': is_adult,
+            'search': search,
+            'format': format_,
+            'status': status,
+            'season': season,
+            'onList': on_list,
+            'licensedBy': licensed_by,
+            'includedGenres': included_genres,
+            'excludedGenres': excluded_genres,
+            'includedTags': included_tags,
+            'excludedTags': excluded_tags,
+        }.items() if v is not None}
+        if sort:
+            variables['sort'] = [s.name for s in sort]
+        if year_range:
+            start, fin = year_range
+            if start == fin:
+                variables['year'] = f'{start}%'
+            else:
+                variables['yearLesser'] = start * 10000
+                variables['yearGreater'] = fin * 10000
+        for page in self.query_pages(self.queries['browse.graphql'], 20, variables):
             for anime in page['data']['Page']['media']:
                 yield anime
 

@@ -2,7 +2,6 @@
 # yearLesser, yearGreater: 20180000
 query (
 $page: Int = 1,
-$type: MediaType,
 $isAdult: Boolean = false,
 $search: String,
 $format: MediaFormat
@@ -17,9 +16,10 @@ $includedGenres: [String],
 $excludedGenres: [String],
 $includedTags: [String],
 $excludedTags: [String],
-$sort: [MediaSort] = [SCORE_DESC, POPULARITY_DESC]
+$sort: [MediaSort] = [SCORE_DESC, POPULARITY_DESC],
+$perPage: Int,
 ) {
-    Page (page: $page, perPage: 20) {
+    Page (page: $page, perPage: $perPage) {
         pageInfo {
             total
             perPage
@@ -27,8 +27,7 @@ $sort: [MediaSort] = [SCORE_DESC, POPULARITY_DESC]
             lastPage
             hasNextPage
         }
-        ANIME: media (
-            type: $type,
+        media (
             season: $season,
             format: $format,
             status: $status,
@@ -52,6 +51,7 @@ $sort: [MediaSort] = [SCORE_DESC, POPULARITY_DESC]
             coverImage {
                 large
             }
+            bannerImage
             startDate {
                 year
                 month
