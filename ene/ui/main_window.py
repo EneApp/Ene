@@ -23,22 +23,19 @@ from PySide2.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
     QLabel,
-    QLayout,
     QMainWindow,
     QPushButton,
-    QScrollArea,
     QVBoxLayout,
     QWidget,
 )
 
 import ene.player
-from ene.api import MediaFormat, MediaSeason
 from ene.constants import IS_WIN
 from ene.files import FileManager
 from ene.resources import Ui_window_main
 from ene.util import open_source_code
-from .custom import EpisodeButton, FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
-from .media_browser import MediaDisplay
+from .custom import EpisodeButton, FlowLayout
+from .media_browser import MediaBrowser
 
 
 class MainWindow(QMainWindow, Ui_window_main):
@@ -53,35 +50,32 @@ class MainWindow(QMainWindow, Ui_window_main):
         self.files = FileManager(self.app.config, self.app.data_home)
         self.player = None
         self.setupUi(self)
-        self._setup_children()
 
-    def _setup_children(self):
+    def setupUi(self, window_main):
         """Setup all the child widgets of the main window"""
+        super().setupUi(window_main)
         self._setup_tab_browser()
+        self._setup_tab_files()
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
-        self._setup_tab_files()
 
     def _setup_tab_browser(self):
-        master_layout = QHBoxLayout()
-        left_layout = QVBoxLayout()
-        right_layout = FlowLayout(None, 10, 10, 10)
-        left_mid_bot_layout = QHBoxLayout()
+        self.media_browser = MediaBrowser(
+            self.app,
+            self.combobox_genre_tag,
+            self.combobox_streaming,
+            self.button_sort_order
+        )
 
+        master_layout = QHBoxLayout()
+        self.tab_browser.setLayout(master_layout)
+
+        left_mid_bot_layout = QHBoxLayout()
+        left_layout = QVBoxLayout()
         left_layout.setAlignment(Qt.AlignTop)
 
         left_layout_control = QWidget()
         left_layout_control.setLayout(left_layout)
-        right_layout_control = QWidget()
-        right_layout_control.setLayout(right_layout)
-        self.tab_browser.setLayout(master_layout)
-        # genre_future = self.app.pool.submit(self.app.api.get_genres)
-        # tags_future = self.app.pool.submit(self.app.api.get_tags)
-
-        # tags = [tag['name'] for tag in tags_future.result()]
-        # genres = genre_future.result()
-        tags = ['']
-        genres = ['']
 
         left_layout.addWidget(self.label_season)
         left_layout.addWidget(self.combobox_season)
@@ -95,41 +89,12 @@ class MainWindow(QMainWindow, Ui_window_main):
         left_layout.addWidget(self.combobox_streaming)
         left_layout.addWidget(self.combobox_genre_tag)
 
-        self.genre_tag_selector = GenreTagSelector(self.combobox_genre_tag, genres, tags)
-        self.streamer_selector = StreamerSelector(self.combobox_streaming)
-        self.sort_toggle = ToggleToolButton(self.button_sort_order)
-
-        self.weirds = [
-            MediaDisplay(
-                self.app.cache_home,
-                i,
-                'https://cdn.anilist.co/img/dir/anime/reg/99147-tbXmbeLCtfAw.jpg',
-                'Shingeki no Kyojin 3' * 3,
-                MediaSeason.SUMMER,
-                2018,
-                'Wit Studio' * 10,
-                {'episode': 5, 'timeUntilAiring': 320580},
-                MediaFormat.TV,
-                81,
-                'descon ' * 200,
-                ['Genre'],
-            ) for i in range(20)
-        ]
-
-        self.weird_scroll = QScrollArea()
-        self.weird_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.weird_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.weird_scroll.setWidget(right_layout_control)
-        self.weird_scroll.setWidgetResizable(True)
-
         left_layout_control.setMaximumWidth(self.groupbox_year.width())
-        master_layout.addWidget(left_layout_control)
-        master_layout.addWidget(self.weird_scroll)
-        right_layout.setSizeConstraint(QLayout.SetMinimumSize)
-        for i, weird in enumerate(self.weirds):
-            right_layout.addWidget(weird)
         left_layout.setSpacing(0)
         left_layout.setMargin(0)
+
+        master_layout.addWidget(left_layout_control)
+        master_layout.addWidget(self.media_browser)
 
     def _setup_tab_files(self):
         """

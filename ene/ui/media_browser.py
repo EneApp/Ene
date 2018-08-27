@@ -21,18 +21,13 @@ from typing import List, Optional
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QPixmap
 from PySide2.QtWidgets import (
-    QHBoxLayout,
-    QLabel,
-    QScrollArea,
-    QSizePolicy,
-    QVBoxLayout,
-    QWidget,
+    QHBoxLayout, QLabel, QLayout, QScrollArea, QSizePolicy, QVBoxLayout, QWidget,
 )
 
 from ene.api import MediaFormat, MediaSeason
 from ene.util import get_resource
 from .common import mk_padding, mk_stylesheet
-from .custom import FlowLayout
+from .custom import FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
 
 
 class MediaDisplay(QWidget):
@@ -214,8 +209,58 @@ class MediaDisplay(QWidget):
 
 
 class MediaBrowser(QScrollArea):
-    def __init__(self):
+    """This class controls the media browsing tab."""
+
+    def __init__(
+            self,
+            app,
+            combobox_genre_tag,
+            combobox_streaming,
+            button_sort_order
+    ):
         super().__init__()
+        self.app = app
+        self.api = self.app.api
+
+        # genre_future = self.app.pool.submit(self.app.api.get_genres)
+        # tags_future = self.app.pool.submit(self.app.api.get_tags)
+
+        # tags = [tag['name'] for tag in tags_future.result()]
+        # genres = genre_future.result()
+        tags = ['']
+        genres = ['']
+        self.genre_tag_selector = GenreTagSelector(combobox_genre_tag, genres, tags)
+        self.streamer_selector = StreamerSelector(combobox_streaming)
+        self.sort_toggle = ToggleToolButton(button_sort_order)
+
+        self._layout = FlowLayout(None, 10, 10, 10)
+        self._layout.setSizeConstraint(QLayout.SetMinimumSize)
+        self.control_widget = QWidget()
+        self.control_widget.setLayout(self._layout)
+
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.layout = FlowLayout()
+        self.setWidget(self.control_widget)
+        self.setWidgetResizable(True)
+
+        self.weirds = [
+            MediaDisplay(
+                self.app.cache_home,
+                i,
+                'https://cdn.anilist.co/img/dir/anime/reg/99147-tbXmbeLCtfAw.jpg',
+                'Shingeki no Kyojin 3' * 3,
+                MediaSeason.SUMMER,
+                2018,
+                'Wit Studio' * 10,
+                {'episode': 5, 'timeUntilAiring': 320580},
+                MediaFormat.TV,
+                81,
+                'descon ' * 200,
+                ['Genre'],
+            ) for i in range(20)
+        ]
+        for i, weird in enumerate(self.weirds):
+            self._layout.addWidget(weird)
+
+    def get_media(self):
+        pass
