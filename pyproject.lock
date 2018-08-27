@@ -21,9 +21,9 @@ category = "dev"
 description = "Atomic file writes."
 name = "atomicwrites"
 optional = false
-platform = "UNKNOWN"
-python-versions = "*"
-version = "1.1.5"
+platform = "*"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "1.2.0"
 
 [[package]]
 category = "dev"
@@ -251,7 +251,7 @@ name = "pytest"
 optional = false
 platform = "unix"
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "3.7.2"
+version = "3.7.3"
 
 [package.dependencies]
 atomicwrites = ">=1.0"
@@ -419,7 +419,7 @@ python-versions = "^3.6"
 [metadata.hashes]
 QDarkStyle = []
 astroid = ["292fa429e69d60e4161e7612cb7cc8fa3609e2e309f80c224d93a76d5e7b58be", "c7013d119ec95eb626f7a2011f0b63d0c9a095df9ad06d8507b37084eada1a8d"]
-atomicwrites = ["240831ea22da9ab882b551b31d4225591e5e447a68c5e188db5b89ca1d487585", "a24da68318b08ac9c9c45029f4a10371ab5b20e4226738e150e6e7c571630ae6"]
+atomicwrites = ["6b5282987b21cd79151f51caccead7a09d0a32e89c568bd9e3c4aaa7bbdf3f3a", "e16334d50fe0f90919ef7339c24b9b62e6abaa78cd2d226f3d94eb067eb89043"]
 attrs = ["4b90b09eeeb9b88c35bc642cbac057e45a5fd85367b985bd2809c62b7b939265", "e0d0eb91441a3b53dab4d9b743eafc1ac44476296a2053b6ca3af0b139faf87b"]
 certifi = ["376690d6f16d32f9d1fe8932551d80b23e9d393a8578c5633a2ed39a64861638", "456048c7e371c089d0a77a5212fb37a2c2dce1e24146e3b7e0261736aaeaa22a"]
 chardet = ["84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae", "fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"]
@@ -441,7 +441,7 @@ pycodestyle = ["682256a5b318149ca0d2a9185d365d8864a768a28db66a84a2ea946bcc426766
 pyflakes = ["08bd6a50edf8cffa9fa09a463063c425ecaaf10d1eb0335a7e8b1401aef89e6f", "8d616a382f243dbf19b54743f280b80198be0bca3a5396f1d2e1fca6223e8805"]
 pylint = ["1d6d3622c94b4887115fe5204982eee66fdd8a951cf98635ee5caee6ec98c3ec", "31142f764d2a7cd41df5196f9933b12b7ee55e73ef12204b648ad7e556c119fb"]
 pyside2 = ["09914eadc2e4f8834aa1937ed1abb58aeac6c7338be8ee7fafb180e19a6ef5ff", "41669d9b0326683144ff1b50893b57157b8fa9b53e0abef8034954e54cdca6d6", "729d36501166ad7a2129291b4a929e9e0eb3a60f338fb7c7b689ea91559b6235", "c3c3adec613acb187f2bb1ee91858c7b1a6048289958e657088e35d51c8f55b0", "d5e29aeef62e36fb0268a0567c39c4530b6c03466c9fd19492297245d74834d5", "dfcc4ccbf77429e7a831bd5ced06e35e046d9007694533a0f38f96f06449787d"]
-pytest = ["3459a123ad5532852d36f6f4501dfe1acf4af1dd9541834a164666aa40395b02", "96bfd45dbe863b447a3054145cd78a9d7f31475d2bce6111b133c0cc4f305118"]
+pytest = ["2e7c330338b2732ddb992217962e3454aa7290434e75329b1a6739cea41bea6b", "4abcd98faeea3eb95bd05aa6a7b121d5f89d72e4d36ddb0dcbbfd1ec9f3651d1"]
 pytest-cov = ["03aa752cf11db41d281ea1d807d954c4eda35cfa1b21d6971966cc041bbf6e2d", "890fe5565400902b0c78b5357004aab1c814115894f4f21370e2433256a3eeec"]
 python-levenshtein = ["033a11de5e3d19ea25c9302d11224e1a1898fe5abd23c61c7c360c25195e3eb1"]
 python-mpv = ["13dbbbcbd996afda37163cae6d4cbad0ef510188e467b16bc50aadc2a2cbdd52"]
