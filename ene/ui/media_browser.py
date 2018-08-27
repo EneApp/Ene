@@ -19,9 +19,10 @@ from pathlib import Path
 from typing import List, Optional
 
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QPixmap
+from PySide2.QtGui import QPixmap, QTextOption
 from PySide2.QtWidgets import (
-    QHBoxLayout, QLabel, QLayout, QScrollArea, QSizePolicy, QVBoxLayout, QWidget,
+    QFrame, QHBoxLayout, QLabel, QLayout, QScrollArea, QSizePolicy, QTextEdit, QVBoxLayout,
+    QWidget,
 )
 
 from ene.api import MediaFormat, MediaSeason
@@ -121,10 +122,10 @@ class MediaDisplay(QWidget):
         else:
             studio_label = None
 
-        for lbl in filter(None, (title_label, studio_label)):
-            lbl.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-
         left_label.setLayout(self.left_layout)
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.left_layout.addWidget(spacer)
         self.left_layout.addWidget(title_label)
         if studio_label:
             self.left_layout.addWidget(studio_label)
@@ -148,8 +149,10 @@ class MediaDisplay(QWidget):
             time_parts.append(f'{minutes}m')
             time_str = ' '.join(time_parts)
             next_airing_label = QLabel(f'Ep {next_episode} - {time_str}')
-        else:
+        elif season:
             next_airing_label = QLabel(f'{season.name.title()} {year}')
+        else:
+            next_airing_label = QLabel(str(year))
 
         next_airing_label.setStyleSheet(mk_stylesheet({
             'color': self.aqua,
@@ -179,30 +182,29 @@ class MediaDisplay(QWidget):
             self.right_mid_layout.addWidget(score_label)
 
     def _setup_des(self, description):
-        desc_label = QLabel(description)
+        desc_text_edit = QTextEdit()
+        desc_text_edit.setHtml(description)
+        desc_text_edit.setReadOnly(True)
+        desc_text_edit.setFrameStyle(QFrame.NoFrame)
+        desc_text_edit.setLineWrapMode(QTextEdit.WidgetWidth)
+        desc_text_edit.setWordWrapMode(QTextOption.WordWrap)
         stylesheet = {
             'color': self.dark_white,
             'background-color': self.light_grey,
             'padding': '5px',
             'font-size': '10pt',
-            'qproperty-alignment': '"AlignLeft"',
-            'qproperty-wordWrap': 'true'
+            'border': 'none'
         }
-        desc_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
-        desc_scroll = QScrollArea()
-        desc_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        desc_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        desc_scroll.setWidgetResizable(True)
-        desc_scroll.setStyleSheet(mk_stylesheet({'border': 'none'}, 'QScrollArea'))
-        desc_scroll.setWidget(desc_label)
+        desc_text_edit.setStyleSheet(mk_stylesheet(stylesheet, 'QTextEdit'))
 
-        self.right_layout.addWidget(desc_scroll)
+        self.right_layout.addWidget(desc_text_edit)
         return stylesheet
 
     def _setup_bottom_bar(self, genres, stylesheet):
         # TODO Need to show buttons on hover
         genre_label = QLabel(', '.join(genres))
         stylesheet['qproperty-alignment'] = '"AlignCenter"'
+        stylesheet['background-color'] = self.dark_grey
         genre_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
         self.bottom_right_layout.addWidget(genre_label)
         self.right_layout.addWidget(genre_label)
@@ -243,24 +245,25 @@ class MediaBrowser(QScrollArea):
         self.setWidget(self.control_widget)
         self.setWidgetResizable(True)
 
-        self.weirds = [
-            MediaDisplay(
-                self.app.cache_home,
-                i,
-                'https://cdn.anilist.co/img/dir/anime/reg/99147-tbXmbeLCtfAw.jpg',
-                'Shingeki no Kyojin 3' * 3,
-                MediaSeason.SUMMER,
-                2018,
-                'Wit Studio' * 10,
-                {'episode': 5, 'timeUntilAiring': 320580},
-                MediaFormat.TV,
-                81,
-                'descon ' * 200,
-                ['Genre'],
-            ) for i in range(20)
-        ]
-        for i, weird in enumerate(self.weirds):
-            self._layout.addWidget(weird)
+        self.get_media()
 
-    def get_media(self):
-        pass
+    def get_media(self, page=1):
+        for anime in self.api.browse_anime(page):
+            season = anime['season']
+            season = MediaSeason[season] if season else None
+            studios = anime['studios']['edges']
+            studio = studios[0]['node']['name'] if studios else None
+            self._layout.addWidget(MediaDisplay(
+                cache_home=self.app.cache_home,
+                anime_id=anime['id'],
+                image_url=anime['coverImage']['large'],
+                title=anime['title']['userPreferred'],
+                season=season,
+                year=anime['startDate']['year'],
+                studio=studio,
+                next_airing_episode=anime['nextAiringEpisode'],
+                media_format=MediaFormat[anime['format']],
+                score=anime['averageScore'],
+                description=anime['description'],
+                genres=anime['genres']
+            ))

@@ -28,6 +28,7 @@ $perPage: Int,
             hasNextPage
         }
         media (
+            type: ANIME,
             season: $season,
             format: $format,
             status: $status,

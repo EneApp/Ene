@@ -322,6 +322,7 @@ version = "2.6.0"
 reference = "d089f12f674c78285302e509745a68cc3fa4bb3b"
 type = "git"
 url = "https://github.com/ColinDuquesnoy/QDarkStyleSheet.git"
+
 [[package]]
 category = "main"
 description = "Python HTTP for Humans."

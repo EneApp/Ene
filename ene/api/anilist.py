@@ -117,6 +117,7 @@ class API:
 
     def browse_anime(
             self,
+            page=1,
             *,
             is_adult: bool = None,
             search: str = None,
@@ -136,6 +137,7 @@ class API:
         Browse anime by the given filters.
 
         Args:
+            page: which page of the anime to return
             is_adult: Filter by if the media's intended for 18+ adult audiences
             search: Filter by search query
             format_: Filter by the media's format
@@ -154,6 +156,7 @@ class API:
             The anime returned
         """
         variables = {k: v for k, v in {
+            'page': page,
             'isAdult': is_adult,
             'search': search,
             'format': format_,
@@ -175,9 +178,7 @@ class API:
             else:
                 variables['yearLesser'] = start * 10000
                 variables['yearGreater'] = fin * 10000
-        for page in self.query_pages(self.queries['browse.graphql'], 20, variables):
-            for anime in page['data']['Page']['media']:
-                yield anime
+        yield from self.query(self.queries['browse.graphql'], variables)['data']['Page']['media']
 
     @lru_cache(maxsize=None)
     def get_genres(self) -> List[str]:
