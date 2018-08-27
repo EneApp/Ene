@@ -85,6 +85,20 @@ class FileManager:
             self.discover_episodes(directory)
         self.series = clean_titles(self.series)
 
+    def refresh_single_show(self, show):
+        """
+        Looks for all the episodes of a given show and adds it to the list of
+        episodes for that show
+
+        Args:
+            show:
+                The show to search for all episodes of
+        """
+        for directory in self.dirs:
+            res = self.find_episodes(show, directory)
+            self.series[show].extend(res)
+        self.series[show].sort()
+
     def find_episodes(self, name, directory):
         """
         Finds all episodes in the set directory that match the given name
@@ -103,7 +117,7 @@ class FileManager:
             if regex.match(path.name.lower()):
                 if path.is_dir():
                     # if a folder matches the regex, assume it contains the episodes for that show
-                    episodes = self.find_episodes(name, path)
+                    episodes += self.find_episodes(name, path)
                     break
                 else:
                     # otherwise just append it to the list
@@ -125,7 +139,7 @@ class FileManager:
                     continue
                 matched = False
                 for show in self.series:
-                    if fuzz.token_set_ratio(show, file) > 90:
+                    if fuzz.token_set_ratio(show, file) >= 90:
                         self.series[show].append(Path(path) / file)
                         matched = True
                         break
