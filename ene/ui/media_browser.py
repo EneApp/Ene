@@ -121,10 +121,10 @@ class MediaDisplay(QWidget):
         else:
             studio_label = None
 
-        for lbl in filter(None, (title_label, studio_label)):
-            lbl.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-
         left_label.setLayout(self.left_layout)
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+        self.left_layout.addWidget(spacer)
         self.left_layout.addWidget(title_label)
         if studio_label:
             self.left_layout.addWidget(studio_label)
