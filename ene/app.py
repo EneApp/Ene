@@ -67,11 +67,13 @@ def launch(config_home=CONFIG_HOME, data_home=DATA_HOME, cache_home=CACHE_HOME, 
         cache_home:
         test: True to use test mode, default False
     """
+    if test:
+        API.query = lambda *args, **kwargs: {}
     app = App(config_home, data_home, cache_home)
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
-    app.main_window.show()
     if test:
         QTimer.singleShot(5000, app.quit)
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
+    app.main_window.show()
     return app.exec_()
 
 

@@ -15,6 +15,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import webbrowser
 
+from ene.api import API
+
 webbrowser.open = lambda *args: post(
     'http://127.0.0.1:50000',
     data=f'#access_token={MOCK_TOKEN_AUTH}'.encode()
@@ -57,6 +59,7 @@ def set_up_dir(dir_, exists):
 
 def _test_init(results, lock, cfg_exist, data_exist, cache_exist):
     with lock:
+        API.query = lambda *args, **kwargs: {}
         app = App(CONFIG_HOME, DATA_HOME, CACHE_HOME)
         results.append((True, app.config_home.is_dir(), 'True,app.config_home.is_dir()'))
         results.append((True, app.data_home.is_dir(), 'True,app.data_home.is_dir()'))

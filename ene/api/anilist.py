@@ -178,7 +178,8 @@ class API:
             else:
                 variables['yearLesser'] = start * 10000
                 variables['yearGreater'] = fin * 10000
-        yield from self.query(self.queries['browse.graphql'], variables)['data']['Page']['media']
+        yield from (self.query(self.queries['browse.graphql'], variables)
+                    .get('data', {}).get('Page', {}).get('media', []))
 
     @lru_cache(maxsize=None)
     def get_genres(self) -> List[str]:
