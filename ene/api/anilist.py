@@ -115,7 +115,7 @@ class API:
                 return
             variables['page'] += 1
 
-    def browse_anime(
+    def browse_anime(  # pylint: disable=R0914
             self,
             page=1,
             *,
