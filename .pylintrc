@@ -11,6 +11,7 @@ disable=no-name-in-module,
         too-many-instance-attributes,
         attribute-defined-outside-init,
         no-else-return,
+        fixme,
 
 [REPORTS]
 evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
