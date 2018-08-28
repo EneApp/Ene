@@ -145,9 +145,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         """
         Plays the selected episode with the users player of choice
         """
-        if isinstance(self.player, ene.player.GenericPlayer):
-            # GenericPlayer doesn't have controls, so stop it and get rid of it
-            self.player.stop()
+        if self.player is not None and self.player.needs_destruction():
             self.player = None
 
         if self.player is None:
