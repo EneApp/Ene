@@ -16,9 +16,8 @@
 
 """This module contains the main window."""
 from pathlib import Path
-from time import sleep
 
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, Slot
 from PySide2.QtWidgets import (
     QFileDialog,
     QGridLayout,
@@ -61,12 +60,23 @@ class MainWindow(QMainWindow, Ui_window_main):
         self.action_source_code.triggered.connect(open_source_code)
         self.widget_tab.currentChanged.connect(self.handle_current_tab_changed)
 
+    @Slot(int)
     def handle_current_tab_changed(self, index):
+        """
+        Handles when the tab changes in the widget tab.
+
+        Args:
+            index:
+                The index of the new tab
+
+        Returns:
+            None
+        """
         if index == 2:
             if not self.media_browser.is_setup:
                 self.media_browser.is_setup = True
                 self.app.pool.submit(
-                    self.media_browser.fetch_genre_tag,
+                    self.media_browser.fetch_control_info,
                     self.combobox_genre_tag,
                     self.combobox_streaming,
                 )

@@ -27,6 +27,7 @@ from PySide2.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QTextEdit,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
@@ -80,6 +81,16 @@ class MediaDisplay(QWidget):
         self._setup_bottom_bar(genres, qss)
 
     def set_image(self, image_url, cache_home):
+        """
+        Set the cover image of the display
+
+        Args:
+            image_url: The image url
+            cache_home: The cache directory
+
+        Returns:
+            None
+        """
         image_path = str(get_resource(image_url, cache_home))
         img = QPixmap(image_path).scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
         self.image_label.setPixmap(img)
@@ -221,7 +232,14 @@ class MediaBrowser(QScrollArea):
 
     ctrl_ready_signal = Signal(QWidget, QWidget)
 
-    def __init__(self, app, button_sort_order):
+    def __init__(self, app, button_sort_order: QToolButton):
+        """
+        Initialize instance
+
+        Args:
+            app: The application instance
+            button_sort_order: The tool button for sort order
+        """
         super().__init__()
         self.current_page = 0
         self.app = app
@@ -234,7 +252,6 @@ class MediaBrowser(QScrollArea):
         self.sort_toggle = None
         self._setup_ui(button_sort_order)
         self.ctrl_ready_signal.connect(self._setup_controls)
-        # self.get_media()
 
     def _setup_ui(self, button_sort_order):
         self._layout = FlowLayout(None, 10, 10, 10)
@@ -248,12 +265,18 @@ class MediaBrowser(QScrollArea):
         self.setWidgetResizable(True)
         self.sort_toggle = ToggleToolButton(button_sort_order)
 
-    @Slot(QWidget, QWidget)
-    def _setup_controls(self, combobox_genre_tag, combobox_streaming):
-        self.genre_tag_selector = GenreTagSelector(combobox_genre_tag, self.genres, self.tags)
-        self.streamer_selector = StreamerSelector(combobox_streaming)
+    def fetch_control_info(self, combobox_genre_tag, combobox_streaming):
+        """
+        Fetch the needed control information from the anilist API and triggers
+        the signal to set up control widgets
 
-    def fetch_genre_tag(self, combobox_genre_tag, combobox_streaming):
+        Args:
+            combobox_genre_tag: The combobox to select genres and tags
+            combobox_streaming: The combobox to select streamers
+
+        Returns:
+            None
+        """
         genre_future = self.app.pool.submit(self.app.api.get_genres)
         tags_future = self.app.pool.submit(self.app.api.get_tags)
         self.tags = [tag['name'] for tag in tags_future.result()]
@@ -261,7 +284,15 @@ class MediaBrowser(QScrollArea):
         self.ctrl_ready_signal.emit(combobox_genre_tag, combobox_streaming)
 
     def get_media(self, page=1):
-        futures = []
+        """
+        Get media from anilist and put them into the layout
+
+        Args:
+            page: Which page of the media to get
+
+        Returns:
+            None
+        """
         for anime in self.api.browse_anime(page):
             season = anime['season']
             season = MediaSeason[season] if season else None
@@ -269,7 +300,7 @@ class MediaBrowser(QScrollArea):
             studio = studios[0]['node']['name'] if studios else None
             cache_home = self.app.cache_home
             image_url = anime['coverImage']['large']
-            disp = MediaDisplay(
+            display = MediaDisplay(
                 anime_id=anime['id'],
                 title=anime['title']['userPreferred'],
                 season=season,
@@ -281,7 +312,10 @@ class MediaBrowser(QScrollArea):
                 description=anime['description'],
                 genres=anime['genres']
             )
-            self._layout.addWidget(disp)
-            futures.append(self.app.pool.submit(disp.set_image, image_url, cache_home))
-        for fut in futures:
-            fut.result()
+            self._layout.addWidget(display)
+            self.app.pool.submit(display.set_image, image_url, cache_home)
+
+    @Slot(QWidget, QWidget)
+    def _setup_controls(self, combobox_genre_tag, combobox_streaming):
+        self.genre_tag_selector = GenreTagSelector(combobox_genre_tag, self.genres, self.tags)
+        self.streamer_selector = StreamerSelector(combobox_streaming)
