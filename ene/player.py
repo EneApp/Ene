@@ -51,6 +51,11 @@ class AbstractPlayer(ABC):
         """Wait for the playback to end."""
         raise NotImplementedError()
 
+    @abstractmethod
+    def needs_destruction(self):
+        """Should the instance be destroyed"""
+        raise NotImplementedError()
+
 
 class VlcPlayer(AbstractPlayer):
     """
@@ -79,13 +84,18 @@ class VlcPlayer(AbstractPlayer):
     def wait_for_playback_end(self):
         sleep(30)
 
+    def needs_destruction(self):
+        return False
+
 
 class RcVlcPlayer(AbstractPlayer):
     """
     An implementation of the VLC player using the rc interface and passing commands to stdin
     """
+    # TODO: Replace this whole class with one that uses HTTP interface
 
     def __init__(self, binary=None):
+        self.broken = False
         if not binary and IS_WIN:
             binary = which('vlc.exe')
         elif not binary:
@@ -106,12 +116,12 @@ class RcVlcPlayer(AbstractPlayer):
         Args:
             cmd:
         """
-        # TODO: Find a better way to prevent this from possibly deadlocking
-        # TODO: or find a way to use Popen.Communicate()
-
-        sleep(1)
-        self.process.stdin.write(cmd + '\n')
-        self.process.stdin.flush()
+        try:
+            self.process.stdin.write(cmd + '\n')
+            self.process.stdin.flush()
+        except BrokenPipeError:
+            self.broken = True
+            self.process.terminate()
 
     def play(self, path):
         """
@@ -132,6 +142,9 @@ class RcVlcPlayer(AbstractPlayer):
     def wait_for_playback_end(self):
         sleep(10)
 
+    def needs_destruction(self):
+        return self.broken
+
 
 class MpvPlayer(AbstractPlayer):
     """
@@ -147,6 +160,7 @@ class MpvPlayer(AbstractPlayer):
         import mpv
         self.player = mpv.MPV(input_default_bindings=True, input_vo_keyboard=True)
         self.eof = Event()
+        self.closed = False
         self.setup_listeners()
 
     def play(self, path):
@@ -169,6 +183,7 @@ class MpvPlayer(AbstractPlayer):
         @self.player.event_callback('shutdown')
         def on_shutdown(event):  # pylint: disable=unused-argument,unused-variable
             self.stop()
+            self.closed = True
 
         @self.player.event_callback('end_file')
         def on_file_end(event):  # pylint: disable=unused-argument,unused-variable
@@ -179,6 +194,9 @@ class MpvPlayer(AbstractPlayer):
         Waits until the media stream reaches end of file
         """
         self.eof.wait()
+
+    def needs_destruction(self):
+        return self.closed
 
 
 class GenericPlayer(AbstractPlayer):
@@ -208,6 +226,9 @@ class GenericPlayer(AbstractPlayer):
     def wait_for_playback_end(self):
         if self.player is not None:
             self.player.wait()
+
+    def needs_destruction(self):
+        return True
 
 
 def get_player(config):
