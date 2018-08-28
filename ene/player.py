@@ -22,6 +22,7 @@ from shutil import which
 from threading import Event
 from time import sleep
 from typing import Union
+import requests
 
 import vlc
 
@@ -86,6 +87,52 @@ class VlcPlayer(AbstractPlayer):
 
     def needs_destruction(self):
         return False
+
+
+class HttpVlcPlayer(AbstractPlayer):
+    """An implementation of the Vlc player using HTTP requests"""
+
+    # The HTTP interface requires a password so its gonna be ene for now
+    PASSWORD = 'ene'
+
+    def __init__(self, ip, binary=None):
+        if not binary and IS_WIN:
+            binary = which('vlc.exe')
+        elif not binary:
+            binary = which('vlc')
+
+        args = [binary, '-I']
+        if IS_MAC:
+            # mac is special
+            args.append('macosx')
+        else:
+            args.append('qt')
+        args.append('--extraintf=http')
+        args.append('--http-password=' + self.PASSWORD)
+
+        self.base = f'http://:{self.PASSWORD}@{ip}/requests/'
+        self.process = subprocess.Popen(args)
+        sleep(1)
+
+    def play(self, path: Union[str, os.PathLike]):
+        url = f'{self.base}status.json?command=in_play&input={path}'
+        response = requests.get(url)
+        print(response.status_code)
+
+    def stop(self):
+        requests.get(f'{self.base}?command=pl_empty')
+
+    def wait_for_playback_end(self):
+        pass
+
+    def needs_destruction(self):
+        try:
+            # if a request gives a non 200 status code just destroy it
+            res = requests.get(f'{self.base}status.json')
+            return res.status_code != 200
+        except requests.exceptions.ConnectionError:
+            # more likely is a connection failure. destroy it in this case
+            return True
 
 
 class RcVlcPlayer(AbstractPlayer):

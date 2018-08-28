@@ -16,7 +16,6 @@
 
 """This module contains the main window."""
 from pathlib import Path
-from time import sleep
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
@@ -142,7 +141,6 @@ class MainWindow(QMainWindow, Ui_window_main):
         layout.addWidget(menu)
         self.files.fetch_db_episodes_for_show(show)
         for i, episode in enumerate(self.files.series[show]):
-            print(episode)
             button = EpisodeButton(episode)
             button.clicked.connect(self.play_episode)
             layout.addWidget(button)
@@ -158,7 +156,6 @@ class MainWindow(QMainWindow, Ui_window_main):
         if self.player is None:
             self.player = ene.player.get_player(self.app.config)
         episode = self.sender().path
-        print(episode)
         self.player.play(str(episode))
 
     def on_back_click(self):
