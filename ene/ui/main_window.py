@@ -121,7 +121,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         layout = FlowLayout()
         layout.setAlignment(Qt.AlignTop)
 
-        for i, show in enumerate(self.files.series):
+        for show in self.files.series:
             button = QPushButton(show)
             button.clicked.connect(self.on_series_click)
             layout.addWidget(button)
@@ -151,7 +151,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         menu.setMinimumWidth(self.stack_local_files.width() / 2)
         layout.addWidget(menu)
         self.files.fetch_db_episodes_for_show(show)
-        for i, episode in enumerate(self.files.series[show]):
+        for episode in self.files.series[show]:
             button = EpisodeButton(episode)
             button.clicked.connect(self.play_episode)
             layout.addWidget(button)
