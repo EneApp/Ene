@@ -24,7 +24,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_local_files">
        <attribute name="title">
@@ -33,6 +33,9 @@
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QStackedWidget" name="stack_local_files">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
           <widget class="QWidget" name="page"/>
           <widget class="QWidget" name="page_2"/>
          </widget>
@@ -46,7 +49,7 @@
       </widget>
       <widget class="QWidget" name="tab_browser">
        <attribute name="title">
-        <string>This Season</string>
+        <string>Browse</string>
        </attribute>
        <widget class="QComboBox" name="combobox_season">
         <property name="geometry">

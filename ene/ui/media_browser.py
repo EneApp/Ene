@@ -15,7 +15,6 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains the media browser."""
-from pathlib import Path
 from typing import List, Optional
 
 from PySide2.QtCore import Qt
@@ -48,9 +47,7 @@ class MediaDisplay(QWidget):
     # pylint: disable=R0913,R0914
     def __init__(
             self,
-            cache_home: Path,
             anime_id: int,
-            image_url: str,
             title: str,
             season: MediaSeason,
             year: int,
@@ -67,16 +64,18 @@ class MediaDisplay(QWidget):
         self.setFixedWidth(self.image_w * 2)
         self.setFixedHeight(self.image_h)
         self.anime_id = anime_id
-        image_path = str(get_resource(image_url, cache_home))
-
-        img = QPixmap(image_path).scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
 
         self._setup_layouts()
-        self._setup_left(img, title, studio)
+        self._setup_left(title, studio)
         self._setup_airing(next_airing_episode, season, year)
         self._setup_format(media_format, score)
         qss = self._setup_des(description)
         self._setup_bottom_bar(genres, qss)
+
+    def set_image(self, image_url, cache_home):
+        image_path = str(get_resource(image_url, cache_home))
+        img = QPixmap(image_path).scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
+        self.image_label.setPixmap(img)
 
     def _setup_layouts(self):
         self.master_layout = QHBoxLayout()
@@ -98,9 +97,9 @@ class MediaDisplay(QWidget):
             layout.setSpacing(0)
             layout.setMargin(0)
 
-    def _setup_left(self, image, title, studio):
-        left_label = QLabel()
-        left_label.setPixmap(image)
+    def _setup_left(self, title, studio):
+        self.image_label = QLabel()
+        self.image_label.setFixedSize(self.image_w, self.image_h)
         stylesheet = {
             'color': self.lighter_white,
             'background-color': self.transparent_grey,
@@ -122,7 +121,7 @@ class MediaDisplay(QWidget):
         else:
             studio_label = None
 
-        left_label.setLayout(self.left_layout)
+        self.image_label.setLayout(self.left_layout)
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
         self.left_layout.addWidget(spacer)
@@ -130,7 +129,7 @@ class MediaDisplay(QWidget):
         if studio_label:
             self.left_layout.addWidget(studio_label)
 
-        self.master_layout.addWidget(left_label)
+        self.master_layout.addWidget(self.image_label)
         self.master_layout.addLayout(self.right_layout)
 
     def _setup_airing(self, next_airing_episode, season, year):
@@ -221,16 +220,18 @@ class MediaBrowser(QScrollArea):
             button_sort_order
     ):
         super().__init__()
+        self.current_page = 0
         self.app = app
         self.api = self.app.api
+        self._setup_ui(combobox_genre_tag, combobox_streaming, button_sort_order)
+        self.get_media()
 
-        # genre_future = self.app.pool.submit(self.app.api.get_genres)
-        # tags_future = self.app.pool.submit(self.app.api.get_tags)
+    def _setup_ui(self, combobox_genre_tag, combobox_streaming, button_sort_order):
+        genre_future = self.app.pool.submit(self.app.api.get_genres)
+        tags_future = self.app.pool.submit(self.app.api.get_tags)
+        tags = [tag['name'] for tag in tags_future.result()]
+        genres = genre_future.result()
 
-        # tags = [tag['name'] for tag in tags_future.result()]
-        # genres = genre_future.result()
-        tags = ['']
-        genres = ['']
         self.genre_tag_selector = GenreTagSelector(combobox_genre_tag, genres, tags)
         self.streamer_selector = StreamerSelector(combobox_streaming)
         self.sort_toggle = ToggleToolButton(button_sort_order)
@@ -245,18 +246,17 @@ class MediaBrowser(QScrollArea):
         self.setWidget(self.control_widget)
         self.setWidgetResizable(True)
 
-        self.get_media()
-
     def get_media(self, page=1):
+        futures = []
         for anime in self.api.browse_anime(page):
             season = anime['season']
             season = MediaSeason[season] if season else None
             studios = anime['studios']['edges']
             studio = studios[0]['node']['name'] if studios else None
-            self._layout.addWidget(MediaDisplay(
-                cache_home=self.app.cache_home,
+            cache_home = self.app.cache_home
+            image_url = anime['coverImage']['large']
+            disp = MediaDisplay(
                 anime_id=anime['id'],
-                image_url=anime['coverImage']['large'],
                 title=anime['title']['userPreferred'],
                 season=season,
                 year=anime['startDate']['year'],
@@ -266,4 +266,8 @@ class MediaBrowser(QScrollArea):
                 score=anime['averageScore'],
                 description=anime['description'],
                 genres=anime['genres']
-            ))
+            )
+            self._layout.addWidget(disp)
+            futures.append(self.app.pool.submit(disp.set_image, image_url, cache_home))
+        for fut in futures:
+            fut.result()

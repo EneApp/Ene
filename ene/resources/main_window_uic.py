@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Mon Aug 27 13:28:26 2018
+# Created: Tue Aug 28 16:40:52 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -177,7 +177,8 @@ class Ui_window_main(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(window_main)
-        self.widget_tab.setCurrentIndex(2)
+        self.widget_tab.setCurrentIndex(0)
+        self.stack_local_files.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(window_main)
 
     def retranslateUi(self, window_main):
@@ -229,7 +230,7 @@ class Ui_window_main(object):
         self.groupbox_year.setTitle(QtWidgets.QApplication.translate("window_main", "Year", None, -1))
         self.label.setText(QtWidgets.QApplication.translate("window_main", "From", None, -1))
         self.label_2.setText(QtWidgets.QApplication.translate("window_main", "To", None, -1))
-        self.widget_tab.setTabText(self.widget_tab.indexOf(self.tab_browser), QtWidgets.QApplication.translate("window_main", "This Season", None, -1))
+        self.widget_tab.setTabText(self.widget_tab.indexOf(self.tab_browser), QtWidgets.QApplication.translate("window_main", "Browse", None, -1))
         self.widget_tab.setTabText(self.widget_tab.indexOf(self.tab_2), QtWidgets.QApplication.translate("window_main", "My List", None, -1))
         self.menuFile.setTitle(QtWidgets.QApplication.translate("window_main", "Fi&le", None, -1))
         self.menuSettings.setTitle(QtWidgets.QApplication.translate("window_main", "Setti&ngs", None, -1))
