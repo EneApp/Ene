@@ -17,10 +17,17 @@
 """This module contains the media browser."""
 from typing import List, Optional
 
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt, Signal, Slot
 from PySide2.QtGui import QPixmap, QTextOption
 from PySide2.QtWidgets import (
-    QFrame, QHBoxLayout, QLabel, QLayout, QScrollArea, QSizePolicy, QTextEdit, QVBoxLayout,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLayout,
+    QScrollArea,
+    QSizePolicy,
+    QTextEdit,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -212,30 +219,24 @@ class MediaDisplay(QWidget):
 class MediaBrowser(QScrollArea):
     """This class controls the media browsing tab."""
 
-    def __init__(
-            self,
-            app,
-            combobox_genre_tag,
-            combobox_streaming,
-            button_sort_order
-    ):
+    ctrl_ready_signal = Signal(QWidget, QWidget)
+
+    def __init__(self, app, button_sort_order):
         super().__init__()
         self.current_page = 0
         self.app = app
         self.api = self.app.api
-        self._setup_ui(combobox_genre_tag, combobox_streaming, button_sort_order)
-        self.get_media()
+        self.is_setup = False
+        self.tags = None
+        self.genres = None
+        self.genre_tag_selector = None
+        self.streamer_selector = None
+        self.sort_toggle = None
+        self._setup_ui(button_sort_order)
+        self.ctrl_ready_signal.connect(self._setup_controls)
+        # self.get_media()
 
-    def _setup_ui(self, combobox_genre_tag, combobox_streaming, button_sort_order):
-        genre_future = self.app.pool.submit(self.app.api.get_genres)
-        tags_future = self.app.pool.submit(self.app.api.get_tags)
-        tags = [tag['name'] for tag in tags_future.result()]
-        genres = genre_future.result()
-
-        self.genre_tag_selector = GenreTagSelector(combobox_genre_tag, genres, tags)
-        self.streamer_selector = StreamerSelector(combobox_streaming)
-        self.sort_toggle = ToggleToolButton(button_sort_order)
-
+    def _setup_ui(self, button_sort_order):
         self._layout = FlowLayout(None, 10, 10, 10)
         self._layout.setSizeConstraint(QLayout.SetMinimumSize)
         self.control_widget = QWidget()
@@ -245,6 +246,19 @@ class MediaBrowser(QScrollArea):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setWidget(self.control_widget)
         self.setWidgetResizable(True)
+        self.sort_toggle = ToggleToolButton(button_sort_order)
+
+    @Slot(QWidget, QWidget)
+    def _setup_controls(self, combobox_genre_tag, combobox_streaming):
+        self.genre_tag_selector = GenreTagSelector(combobox_genre_tag, self.genres, self.tags)
+        self.streamer_selector = StreamerSelector(combobox_streaming)
+
+    def fetch_genre_tag(self, combobox_genre_tag, combobox_streaming):
+        genre_future = self.app.pool.submit(self.app.api.get_genres)
+        tags_future = self.app.pool.submit(self.app.api.get_tags)
+        self.tags = [tag['name'] for tag in tags_future.result()]
+        self.genres = genre_future.result()
+        self.ctrl_ready_signal.emit(combobox_genre_tag, combobox_streaming)
 
     def get_media(self, page=1):
         futures = []

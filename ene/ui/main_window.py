@@ -16,6 +16,7 @@
 
 """This module contains the main window."""
 from pathlib import Path
+from time import sleep
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import (
@@ -58,14 +59,20 @@ class MainWindow(QMainWindow, Ui_window_main):
         self._setup_tab_files()
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
+        self.widget_tab.currentChanged.connect(self.handle_current_tab_changed)
+
+    def handle_current_tab_changed(self, index):
+        if index == 2:
+            if not self.media_browser.is_setup:
+                self.media_browser.is_setup = True
+                self.app.pool.submit(
+                    self.media_browser.fetch_genre_tag,
+                    self.combobox_genre_tag,
+                    self.combobox_streaming,
+                )
 
     def _setup_tab_browser(self):
-        self.media_browser = MediaBrowser(
-            self.app,
-            self.combobox_genre_tag,
-            self.combobox_streaming,
-            self.button_sort_order
-        )
+        self.media_browser = MediaBrowser(self.app, self.button_sort_order)
 
         master_layout = QHBoxLayout()
         self.tab_browser.setLayout(master_layout)
