@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Tue Aug 28 21:08:44 2018
+# Created: Tue Aug 28 20:27:02 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -21,6 +21,7 @@ class Ui_window_main(object):
         self.widget_tab = QtWidgets.QTabWidget(self.centralwidget)
         self.widget_tab.setCursor(QtCore.Qt.ArrowCursor)
         self.widget_tab.setMouseTracking(True)
+        self.widget_tab.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.widget_tab.setObjectName("widget_tab")
         self.tab_local_files = QtWidgets.QWidget()
         self.tab_local_files.setObjectName("tab_local_files")
