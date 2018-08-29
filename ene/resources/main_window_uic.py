@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Tue Aug 28 17:48:30 2018
+# Created: Tue Aug 28 21:08:44 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!

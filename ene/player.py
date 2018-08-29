@@ -291,8 +291,8 @@ def get_player(config):
     """
     option = config.get('Player')
     if option == 'vlc':
-        if config.get('VLC RC Interface'):
-            return RcVlcPlayer()
+        if config.get('VLC HTTP Interface'):
+            return HttpVlcPlayer('127.0.0.1:8080')
         return VlcPlayer()
     elif option == 'mpv':
         return MpvPlayer()

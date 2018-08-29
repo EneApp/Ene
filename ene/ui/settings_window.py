@@ -40,8 +40,8 @@ SETTINGS = {
 CONFIG_ITEM = {
     'player_type': 'Player',
     'player_path': 'Player Path',
-    'use_rc': 'VLC RC Interface',
-    'local_paths': 'Local Paths'
+    'use_http': 'VLC HTTP Interface',
+    'local_paths': 'Local Paths',
 }
 
 
@@ -248,11 +248,11 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         """
         self.on_changed()
         if selection is not 0:
-            self.label_rc.hide()
-            self.use_rc.hide()
+            self.label_http.hide()
+            self.use_http.hide()
         else:
-            self.label_rc.show()
-            self.use_rc.show()
+            self.label_http.show()
+            self.use_http.show()
         self.player_path.setText(which(self.player_type.currentText()))
 
     def pick_player_path(self):

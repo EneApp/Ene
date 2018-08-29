@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/settings_window.ui',
 # licensing of 'ene/resources/settings_window.ui' applies.
 #
-# Created: Tue Aug 28 17:48:30 2018
+# Created: Tue Aug 28 21:08:44 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -61,14 +61,14 @@ class Ui_window_settings(object):
         self.button_browse_player = QtWidgets.QPushButton(self.player)
         self.button_browse_player.setObjectName("button_browse_player")
         self.player_layout.setWidget(7, QtWidgets.QFormLayout.FieldRole, self.button_browse_player)
-        self.label_rc = QtWidgets.QLabel(self.player)
-        self.label_rc.setObjectName("label_rc")
-        self.player_layout.setWidget(8, QtWidgets.QFormLayout.LabelRole, self.label_rc)
-        self.use_rc = QtWidgets.QCheckBox(self.player)
-        self.use_rc.setEnabled(True)
-        self.use_rc.setText("")
-        self.use_rc.setObjectName("use_rc")
-        self.player_layout.setWidget(8, QtWidgets.QFormLayout.FieldRole, self.use_rc)
+        self.label_http = QtWidgets.QLabel(self.player)
+        self.label_http.setObjectName("label_http")
+        self.player_layout.setWidget(8, QtWidgets.QFormLayout.LabelRole, self.label_http)
+        self.use_http = QtWidgets.QCheckBox(self.player)
+        self.use_http.setEnabled(True)
+        self.use_http.setText("")
+        self.use_http.setObjectName("use_http")
+        self.player_layout.setWidget(8, QtWidgets.QFormLayout.FieldRole, self.use_http)
         self.verticalLayout.addLayout(self.player_layout)
         self.settings_menu.addWidget(self.player)
         self.local_files = QtWidgets.QWidget()
@@ -118,8 +118,8 @@ class Ui_window_settings(object):
         self.player_type.setItemText(2, QtWidgets.QApplication.translate("window_settings", "Other", None, -1))
         self.label_3.setText(QtWidgets.QApplication.translate("window_settings", "Path to player: ", None, -1))
         self.button_browse_player.setText(QtWidgets.QApplication.translate("window_settings", "Browse", None, -1))
-        self.label_rc.setText(QtWidgets.QApplication.translate("window_settings", "Use RC Interface for VLC", None, -1))
-        self.use_rc.setToolTip(QtWidgets.QApplication.translate("window_settings", "Uses a different implementation for vlc. Enable this if you\'re having issues without it. Disable it if it causes weird behaviour", None, -1))
+        self.label_http.setText(QtWidgets.QApplication.translate("window_settings", "Use HTTP Interface for VLC", None, -1))
+        self.use_http.setToolTip(QtWidgets.QApplication.translate("window_settings", "Uses a different implementation for vlc. Enable this if you\'re having issues without it. Disable it if it causes weird behaviour", None, -1))
         self.label_5.setText(QtWidgets.QApplication.translate("window_settings", "Local Files", None, -1))
         self.path_add.setText(QtWidgets.QApplication.translate("window_settings", "Add", None, -1))
         self.path_remove.setText(QtWidgets.QApplication.translate("window_settings", "Remove", None, -1))
