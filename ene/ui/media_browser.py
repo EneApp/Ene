@@ -231,6 +231,7 @@ class MediaBrowser(QScrollArea):
     """This class controls the media browsing tab."""
 
     ctrl_ready_signal = Signal(QWidget, QWidget)
+    get_media_signal = Signal()
 
     def __init__(self, app, button_sort_order: QToolButton):
         """
@@ -241,7 +242,9 @@ class MediaBrowser(QScrollArea):
             button_sort_order: The tool button for sort order
         """
         super().__init__()
+        self._setup_ui(button_sort_order)
         self.current_page = 0
+        self.has_next_page = True
         self.app = app
         self.api = self.app.api
         self.is_setup = False
@@ -249,9 +252,10 @@ class MediaBrowser(QScrollArea):
         self.genres = None
         self.genre_tag_selector = None
         self.streamer_selector = None
-        self.sort_toggle = None
-        self._setup_ui(button_sort_order)
+        self._scroll_bar = self.verticalScrollBar()
         self.ctrl_ready_signal.connect(self._setup_controls)
+        self.get_media_signal.connect(self.get_media)
+        self._scroll_bar.valueChanged.connect(self._on_scroll)
 
     def _setup_ui(self, button_sort_order):
         self._layout = FlowLayout(None, 10, 10, 10)
@@ -273,9 +277,6 @@ class MediaBrowser(QScrollArea):
         Args:
             combobox_genre_tag: The combobox to select genres and tags
             combobox_streaming: The combobox to select streamers
-
-        Returns:
-            None
         """
         genre_future = self.app.pool.submit(self.app.api.get_genres)
         tags_future = self.app.pool.submit(self.app.api.get_tags)
@@ -283,17 +284,15 @@ class MediaBrowser(QScrollArea):
         self.genres = genre_future.result()
         self.ctrl_ready_signal.emit(combobox_genre_tag, combobox_streaming)
 
-    def get_media(self, page=1) -> bool:
+    @Slot()
+    def get_media(self):
         """
         Get media from anilist and put them into the layout
-
-        Args:
-            page: Which page of the media to get
-
-        Returns:
-            If there's a next page
         """
-        res, has_next = self.api.browse_anime(page)
+        self.current_page += 1
+        res, has_next = self.api.browse_anime(self.current_page)
+        self.has_next_page = has_next
+
         for anime in res:
             season = anime['season']
             season = MediaSeason[season] if season else None
@@ -315,9 +314,14 @@ class MediaBrowser(QScrollArea):
             )
             self._layout.addWidget(display)
             self.app.pool.submit(display.set_image, image_url, cache_home)
-            return has_next
 
     @Slot(QWidget, QWidget)
     def _setup_controls(self, combobox_genre_tag, combobox_streaming):
         self.genre_tag_selector = GenreTagSelector(combobox_genre_tag, self.genres, self.tags)
         self.streamer_selector = StreamerSelector(combobox_streaming)
+        self.get_media_signal.emit()
+
+    @Slot(int)
+    def _on_scroll(self, value):
+        if value == self._scroll_bar.maximum() and self.has_next_page:
+            self.get_media_signal.emit()
