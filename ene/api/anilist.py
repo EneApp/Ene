@@ -132,7 +132,7 @@ class API:
             included_tags: List[str] = None,
             excluded_tags: List[str] = None,
             sort: List[MediaSort] = None
-    ) -> Iterable[dict]:
+    ) -> Tuple[List[dict], bool]:
         """
         Browse anime by the given filters.
 
@@ -152,8 +152,8 @@ class API:
             excluded_tags: Filter by the media's tags
             sort: The order the results will be returned in
 
-        Yields:
-            The anime returned
+        Returns:
+            The page anime returned and if there's a next page
         """
         variables = {k: v for k, v in {
             'page': page,
@@ -178,8 +178,9 @@ class API:
             else:
                 variables['yearLesser'] = start * 10000
                 variables['yearGreater'] = fin * 10000
-        yield from (self.query(self.queries['browse.graphql'], variables)
-                    .get('data', {}).get('Page', {}).get('media', []))
+        res = self.query(self.queries['browse.graphql'], variables).get('data', {}).get('Page', {})
+        has_next = res.get('pageInfo', {}).get('hasNextPage', False)
+        return res.get('media', []), has_next
 
     @lru_cache(maxsize=None)
     def get_genres(self) -> List[str]:
