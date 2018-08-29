@@ -135,64 +135,6 @@ class HttpVlcPlayer(AbstractPlayer):
             return True
 
 
-class RcVlcPlayer(AbstractPlayer):
-    """
-    An implementation of the VLC player using the rc interface and passing commands to stdin
-    """
-    # TODO: Replace this whole class with one that uses HTTP interface
-
-    def __init__(self, binary=None):
-        self.broken = False
-        if not binary and IS_WIN:
-            binary = which('vlc.exe')
-        elif not binary:
-            binary = which('vlc')
-
-        args = [binary, '-I', 'rc']
-        if IS_MAC:
-            # mac is special
-            args.append('--extraintf=macosx')
-        else:
-            args.append('--extraintf=qt')
-        self.process = subprocess.Popen(args, stdin=subprocess.PIPE, universal_newlines=True)
-
-    def write_cmd(self, cmd):
-        """
-        Prepares and writes a command to the vlc rc interface on STDIN
-
-        Args:
-            cmd:
-        """
-        try:
-            self.process.stdin.write(cmd + '\n')
-            self.process.stdin.flush()
-        except BrokenPipeError:
-            self.broken = True
-            self.process.terminate()
-
-    def play(self, path):
-        """
-        Plays the media file given by path
-
-        Args:
-            path: The location of the media file to play
-        """
-        self.write_cmd('add ' + path)
-
-    def get_title(self):
-        """Get the title of the playing media."""
-        self.write_cmd('get_title')
-
-    def stop(self):
-        self.write_cmd('stop')
-
-    def wait_for_playback_end(self):
-        sleep(10)
-
-    def needs_destruction(self):
-        return self.broken
-
-
 class MpvPlayer(AbstractPlayer):
     """
     An implementation of the MPV player using the python-mpv library
