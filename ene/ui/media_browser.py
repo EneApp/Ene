@@ -283,7 +283,7 @@ class MediaBrowser(QScrollArea):
         self.genres = genre_future.result()
         self.ctrl_ready_signal.emit(combobox_genre_tag, combobox_streaming)
 
-    def get_media(self, page=1):
+    def get_media(self, page=1) -> bool:
         """
         Get media from anilist and put them into the layout
 
@@ -291,9 +291,10 @@ class MediaBrowser(QScrollArea):
             page: Which page of the media to get
 
         Returns:
-            None
+            If there's a next page
         """
-        for anime in self.api.browse_anime(page):
+        res, has_next = self.api.browse_anime(page)
+        for anime in res:
             season = anime['season']
             season = MediaSeason[season] if season else None
             studios = anime['studios']['edges']
@@ -314,6 +315,7 @@ class MediaBrowser(QScrollArea):
             )
             self._layout.addWidget(display)
             self.app.pool.submit(display.set_image, image_url, cache_home)
+            return has_next
 
     @Slot(QWidget, QWidget)
     def _setup_controls(self, combobox_genre_tag, combobox_streaming):
