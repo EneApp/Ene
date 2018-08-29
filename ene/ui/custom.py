@@ -21,8 +21,9 @@ from typing import Any, Iterable, Optional, Union
 from PySide2.QtCore import QModelIndex, QPoint, QRect, QSize, Qt
 from PySide2.QtGui import QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import (
-    QComboBox, QLayout, QPushButton, QSizePolicy, QStyle, QStyleOptionViewItem,
-    QStyledItemDelegate, QToolButton,
+    QComboBox, QLayout, QLabel, QPushButton, QSizePolicy,
+    QStyle, QStyleOptionViewItem, QStyledItemDelegate, QToolButton, QVBoxLayout,
+    QWidget
 )
 
 from ene.constants import STREAMERS
@@ -346,3 +347,25 @@ class FlowLayout(QLayout):
             return parent.style().pixelMetric(pm, None, parent)
         else:
             return parent.spacing()
+
+
+class SeriesButton(QPushButton):
+    def __init__(self, series, episodes):
+        super().__init__()
+        self.title = series
+        self.image_frame = QLabel()
+        layout = QVBoxLayout()
+        self.image_frame.setLayout(layout)
+        layout.setAlignment(Qt.AlignBottom)
+        title_label = QLabel(series)
+        title_label.setWordWrap(True)
+        layout.addWidget(title_label)
+        layout.addWidget(QLabel('Episodes: ' + str(episodes)))
+        self.setMinimumWidth(200)
+        self.setMinimumHeight(200)
+        base_layout = QVBoxLayout()
+        base_layout.addWidget(self.image_frame)
+        super().setLayout(base_layout)
+
+    def set_image(self, image):
+        self.image_frame.setPixmap(image)

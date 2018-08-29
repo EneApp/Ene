@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Tue Aug 28 20:27:02 2018
+# Created: Wed Aug 29 19:45:24 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -29,12 +29,6 @@ class Ui_window_main(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.stack_local_files = QtWidgets.QStackedWidget(self.tab_local_files)
         self.stack_local_files.setObjectName("stack_local_files")
-        self.page = QtWidgets.QWidget()
-        self.page.setObjectName("page")
-        self.stack_local_files.addWidget(self.page)
-        self.page_2 = QtWidgets.QWidget()
-        self.page_2.setObjectName("page_2")
-        self.stack_local_files.addWidget(self.page_2)
         self.horizontalLayout.addWidget(self.stack_local_files)
         self.widget_tab.addTab(self.tab_local_files, "")
         self.tabWidgetPage2 = QtWidgets.QWidget()
@@ -145,7 +139,7 @@ class Ui_window_main(object):
         self.verticalLayout_2.addWidget(self.widget_tab)
         window_main.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(window_main)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 29))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 30))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -179,7 +173,7 @@ class Ui_window_main(object):
 
         self.retranslateUi(window_main)
         self.widget_tab.setCurrentIndex(0)
-        self.stack_local_files.setCurrentIndex(0)
+        self.stack_local_files.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(window_main)
 
     def retranslateUi(self, window_main):

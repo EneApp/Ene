@@ -37,10 +37,8 @@
         <item>
          <widget class="QStackedWidget" name="stack_local_files">
           <property name="currentIndex">
-           <number>0</number>
+           <number>-1</number>
           </property>
-          <widget class="QWidget" name="page"/>
-          <widget class="QWidget" name="page_2"/>
          </widget>
         </item>
        </layout>
@@ -431,7 +429,7 @@
      <x>0</x>
      <y>0</y>
      <width>1440</width>
-     <height>29</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

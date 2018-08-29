@@ -196,7 +196,7 @@ class Database:
             ON E.show_ID=S.show_ID""")
         res = defaultdict(list)
         for key, val in self.cursor.fetchall():
-            res[key].append(val)
+            res[key].append(Path(val))
         return res
 
     def get_all_shows(self):

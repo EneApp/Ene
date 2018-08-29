@@ -25,6 +25,7 @@ from PySide2.QtWidgets import (
     QLabel,
     QMainWindow,
     QPushButton,
+    QScrollArea,
     QVBoxLayout,
     QWidget,
 )
@@ -34,7 +35,7 @@ from ene.constants import IS_WIN
 from ene.files import FileManager
 from ene.resources import Ui_window_main
 from ene.util import open_source_code
-from .custom import EpisodeButton, FlowLayout
+from .custom import EpisodeButton, FlowLayout, SeriesButton
 from .media_browser import MediaBrowser
 
 
@@ -117,23 +118,31 @@ class MainWindow(QMainWindow, Ui_window_main):
         """
         Sets up the local files tab. Triggered when the tab is selected
         """
-        self.files.build_shows_from_db()
+
+        self.files.build_all_from_db()
         layout = FlowLayout()
         layout.setAlignment(Qt.AlignTop)
 
         for show in self.files.series:
-            button = QPushButton(show)
+            button = SeriesButton(show, len(self.files.series[show]))
             button.clicked.connect(self.on_series_click)
             layout.addWidget(button)
 
-        self.stack_local_files.currentWidget().setLayout(layout)
+        layout.setSizeConstraint(FlowLayout.SetMaximumSize)
+        page_widget = QWidget()
+        page_widget.setLayout(layout)
+        series_page = QScrollArea()
+        series_page.setWidget(page_widget)
+        series_page.setWidgetResizable(True)
+        self.stack_local_files.addWidget(series_page)
+        self.stack_local_files.addWidget(QWidget())
 
     def on_series_click(self):
         """
         Sets up the window for the episodes of a show. Triggered when a show is
         clicked from the local files page
         """
-        show = self.sender().text()
+        show = self.sender().title
         self.stack_local_files.setCurrentIndex(1)
         menu_layout = QGridLayout()
         menu = QWidget()
@@ -150,7 +159,8 @@ class MainWindow(QMainWindow, Ui_window_main):
         menu.setMaximumWidth(self.stack_local_files.width())
         menu.setMinimumWidth(self.stack_local_files.width() / 2)
         layout.addWidget(menu)
-        self.files.fetch_db_episodes_for_show(show)
+
+        self.files.series[show].sort()
         for episode in self.files.series[show]:
             button = EpisodeButton(episode)
             button.clicked.connect(self.play_episode)
