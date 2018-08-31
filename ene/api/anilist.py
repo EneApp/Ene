@@ -171,7 +171,7 @@ class API:
         }.items() if v is not None}
         if sort:
             variables['sort'] = [s.name for s in sort]
-        if year_range:
+        if year_range and year_range[0] and year_range[1]:
             start, fin = year_range
             if start == fin:
                 variables['year'] = f'{start}%'
