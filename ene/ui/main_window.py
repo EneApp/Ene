@@ -83,7 +83,18 @@ class MainWindow(QMainWindow, Ui_window_main):
                 )
 
     def _setup_tab_browser(self):
-        self.media_browser = MediaBrowser(self.app, self.button_sort_order)
+        self.media_browser = MediaBrowser(
+            self.app,
+            self.button_sort_order,
+            self.combobox_season,
+            self.spinbox_year_min,
+            self.spinbox_year_max,
+            self.combobox_sort,
+            self.combobox_format,
+            self.combobox_status,
+            self.check_box_on_list,
+            self.check_box_adult
+        )
 
         master_layout = QHBoxLayout()
         self.tab_browser.setLayout(master_layout)

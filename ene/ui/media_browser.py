@@ -20,19 +20,11 @@ from typing import List, Optional
 from PySide2.QtCore import Qt, Signal, Slot
 from PySide2.QtGui import QPixmap, QTextOption
 from PySide2.QtWidgets import (
-    QFrame,
-    QHBoxLayout,
-    QLabel,
-    QLayout,
-    QScrollArea,
-    QSizePolicy,
-    QTextEdit,
-    QToolButton,
-    QVBoxLayout,
-    QWidget,
+    QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel, QLayout, QScrollArea, QSizePolicy, QSpinBox,
+    QTextEdit, QToolButton, QVBoxLayout, QWidget,
 )
 
-from ene.api import MediaFormat, MediaSeason
+from ene.api import MediaFormat, MediaSeason, MediaSort, MediaStatus
 from ene.util import get_resource
 from .common import mk_padding, mk_stylesheet
 from .custom import FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
@@ -230,10 +222,22 @@ class MediaDisplay(QWidget):
 class MediaBrowser(QScrollArea):
     """This class controls the media browsing tab."""
 
-    ctrl_ready_signal = Signal(QWidget, QWidget)
+    ctrl_ready_signal = Signal(list, list, QWidget, QWidget)
     get_media_signal = Signal()
 
-    def __init__(self, app, button_sort_order: QToolButton):
+    def __init__(
+            self,
+            app,
+            button_sort_order: QToolButton,
+            combobox_season: QComboBox,
+            spinbox_year_min: QSpinBox,
+            spinbox_year_max: QSpinBox,
+            combobox_sort: QComboBox,
+            combobox_format: QComboBox,
+            combobox_status: QComboBox,
+            checkbox_on_list: QCheckBox,
+            checkbox_adult: QCheckBox
+    ):
         """
         Initialize instance
 
@@ -242,20 +246,103 @@ class MediaBrowser(QScrollArea):
             button_sort_order: The tool button for sort order
         """
         super().__init__()
+        self.combobox_season = combobox_season
+        self.spinbox_year_min = spinbox_year_min
+        self.spinbox_year_max = spinbox_year_max
+        self.combobox_sort = combobox_sort
+        self.combobox_format = combobox_format
+        self.combobox_status = combobox_status
+        self.checkbox_on_list = checkbox_on_list
+        self.checkbox_adult = checkbox_adult
         self._setup_ui(button_sort_order)
-        self.current_page = 0
-        self.has_next_page = True
+
         self.app = app
         self.api = self.app.api
+
+        self.current_page = 0
+        self.has_next_page = True
+
         self.is_setup = False
-        self.tags = None
-        self.genres = None
+
         self.genre_tag_selector = None
         self.streamer_selector = None
+
         self._scroll_bar = self.verticalScrollBar()
         self.ctrl_ready_signal.connect(self._setup_controls)
         self.get_media_signal.connect(self.get_media)
         self._scroll_bar.valueChanged.connect(self._on_scroll)
+
+    @property
+    def season(self):
+        return {
+            'All': None,
+            'Winter': MediaSeason.WINTER,
+            'Spring': MediaSeason.SPRING,
+            'Summer': MediaSeason.SUMMER,
+            'Fall': MediaSeason.FALL
+        }[self.combobox_season.currentText()]
+
+    @property
+    def year_range(self):
+        min_, max_ = self.spinbox_year_min.value(), self.spinbox_year_max.value()
+        return min_, max_
+
+    @property
+    def sort(self):
+        res = {
+            'Sort': None,
+            'Popularity': 'POPULARITY',
+            'Score': 'SCORE',
+            'Trending': 'TRENDING',
+            'Favourites': 'FAVOURITES',
+            'Date Added': 'ID',
+            'Release Date': 'START_DATE'
+        }[self.combobox_sort.currentText()]
+        if res:
+            if self.sort_toggle.button.arrowType() == Qt.DownArrow:
+                res = f'{res}_DESC'
+            return [MediaSort[res]]
+        else:
+            return None
+
+    @property
+    def format(self):
+        return {
+            'Format': None,
+            'TV': MediaFormat.TV,
+            'TV Short': MediaFormat.TV_SHORT,
+            'Movie': MediaFormat.MOVIE,
+            'Special': MediaFormat.SPECIAL,
+            'OVA': MediaFormat.OVA,
+            'ONA': MediaFormat.ONA,
+            'Music': MediaFormat.MUSIC
+        }[self.combobox_format.currentText()]
+
+    @property
+    def status(self):
+        return {
+            'Status': None,
+            'Releasing': MediaStatus.RELEASING,
+            'Finished': MediaStatus.FINISHED,
+            'Not Yet Released': MediaStatus.NOT_YET_RELEASED,
+            'Cancelled': MediaStatus.CANCELLED
+        }[self.combobox_status.currentText()]
+
+    @property
+    def streaming_on(self):
+        if not self.streamer_selector.checked_items:
+            return None
+        return [item.text() for item in self.streamer_selector.checked_items]
+
+    @property
+    def on_list(self):
+        if self.checkbox_on_list.isChecked():
+            return False
+        return None
+
+    @property
+    def adult(self):
+        return self.checkbox_adult.isChecked()
 
     def _setup_ui(self, button_sort_order):
         self._layout = FlowLayout(None, 10, 10, 10)
@@ -280,9 +367,9 @@ class MediaBrowser(QScrollArea):
         """
         genre_future = self.app.pool.submit(self.app.api.get_genres)
         tags_future = self.app.pool.submit(self.app.api.get_tags)
-        self.tags = [tag['name'] for tag in tags_future.result()]
-        self.genres = genre_future.result()
-        self.ctrl_ready_signal.emit(combobox_genre_tag, combobox_streaming)
+        tags = [tag['name'] for tag in tags_future.result()]
+        genres = genre_future.result()
+        self.ctrl_ready_signal.emit(genres, tags, combobox_genre_tag, combobox_streaming)
 
     @Slot()
     def get_media(self):
@@ -290,7 +377,20 @@ class MediaBrowser(QScrollArea):
         Get media from anilist and put them into the layout
         """
         self.current_page += 1
-        res, has_next = self.api.browse_anime(self.current_page)
+        genres, tags = self.genre_tag_selector.genre_tags()
+        res, has_next = self.api.browse_anime(
+            self.current_page,
+            season=self.season,
+            year_range=self.year_range,
+            sort=self.sort,
+            format_=self.format,
+            status=self.status,
+            licensed_by=self.streaming_on,
+            included_genres=genres or None,
+            included_tags=tags or None,
+            on_list=self.on_list,
+            is_adult=self.adult
+        )
         self.has_next_page = has_next
 
         for anime in res:
@@ -315,9 +415,9 @@ class MediaBrowser(QScrollArea):
             self._layout.addWidget(display)
             self.app.pool.submit(display.set_image, image_url, cache_home)
 
-    @Slot(QWidget, QWidget)
-    def _setup_controls(self, combobox_genre_tag, combobox_streaming):
-        self.genre_tag_selector = GenreTagSelector(combobox_genre_tag, self.genres, self.tags)
+    @Slot(list, list, QWidget, QWidget)
+    def _setup_controls(self, genres, tags, combobox_genre_tag, combobox_streaming):
+        self.genre_tag_selector = GenreTagSelector(combobox_genre_tag, genres, tags)
         self.streamer_selector = StreamerSelector(combobox_streaming)
         self.get_media_signal.emit()
 

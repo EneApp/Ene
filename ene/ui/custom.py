@@ -17,12 +17,13 @@
 """This module contains custom UI widgets/elements."""
 from collections import deque
 from itertools import chain
-from typing import Any, Iterable, Optional, Union
+from typing import Any, Iterable, List, Optional, Tuple, Union
+
 from PySide2.QtCore import QModelIndex, QPoint, QRect, QSize, Qt
 from PySide2.QtGui import QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import (
-    QComboBox, QLayout, QLabel, QPushButton, QSizePolicy,
-    QStyle, QStyleOptionViewItem, QStyledItemDelegate, QToolButton, QVBoxLayout,
+    QComboBox, QLabel, QLayout, QPushButton, QSizePolicy, QStyle, QStyleOptionViewItem,
+    QStyledItemDelegate, QToolButton, QVBoxLayout,
 )
 
 from ene.constants import STREAMERS
@@ -61,6 +62,7 @@ class ComboCheckbox:
         self.combobox.setModel(self.model)
         self.combobox.setItemDelegate(CheckMarkDelegate())
         self.combobox.view().pressed.connect(self.handle_item_pressed)
+        self.checked_items = deque()
         if items:
             self.model.appendColumn(items)
 
@@ -93,6 +95,7 @@ class ComboCheckbox:
             item: Item checked
         """
         item.setCheckState(Qt.Checked)
+        self.checked_items.append(item)
 
     # pylint: disable=no-self-use
     def _on_uncheck(self, item: QStandardItem):
@@ -103,6 +106,7 @@ class ComboCheckbox:
             item: Item unchecked
         """
         item.setCheckState(Qt.Unchecked)
+        self.checked_items.remove(item)
 
     def __getitem__(self, i: Union[int, QModelIndex]) -> QStandardItem:
         """
@@ -165,8 +169,11 @@ class GenreTagSelector(ComboCheckbox):
         genre_text = self._make_item('Genres', False)
         divider = self._make_item('-' * max_length, False)
 
+        self.genres = set()
+
         items = [title, divider.clone(), genre_text]
         for genre in genres:
+            self.genres.add(genre)
             items.append(self._make_item(genre, True))
         items.append(divider)
         items.append(tag_text)
@@ -174,6 +181,22 @@ class GenreTagSelector(ComboCheckbox):
             items.append(self._make_item(tag, True))
         super().__init__(combobox, items)
         self.combobox.setCurrentText('Genres & Tags')
+
+    def genre_tags(self) -> Tuple[List[str], List[str]]:
+        """
+        Get selected genres and tags
+
+        Returns:
+            Selected genres and tags
+        """
+        genres, tags = [], []
+        for item in self.checked_items:
+            text = item.text()
+            if text in self.genres:
+                genres.append(text)
+            else:
+                tags.append(text)
+        return genres, tags
 
 
 class StreamerSelector(ComboCheckbox):
