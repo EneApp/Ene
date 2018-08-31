@@ -106,6 +106,8 @@ class MainWindow(QMainWindow, Ui_window_main):
         left_layout.addWidget(self.combobox_status)
         left_layout.addWidget(self.combobox_streaming)
         left_layout.addWidget(self.combobox_genre_tag)
+        left_layout.addWidget(self.check_box_on_list)
+        left_layout.addWidget(self.check_box_adult)
 
         left_layout_control.setMaximumWidth(self.groupbox_year.width())
         left_layout.setSpacing(0)

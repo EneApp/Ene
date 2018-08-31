@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Wed Aug 29 19:45:24 2018
+# Created: Fri Aug 31 16:10:57 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -132,6 +132,12 @@ class Ui_window_main(object):
         self.spinbox_year_max.setProperty("value", 2018)
         self.spinbox_year_max.setObjectName("spinbox_year_max")
         self.gridLayout.addWidget(self.spinbox_year_max, 1, 1, 1, 1)
+        self.check_box_on_list = QtWidgets.QCheckBox(self.tab_browser)
+        self.check_box_on_list.setGeometry(QtCore.QRect(0, 390, 151, 21))
+        self.check_box_on_list.setObjectName("check_box_on_list")
+        self.check_box_adult = QtWidgets.QCheckBox(self.tab_browser)
+        self.check_box_adult.setGeometry(QtCore.QRect(0, 410, 86, 21))
+        self.check_box_adult.setObjectName("check_box_adult")
         self.widget_tab.addTab(self.tab_browser, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
@@ -139,7 +145,7 @@ class Ui_window_main(object):
         self.verticalLayout_2.addWidget(self.widget_tab)
         window_main.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(window_main)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 30))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 29))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -225,6 +231,8 @@ class Ui_window_main(object):
         self.groupbox_year.setTitle(QtWidgets.QApplication.translate("window_main", "Year", None, -1))
         self.label.setText(QtWidgets.QApplication.translate("window_main", "From", None, -1))
         self.label_2.setText(QtWidgets.QApplication.translate("window_main", "To", None, -1))
+        self.check_box_on_list.setText(QtWidgets.QApplication.translate("window_main", "Hide anime on my list", None, -1))
+        self.check_box_adult.setText(QtWidgets.QApplication.translate("window_main", "Adult", None, -1))
         self.widget_tab.setTabText(self.widget_tab.indexOf(self.tab_browser), QtWidgets.QApplication.translate("window_main", "Browse", None, -1))
         self.widget_tab.setTabText(self.widget_tab.indexOf(self.tab_2), QtWidgets.QApplication.translate("window_main", "My List", None, -1))
         self.menuFile.setTitle(QtWidgets.QApplication.translate("window_main", "Fi&le", None, -1))

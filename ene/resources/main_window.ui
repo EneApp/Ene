@@ -413,6 +413,32 @@
          </item>
         </layout>
        </widget>
+       <widget class="QCheckBox" name="check_box_on_list">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>390</y>
+          <width>151</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Hide anime on my list</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="check_box_adult">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>410</y>
+          <width>86</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Adult</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
@@ -429,7 +455,7 @@
      <x>0</x>
      <y>0</y>
      <width>1440</width>
-     <height>30</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
