@@ -168,6 +168,11 @@
           <string>Date Added</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Release Date</string>
+         </property>
+        </item>
        </widget>
        <widget class="QToolButton" name="button_sort_order">
         <property name="geometry">

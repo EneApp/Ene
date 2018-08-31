@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Fri Aug 31 16:10:57 2018
+# Created: Fri Aug 31 17:00:25 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -59,6 +59,7 @@ class Ui_window_main(object):
         self.combobox_sort = QtWidgets.QComboBox(self.tab_browser)
         self.combobox_sort.setGeometry(QtCore.QRect(0, 230, 141, 31))
         self.combobox_sort.setObjectName("combobox_sort")
+        self.combobox_sort.addItem("")
         self.combobox_sort.addItem("")
         self.combobox_sort.addItem("")
         self.combobox_sort.addItem("")
@@ -201,6 +202,7 @@ class Ui_window_main(object):
         self.combobox_sort.setItemText(3, QtWidgets.QApplication.translate("window_main", "Trending", None, -1))
         self.combobox_sort.setItemText(4, QtWidgets.QApplication.translate("window_main", "Favourites", None, -1))
         self.combobox_sort.setItemText(5, QtWidgets.QApplication.translate("window_main", "Date Added", None, -1))
+        self.combobox_sort.setItemText(6, QtWidgets.QApplication.translate("window_main", "Release Date", None, -1))
         self.button_sort_order.setText(QtWidgets.QApplication.translate("window_main", "...", None, -1))
         self.combobox_format.setCurrentText(QtWidgets.QApplication.translate("window_main", "Format", None, -1))
         self.combobox_format.setItemText(0, QtWidgets.QApplication.translate("window_main", "Format", None, -1))
