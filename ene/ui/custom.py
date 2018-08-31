@@ -23,7 +23,6 @@ from PySide2.QtGui import QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import (
     QComboBox, QLayout, QLabel, QPushButton, QSizePolicy,
     QStyle, QStyleOptionViewItem, QStyledItemDelegate, QToolButton, QVBoxLayout,
-    QWidget
 )
 
 from ene.constants import STREAMERS

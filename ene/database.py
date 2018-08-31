@@ -17,7 +17,7 @@
 """ This module handles database access"""
 import sqlite3
 from collections import defaultdict
-from pathlib import Path
+from pathlib import Path, PosixPath
 
 
 class Database:
@@ -27,6 +27,7 @@ class Database:
 
     def __init__(self, db_path: Path):
         setup = not db_path.is_file()
+        sqlite3.register_adapter(PosixPath, str)
         self.connection = sqlite3.connect(str(db_path), isolation_level=None)
         self.cursor = self.connection.cursor()
         if setup:
@@ -111,7 +112,7 @@ class Database:
             shows:
                 A list of shows to compare and add
         """
-        cur = [x[0] for x in self.get_all_shows()]
+        cur = set(self.get_all_shows())
         delta = (set(shows) - set(cur))
         for show in sorted(delta):
             self.add_show(show)
@@ -129,8 +130,8 @@ class Database:
             key = self.get_show_id_by_name(show)
             if key is None:
                 key = self.add_show(show)
-            episodes = {str(x) for x in series[show]}
-            cur = set(x[0] for x in self.get_episodes_by_show_id(key))
+            episodes = set(series[show])
+            cur = set(self.get_episodes_by_show_id(key))
             delta = episodes - cur
             for episode in sorted(delta):
                 self.add_episode_by_show_id(str(episode), key)
@@ -146,10 +147,12 @@ class Database:
         Returns:
             The show ID for the show
         """
-        self.cursor.execute('SELECT show_ID FROM Show WHERE show_name=?', (show,))
-        res = self.cursor.fetchone()
+        self.connection.row_factory = single_factory
+        cur = self.connection.cursor()
+        cur.execute('SELECT show_ID FROM Show WHERE show_name=?', (show,))
+        res = cur.fetchone()
         if res is not None:
-            return res[0]
+            return res
         return None
 
     def get_episodes_by_show_name(self, show):
@@ -166,7 +169,7 @@ class Database:
         show_id = self.get_show_id_by_name(show)
         if show_id is None:
             return None
-        return [x[0] for x in self.get_episodes_by_show_id(show_id)]
+        return self.get_episodes_by_show_id(show_id)
 
     def get_episodes_by_show_id(self, show_id):
         """
@@ -179,8 +182,10 @@ class Database:
         Returns:
             A list of episodes for the given show
         """
-        self.cursor.execute('SELECT episode_path FROM Episode where show_ID = ?', (show_id,))
-        return self.cursor.fetchall()
+        self.connection.row_factory = episode_factory
+        cur = self.connection.cursor()
+        cur.execute('SELECT episode_path FROM Episode where show_ID = ?', (show_id,))
+        return cur.fetchall()
 
     def get_all(self):
         """
@@ -190,13 +195,15 @@ class Database:
             A list of tuples with the show name as the first element and the
             episode path as the second element
         """
-        self.cursor.execute("""SELECT show_name, episode_path
+        self.connection.row_factory = pair_factory
+        cur = self.connection.cursor()
+        cur.execute("""SELECT show_name, episode_path
             FROM Show S
             INNER JOIN Episode E
             ON E.show_ID=S.show_ID""")
         res = defaultdict(list)
-        for key, val in self.cursor.fetchall():
-            res[key].append(Path(val))
+        for show, episode in cur.fetchall():
+            res[show].append(episode)
         return res
 
     def get_all_shows(self):
@@ -206,8 +213,10 @@ class Database:
         Returns:
             A list of tuples containing all shows in the database
         """
-        self.cursor.execute('SELECT show_name FROM Show')
-        return [x[0] for x in self.cursor.fetchall()]
+        self.connection.row_factory = single_factory
+        cur = self.connection.cursor()
+        cur.execute('SELECT show_name FROM Show')
+        return cur.fetchall()
 
     def get_all_episodes(self):
         """
@@ -216,5 +225,58 @@ class Database:
         Returns:
             A list of tuples containing all the episodes in the database
         """
-        self.cursor.execute('SELECT episode_path FROM Episode')
-        return [x[0] for x in self.cursor.fetchall()]
+        self.connection.row_factory = episode_factory
+        cur = self.connection.cursor()
+        cur.execute('SELECT episode_path FROM Episode')
+        return cur.fetchall()
+
+
+# pylint: disable=W0613
+def episode_factory(cursor, row):
+    """
+    Builds an episode path based off of a database row
+
+    Args:
+        cursor:
+            Unused
+        row:
+            The database row
+
+    Returns:
+        The path to the episode from the database row
+    """
+    return Path(row[0])
+
+
+# pylint: disable=W0613
+def single_factory(cursor, row):
+    """
+    Converts the row tuple into a single value
+
+    Args:
+        cursor:
+            Unused.
+        row:
+            The database row
+
+    Returns:
+        The first column of the row
+    """
+    return row[0]
+
+
+# pylint: disable=W0613
+def pair_factory(cursor, row):
+    """
+    Builds a show-episode pair from a given database row
+
+    Args:
+        cursor:
+            Unused.
+        row:
+            The database row to build the pair from
+
+    Returns:
+        A pair in the form (string, path)
+    """
+    return row[0], Path(row[1])

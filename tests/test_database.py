@@ -9,18 +9,18 @@ from . import HERE
 
 MOCK_SQL = HERE / 'mock_db.sql'
 MOCK_SHOWS = {
-        'foo': ['foo episode 1',
-                'foo episode 2',
-                'foo episode 3',
-                'foo episode 4',
-                'foo episode 5'],
-        'bar': ['bar episode 1',
-                'bar episode 2',
-                'bar episode 3'],
-        'baz': ['baz episode 1',
-                'baz episode 2',
-                'baz episode 3',
-                'baz episode 4']
+        'foo': [Path('foo episode 1'),
+                Path('foo episode 2'),
+                Path('foo episode 3'),
+                Path('foo episode 4'),
+                Path('foo episode 5')],
+        'bar': [Path('bar episode 1'),
+                Path('bar episode 2'),
+                Path('bar episode 3')],
+        'baz': [Path('baz episode 1'),
+                Path('baz episode 2'),
+                Path('baz episode 3'),
+                Path('baz episode 4')]
     }
 
 
@@ -63,6 +63,7 @@ def test_get_episodes_for_show(mock_db):
 def test_get_episodes_for_nonexistent_show(empty_db):
     assert None is empty_db.get_episodes_by_show_name('quz')
 
+
 def test_get_all(mock_db):
     assert mock_db.get_all() == MOCK_SHOWS
 
@@ -77,11 +78,11 @@ def test_write_show(empty_db):
 
 
 def test_write_episode(empty_db):
-    assert empty_db.add_episode_by_show_name('foo episode 1', 'foo') == 1
+    assert empty_db.add_episode_by_show_name(Path('foo episode 1'), 'foo') == 1
     assert empty_db.get_show_id_by_name('foo') == 1
-    assert empty_db.add_episode_by_show_name('foo episode 2', 'foo') == 2
-    assert empty_db.get_episodes_by_show_name('foo') == ['foo episode 1',
-                                                         'foo episode 2']
+    assert empty_db.add_episode_by_show_name(Path('foo episode 2'), 'foo') == 2
+    assert empty_db.get_episodes_by_show_name('foo') == [Path('foo episode 1'),
+                                                         Path('foo episode 2')]
 
 
 def test_write_all_episodes(empty_db):
@@ -90,6 +91,19 @@ def test_write_all_episodes(empty_db):
     assert MOCK_SHOWS == empty_db.get_all()
 
 
-def test_write_all_show(empty_db):
+def test_write_all_shows(empty_db):
     empty_db.write_all_shows_delta(MOCK_SHOWS)
     assert sorted(list(MOCK_SHOWS.keys())) == empty_db.get_all_shows()
+
+
+def test_write_all_shows_delta(empty_db):
+    empty_db.add_show('foo')
+    empty_db.write_all_shows_delta(MOCK_SHOWS)
+    assert list(MOCK_SHOWS.keys()) == empty_db.get_all_shows()
+
+
+def test_write_all_episodes_delta(empty_db):
+    for key in MOCK_SHOWS:
+        empty_db.add_episode_by_show_name(MOCK_SHOWS[key][0], key)
+    empty_db.write_all_episodes_delta(MOCK_SHOWS)
+    assert MOCK_SHOWS == empty_db.get_all()
