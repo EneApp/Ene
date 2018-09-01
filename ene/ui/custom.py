@@ -62,7 +62,7 @@ class ComboCheckbox:
         self.combobox.setModel(self.model)
         self.combobox.setItemDelegate(CheckMarkDelegate())
         self.combobox.view().pressed.connect(self.handle_item_pressed)
-        self.checked_items = deque()
+        self.checked_items = []
         if items:
             self.model.appendColumn(items)
 

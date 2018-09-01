@@ -159,9 +159,9 @@ class API:
             'page': page,
             'isAdult': is_adult,
             'search': search,
-            'format': format_,
-            'status': status,
-            'season': season,
+            'format': format_.name if format_ else None,
+            'status': status.name if status else None,
+            'season': season.name if season else None,
             'onList': on_list,
             'licensedBy': licensed_by,
             'includedGenres': included_genres,
@@ -176,8 +176,8 @@ class API:
             if start == fin:
                 variables['year'] = f'{start}%'
             else:
-                variables['yearLesser'] = start * 10000
-                variables['yearGreater'] = fin * 10000
+                variables['yearGreater'] = start * 10000
+                variables['yearLesser'] = fin * 10000
         res = self.query(self.queries['browse.graphql'], variables).get('data', {}).get('Page', {})
         has_next = res.get('pageInfo', {}).get('hasNextPage', False)
         return res.get('media', []), has_next

@@ -224,6 +224,7 @@ class MediaBrowser(QScrollArea):
 
     ctrl_ready_signal = Signal(list, list, QWidget, QWidget)
     get_media_signal = Signal()
+    media_ready_signal = Signal(list)
 
     def __init__(
             self,
@@ -270,6 +271,7 @@ class MediaBrowser(QScrollArea):
         self._scroll_bar = self.verticalScrollBar()
         self.ctrl_ready_signal.connect(self._setup_controls)
         self.get_media_signal.connect(self.get_media)
+        self.media_ready_signal.connect(self._media_ready)
         self._scroll_bar.valueChanged.connect(self._on_scroll)
 
     @property
@@ -369,7 +371,37 @@ class MediaBrowser(QScrollArea):
         tags_future = self.app.pool.submit(self.app.api.get_tags)
         tags = [tag['name'] for tag in tags_future.result()]
         genres = genre_future.result()
-        self.ctrl_ready_signal.emit(genres, tags, combobox_genre_tag, combobox_streaming)
+        self.app.pool.submit(
+            self.ctrl_ready_signal.emit,
+            genres,
+            tags,
+            combobox_genre_tag,
+            combobox_streaming
+        )
+
+    @Slot(list)
+    def _media_ready(self, media):
+        for anime in media:
+            season = anime['season']
+            season = MediaSeason[season] if season else None
+            studios = anime['studios']['edges']
+            studio = studios[0]['node']['name'] if studios else None
+            cache_home = self.app.cache_home
+            image_url = anime['coverImage']['large']
+            display = MediaDisplay(
+                anime_id=anime['id'],
+                title=anime['title']['userPreferred'],
+                season=season,
+                year=anime['startDate']['year'],
+                studio=studio,
+                next_airing_episode=anime['nextAiringEpisode'],
+                media_format=MediaFormat[anime['format']],
+                score=anime['averageScore'],
+                description=anime['description'],
+                genres=anime['genres']
+            )
+            self._layout.addWidget(display)
+            self.app.pool.submit(display.set_image, image_url, cache_home)
 
     @Slot()
     def get_media(self):
@@ -392,36 +424,39 @@ class MediaBrowser(QScrollArea):
             is_adult=self.adult
         )
         self.has_next_page = has_next
-
-        for anime in res:
-            season = anime['season']
-            season = MediaSeason[season] if season else None
-            studios = anime['studios']['edges']
-            studio = studios[0]['node']['name'] if studios else None
-            cache_home = self.app.cache_home
-            image_url = anime['coverImage']['large']
-            display = MediaDisplay(
-                anime_id=anime['id'],
-                title=anime['title']['userPreferred'],
-                season=season,
-                year=anime['startDate']['year'],
-                studio=studio,
-                next_airing_episode=anime['nextAiringEpisode'],
-                media_format=MediaFormat[anime['format']],
-                score=anime['averageScore'],
-                description=anime['description'],
-                genres=anime['genres']
-            )
-            self._layout.addWidget(display)
-            self.app.pool.submit(display.set_image, image_url, cache_home)
+        self.app.pool.submit(self.media_ready_signal.emit, res)
 
     @Slot(list, list, QWidget, QWidget)
     def _setup_controls(self, genres, tags, combobox_genre_tag, combobox_streaming):
         self.genre_tag_selector = GenreTagSelector(combobox_genre_tag, genres, tags)
         self.streamer_selector = StreamerSelector(combobox_streaming)
-        self.get_media_signal.emit()
+        for signal in (
+                self.combobox_status.currentTextChanged,
+                self.combobox_format.currentTextChanged,
+                self.combobox_sort.currentTextChanged,
+                self.combobox_season.currentTextChanged,
+                self.sort_toggle.button.clicked,
+                self.spinbox_year_min.valueChanged,
+                self.spinbox_year_max.valueChanged,
+                self.streamer_selector.combobox.view().pressed,
+                self.genre_tag_selector.combobox.view().pressed,
+                self.checkbox_adult.clicked,
+                self.checkbox_on_list.clicked
+        ):
+            signal.connect(self._reset_media)
+        self.app.pool.submit(self.get_media_signal.emit)
 
     @Slot(int)
     def _on_scroll(self, value):
         if value == self._scroll_bar.maximum() and self.has_next_page:
-            self.get_media_signal.emit()
+            self.app.pool.submit(self.get_media_signal.emit)
+
+    @Slot()
+    def _reset_media(self):
+        self.current_page = 0
+        self.has_next_page = False
+        for item in reversed(self._layout):
+            item.widget().setParent(None)
+        self._layout._items.clear()
+        self._scroll_bar.setValue(0)
+        self.app.pool.submit(self.get_media_signal.emit)

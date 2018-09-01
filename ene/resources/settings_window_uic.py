@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/settings_window.ui',
 # licensing of 'ene/resources/settings_window.ui' applies.
 #
-# Created: Fri Aug 31 20:19:13 2018
+# Created: Sat Sep  1 17:00:21 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!

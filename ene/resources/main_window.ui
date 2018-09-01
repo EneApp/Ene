@@ -392,6 +392,15 @@
          </item>
          <item row="1" column="0">
           <widget class="QSpinBox" name="spinbox_year_min">
+           <property name="frame">
+            <bool>true</bool>
+           </property>
+           <property name="correctionMode">
+            <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="minimum">
             <number>1950</number>
            </property>
@@ -405,6 +414,9 @@
          </item>
          <item row="1" column="1">
           <widget class="QSpinBox" name="spinbox_year_max">
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="minimum">
             <number>1950</number>
            </property>
