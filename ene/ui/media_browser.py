@@ -16,7 +16,7 @@
 
 """This module contains the media browser."""
 from threading import RLock
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from PySide2.QtCore import Qt, Signal, Slot
 from PySide2.QtGui import QPixmap, QTextOption
@@ -80,10 +80,9 @@ class MediaDisplay(QWidget):
         Args:
             image_url: The image url
             cache_home: The cache directory
-
-        Returns:
-            None
         """
+        if not self.parent():
+            return
         image_path = str(get_resource(image_url, cache_home))
         img = QPixmap(image_path).scaled(self.image_w, self.image_h)
         self.image_label.setPixmap(img)
@@ -226,7 +225,7 @@ class MediaBrowser(QScrollArea):
     ctrl_ready_signal = Signal(list, list, QWidget, QWidget)
     media_ready_signal = Signal(list)
 
-    def __init__(
+    def __init__(  # pylint: disable=R0913
             self,
             app,
             button_sort_order: QToolButton,
@@ -276,7 +275,8 @@ class MediaBrowser(QScrollArea):
         self._scroll_bar.valueChanged.connect(self._on_scroll)
 
     @property
-    def season(self):
+    def season(self) -> Optional[MediaSeason]:
+        """The season the media was initially released in."""
         return {
             'All': None,
             'Winter': MediaSeason.WINTER,
@@ -286,12 +286,14 @@ class MediaBrowser(QScrollArea):
         }[self.combobox_season.currentText()]
 
     @property
-    def year_range(self):
+    def year_range(self) -> Tuple[int, int]:
+        """Year range of the first official release date of the media."""
         min_, max_ = self.spinbox_year_min.value(), self.spinbox_year_max.value()
         return min_, max_
 
     @property
-    def sort(self):
+    def sort(self) -> Optional[List[MediaSort]]:
+        """The order the results will be displayed in."""
         res = {
             'Sort': None,
             'Popularity': 'POPULARITY',
@@ -309,7 +311,8 @@ class MediaBrowser(QScrollArea):
             return None
 
     @property
-    def format(self):
+    def format(self) -> Optional[MediaFormat]:
+        """The media's format."""
         return {
             'Format': None,
             'TV': MediaFormat.TV,
@@ -322,7 +325,8 @@ class MediaBrowser(QScrollArea):
         }[self.combobox_format.currentText()]
 
     @property
-    def status(self):
+    def status(self) -> Optional[MediaStatus]:
+        """The media's current release status."""
         return {
             'Status': None,
             'Releasing': MediaStatus.RELEASING,
@@ -332,17 +336,20 @@ class MediaBrowser(QScrollArea):
         }[self.combobox_status.currentText()]
 
     @property
-    def streaming_on(self):
+    def streaming_on(self) -> Optional[List[str]]:
+        """Sites with a online streaming license of the media."""
         return self.streamer_selector.checked_items or None
 
     @property
-    def on_list(self):
+    def on_list(self) -> Optional[bool]:
+        """Whether the media is on the authenticated user's lists."""
         if self.checkbox_on_list.isChecked():
             return False
         return None
 
     @property
-    def adult(self):
+    def adult(self) -> bool:
+        """Whether if the media's intended for 18+ adult audiences."""
         return self.checkbox_adult.isChecked()
 
     def _setup_ui(self, button_sort_order):
@@ -454,11 +461,12 @@ class MediaBrowser(QScrollArea):
 
     @Slot()
     def reset_media(self):
+        """Reset the media display."""
         with self.reset_media_lock:
             self.current_page = 0
             self.has_next_page = False
             for item in reversed(self._layout):
                 item.widget().setParent(None)
-            self._layout._items.clear()
+            self._layout._items.clear()  # pylint: disable=W0212
             self._scroll_bar.setValue(0)
             self.get_media()
