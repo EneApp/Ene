@@ -19,7 +19,7 @@ from collections import deque
 from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple, Union
 
-from PySide2.QtCore import QModelIndex, QPoint, QRect, QSize, Qt
+from PySide2.QtCore import QModelIndex, QObject, QPoint, QRect, QSize, Qt
 from PySide2.QtGui import QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import (
     QComboBox, QLabel, QLayout, QPushButton, QSizePolicy, QStyle, QStyleOptionViewItem,
@@ -42,7 +42,7 @@ class CheckMarkDelegate(QStyledItemDelegate):
         super().paint(painter_, option_, index_)
 
 
-class ComboCheckbox:
+class ComboCheckbox(QObject):
     """A combo box with its items as checkboxes."""
 
     def __init__(
@@ -57,6 +57,7 @@ class ComboCheckbox:
             combobox: The underlying combobox, None to create a new one
             items: Items to put in the combobox, if any
         """
+        super().__init__()
         self.combobox = combobox if combobox else QComboBox()
         self.model = QStandardItemModel()
         self.combobox.setModel(self.model)
@@ -95,7 +96,8 @@ class ComboCheckbox:
             item: Item checked
         """
         item.setCheckState(Qt.Checked)
-        self.checked_items.append(item)
+        assert item.text() not in self.checked_items
+        self.checked_items.append(item.text())
 
     # pylint: disable=no-self-use
     def _on_uncheck(self, item: QStandardItem):
@@ -106,7 +108,8 @@ class ComboCheckbox:
             item: Item unchecked
         """
         item.setCheckState(Qt.Unchecked)
-        self.checked_items.remove(item)
+        assert item.text() in self.checked_items
+        self.checked_items.remove(item.text())
 
     def __getitem__(self, i: Union[int, QModelIndex]) -> QStandardItem:
         """
@@ -190,8 +193,7 @@ class GenreTagSelector(ComboCheckbox):
             Selected genres and tags
         """
         genres, tags = [], []
-        for item in self.checked_items:
-            text = item.text()
+        for text in self.checked_items:
             if text in self.genres:
                 genres.append(text)
             else:
@@ -211,7 +213,7 @@ class StreamerSelector(ComboCheckbox):
         self.combobox.setCurrentText(streaming_on)
 
 
-class ToggleToolButton:
+class ToggleToolButton(QObject):
     """A toggleable tool button"""
 
     def __init__(self, button: Optional[QToolButton] = None):
@@ -221,6 +223,7 @@ class ToggleToolButton:
         Args:
             button: The underlying tool button
         """
+        super().__init__()
         self.button = button or QToolButton()
         self.button.clicked.connect(self._handle_toggle)
 

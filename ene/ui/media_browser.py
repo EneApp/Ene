@@ -15,6 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains the media browser."""
+from threading import RLock
 from typing import List, Optional
 
 from PySide2.QtCore import Qt, Signal, Slot
@@ -84,7 +85,7 @@ class MediaDisplay(QWidget):
             None
         """
         image_path = str(get_resource(image_url, cache_home))
-        img = QPixmap(image_path).scaled(self.image_w, self.image_h, Qt.KeepAspectRatio)
+        img = QPixmap(image_path).scaled(self.image_w, self.image_h)
         self.image_label.setPixmap(img)
 
     def _setup_layouts(self):
@@ -223,7 +224,6 @@ class MediaBrowser(QScrollArea):
     """This class controls the media browsing tab."""
 
     ctrl_ready_signal = Signal(list, list, QWidget, QWidget)
-    get_media_signal = Signal()
     media_ready_signal = Signal(list)
 
     def __init__(
@@ -247,6 +247,8 @@ class MediaBrowser(QScrollArea):
             button_sort_order: The tool button for sort order
         """
         super().__init__()
+        self.reset_media_lock = RLock()
+
         self.combobox_season = combobox_season
         self.spinbox_year_min = spinbox_year_min
         self.spinbox_year_max = spinbox_year_max
@@ -270,7 +272,6 @@ class MediaBrowser(QScrollArea):
 
         self._scroll_bar = self.verticalScrollBar()
         self.ctrl_ready_signal.connect(self._setup_controls)
-        self.get_media_signal.connect(self.get_media)
         self.media_ready_signal.connect(self._media_ready)
         self._scroll_bar.valueChanged.connect(self._on_scroll)
 
@@ -332,9 +333,7 @@ class MediaBrowser(QScrollArea):
 
     @property
     def streaming_on(self):
-        if not self.streamer_selector.checked_items:
-            return None
-        return [item.text() for item in self.streamer_selector.checked_items]
+        return self.streamer_selector.checked_items or None
 
     @property
     def on_list(self):
@@ -371,8 +370,7 @@ class MediaBrowser(QScrollArea):
         tags_future = self.app.pool.submit(self.app.api.get_tags)
         tags = [tag['name'] for tag in tags_future.result()]
         genres = genre_future.result()
-        self.app.pool.submit(
-            self.ctrl_ready_signal.emit,
+        self.ctrl_ready_signal.emit(
             genres,
             tags,
             combobox_genre_tag,
@@ -381,33 +379,36 @@ class MediaBrowser(QScrollArea):
 
     @Slot(list)
     def _media_ready(self, media):
-        for anime in media:
-            season = anime['season']
-            season = MediaSeason[season] if season else None
-            studios = anime['studios']['edges']
-            studio = studios[0]['node']['name'] if studios else None
-            cache_home = self.app.cache_home
-            image_url = anime['coverImage']['large']
-            display = MediaDisplay(
-                anime_id=anime['id'],
-                title=anime['title']['userPreferred'],
-                season=season,
-                year=anime['startDate']['year'],
-                studio=studio,
-                next_airing_episode=anime['nextAiringEpisode'],
-                media_format=MediaFormat[anime['format']],
-                score=anime['averageScore'],
-                description=anime['description'],
-                genres=anime['genres']
-            )
-            self._layout.addWidget(display)
-            self.app.pool.submit(display.set_image, image_url, cache_home)
+        with self.reset_media_lock:
+            for anime in media:
+                season = anime['season']
+                season = MediaSeason[season] if season else None
+                studios = anime['studios']['edges']
+                studio = studios[0]['node']['name'] if studios else None
+                cache_home = self.app.cache_home
+                image_url = anime['coverImage']['large']
+                display = MediaDisplay(
+                    anime_id=anime['id'],
+                    title=anime['title']['userPreferred'],
+                    season=season,
+                    year=anime['startDate']['year'],
+                    studio=studio,
+                    next_airing_episode=anime['nextAiringEpisode'],
+                    media_format=MediaFormat[anime['format']],
+                    score=anime['averageScore'],
+                    description=anime['description'],
+                    genres=anime['genres']
+                )
+                self._layout.addWidget(display)
+                self.app.pool.submit(display.set_image, image_url, cache_home)
 
-    @Slot()
     def get_media(self):
         """
         Get media from anilist and put them into the layout
         """
+        self.app.pool.submit(self._get_media)
+
+    def _get_media(self):
         self.current_page += 1
         genres, tags = self.genre_tag_selector.genre_tags()
         res, has_next = self.api.browse_anime(
@@ -424,7 +425,7 @@ class MediaBrowser(QScrollArea):
             is_adult=self.adult
         )
         self.has_next_page = has_next
-        self.app.pool.submit(self.media_ready_signal.emit, res)
+        self.media_ready_signal.emit(res)
 
     @Slot(list, list, QWidget, QWidget)
     def _setup_controls(self, genres, tags, combobox_genre_tag, combobox_streaming):
@@ -443,20 +444,21 @@ class MediaBrowser(QScrollArea):
                 self.checkbox_adult.clicked,
                 self.checkbox_on_list.clicked
         ):
-            signal.connect(self._reset_media)
-        self.app.pool.submit(self.get_media_signal.emit)
+            signal.connect(self.reset_media)
+        self.get_media()
 
     @Slot(int)
     def _on_scroll(self, value):
         if value == self._scroll_bar.maximum() and self.has_next_page:
-            self.app.pool.submit(self.get_media_signal.emit)
+            self.get_media()
 
     @Slot()
-    def _reset_media(self):
-        self.current_page = 0
-        self.has_next_page = False
-        for item in reversed(self._layout):
-            item.widget().setParent(None)
-        self._layout._items.clear()
-        self._scroll_bar.setValue(0)
-        self.app.pool.submit(self.get_media_signal.emit)
+    def reset_media(self):
+        with self.reset_media_lock:
+            self.current_page = 0
+            self.has_next_page = False
+            for item in reversed(self._layout):
+                item.widget().setParent(None)
+            self._layout._items.clear()
+            self._scroll_bar.setValue(0)
+            self.get_media()
