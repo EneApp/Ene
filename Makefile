@@ -14,9 +14,15 @@ define graphqlconfig
 }
 endef
 
-.PHONY: resources ui gql ci_setup lint test coverage
+.PHONY: list no_targets__ ui gql ci_setup lint test coverage
 
-resources: ui
+list:
+	@sh -c "$(MAKE) -p no_targets__ | \
+		awk -F':' '/^[a-zA-Z0-9][^\$$#\/\\t=]*:([^=]|$$)/ {\
+			split(\$$1,A,/ /);for(i in A)print A[i]\
+	}' | grep -v '__\$$' | grep -v 'make\[1\]' | grep -v 'Makefile' | sort"
+
+no_targets__:
 
 ui:
 	pyside2-uic ene/resources/main_window.ui -o ene/resources/main_window_uic.py
