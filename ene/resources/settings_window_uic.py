@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/settings_window.ui',
 # licensing of 'ene/resources/settings_window.ui' applies.
 #
-# Created: Sat Sep  1 17:00:21 2018
+# Created: Tue Sep  4 19:27:29 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -20,13 +20,10 @@ class Ui_window_settings(object):
         self.settings_list.setProperty("showDropIndicator", False)
         self.settings_list.setObjectName("settings_list")
         self.settings_menu = QtWidgets.QStackedWidget(window_settings)
-        self.settings_menu.setGeometry(QtCore.QRect(270, 6, 451, 451))
+        self.settings_menu.setGeometry(QtCore.QRect(270, 6, 471, 451))
         self.settings_menu.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.settings_menu.setFrameShadow(QtWidgets.QFrame.Raised)
         self.settings_menu.setObjectName("settings_menu")
-        self.page = QtWidgets.QWidget()
-        self.page.setObjectName("page")
-        self.settings_menu.addWidget(self.page)
         self.player = QtWidgets.QWidget()
         self.player.setObjectName("player")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.player)
@@ -89,6 +86,24 @@ class Ui_window_settings(object):
         self.path_remove.setGeometry(QtCore.QRect(360, 400, 84, 34))
         self.path_remove.setObjectName("path_remove")
         self.settings_menu.addWidget(self.local_files)
+        self.anilist = QtWidgets.QWidget()
+        self.anilist.setObjectName("anilist")
+        self.formLayout = QtWidgets.QFormLayout(self.anilist)
+        self.formLayout.setObjectName("formLayout")
+        self.title_anilist = QtWidgets.QLabel(self.anilist)
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        self.title_anilist.setFont(font)
+        self.title_anilist.setObjectName("title_anilist")
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.title_anilist)
+        self.label_adult = QtWidgets.QLabel(self.anilist)
+        self.label_adult.setObjectName("label_adult")
+        self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_adult)
+        self.check_adult = QtWidgets.QCheckBox(self.anilist)
+        self.check_adult.setText("")
+        self.check_adult.setObjectName("check_adult")
+        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.check_adult)
+        self.settings_menu.addWidget(self.anilist)
         self.horizontalLayoutWidget_2 = QtWidgets.QWidget(window_settings)
         self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(270, 460, 451, 41))
         self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
@@ -106,7 +121,7 @@ class Ui_window_settings(object):
         self.horizontalLayout.addWidget(self.button_cancel)
 
         self.retranslateUi(window_settings)
-        self.settings_menu.setCurrentIndex(1)
+        self.settings_menu.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(window_settings)
 
     def retranslateUi(self, window_settings):
@@ -123,6 +138,9 @@ class Ui_window_settings(object):
         self.label_5.setText(QtWidgets.QApplication.translate("window_settings", "Local Files", None, -1))
         self.path_add.setText(QtWidgets.QApplication.translate("window_settings", "Add", None, -1))
         self.path_remove.setText(QtWidgets.QApplication.translate("window_settings", "Remove", None, -1))
+        self.title_anilist.setText(QtWidgets.QApplication.translate("window_settings", "Anilist", None, -1))
+        self.label_adult.setText(QtWidgets.QApplication.translate("window_settings", "Allow Showing Adult Content", None, -1))
+        self.check_adult.setToolTip(QtWidgets.QApplication.translate("window_settings", "<html><head/><body><p>Enables the option in the media browser to show 18+ results.</p><p>Requires \'18+ Content\' enabled on anilist, under Anime &amp; Manga settings.</p></body></html>", None, -1))
         self.button_OK.setText(QtWidgets.QApplication.translate("window_settings", "OK", None, -1))
         self.button_apply.setText(QtWidgets.QApplication.translate("window_settings", "Apply", None, -1))
         self.button_cancel.setText(QtWidgets.QApplication.translate("window_settings", "Cancel", None, -1))

@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Sat Sep  1 17:00:21 2018
+# Created: Tue Sep  4 19:27:29 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -123,7 +123,7 @@ class Ui_window_main(object):
         self.gridLayout.addWidget(self.label_2, 0, 1, 1, 1)
         self.spinbox_year_min = QtWidgets.QSpinBox(self.groupbox_year)
         self.spinbox_year_min.setFrame(True)
-        self.spinbox_year_min.setCorrectionMode(QtWidgets.QAbstractSpinBox.CorrectToNearestValue)
+        self.spinbox_year_min.setCorrectionMode(QtWidgets.QAbstractSpinBox.CorrectToPreviousValue)
         self.spinbox_year_min.setKeyboardTracking(False)
         self.spinbox_year_min.setMinimum(1950)
         self.spinbox_year_min.setMaximum(2020)

@@ -81,6 +81,9 @@ class MainWindow(QMainWindow, Ui_window_main):
                     self.combobox_genre_tag,
                     self.combobox_streaming,
                 )
+            self.check_box_adult.setVisible(self.app.config.get(
+                'Allow Adult Content',
+                default=False))
 
     def _setup_tab_browser(self):
         self.media_browser = MediaBrowser(

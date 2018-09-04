@@ -33,8 +33,9 @@ from ene.constants import IS_WIN
 from ene.resources import Ui_window_settings
 
 SETTINGS = {
-    'Video Player': 1,
-    'Local Files': 2
+    'Video Player': 0,
+    'Local Files': 1,
+    'Anilist': 2
 }
 
 CONFIG_ITEM = {
@@ -42,6 +43,7 @@ CONFIG_ITEM = {
     'player_path': 'Player Path',
     'use_http': 'VLC HTTP Interface',
     'local_paths': 'Local Paths',
+    'check_adult': 'Allow Adult Content'
 }
 
 
@@ -57,7 +59,6 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         self.changes = False
 
     def _setup_children(self):
-        self.player_type.currentIndexChanged.connect(self.pick_player)
         self.reset_page()
         self.setup_listeners()
         self.button_cancel.clicked.connect(self.hide)
@@ -80,10 +81,10 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         """
         Sets up listeners for children to trigger events
         """
-        page = self.settings_menu.widget(self.current_page)
-        for child in page.children():
-            if child.objectName() in CONFIG_ITEM:
-                self.attach_change_listener(child)
+        for page in self.settings_menu.children():
+            for child in page.children():
+                if child.objectName() in CONFIG_ITEM:
+                    self.attach_change_listener(child)
 
     def attach_change_listener(self, child):
         """
@@ -139,6 +140,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         """
         if self.changes:
             save = QMessageBox().question(
+                self,
                 "Save",
                 "Changes detected. Save current page?"
             )
