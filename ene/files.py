@@ -34,7 +34,8 @@ class FileManager:
 
     def __init__(self, cfg, data_home: Path):
         self.config = cfg
-        self.dirs = [Path(x) for x in self.config.get('Local Paths')]
+        self.dirs = [Path(x) for x in self.config.get('Local Paths',
+                                                      default=[])]
         self.db = Database(data_home / 'ene.db')
         self.series = defaultdict(list)
 
