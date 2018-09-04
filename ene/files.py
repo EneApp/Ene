@@ -34,7 +34,7 @@ class FileManager:
 
     def __init__(self, cfg, data_home: Path):
         self.config = cfg
-        self.dirs = self.config.get('Local Paths')
+        self.dirs = [Path(x) for x in self.config.get('Local Paths')]
         self.db = Database(data_home / 'ene.db')
         self.series = defaultdict(list)
 
@@ -93,11 +93,21 @@ class FileManager:
         Args:
             show:
                 The show to search for all episodes of
+
+        Returns:
+            A list of new shows
         """
+        res = []
         for directory in self.dirs:
-            res = self.find_episodes(show, directory)
-            self.series[show].extend(res)
+            print(directory)
+            print(type(directory))
+            res.extend(self.find_episodes(show, directory))
+        new = set(res) - set(self.series[show])
+        print(res)
+        print(new)
+        self.series[show].extend(new)
         self.series[show].sort()
+        return sorted(new)
 
     def find_episodes(self, name, directory):
         """

@@ -50,6 +50,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         self.app = app
         self.files = FileManager(self.app.config, self.app.data_home)
         self.player = None
+        self.current_show = None
         self.setupUi(self)
 
     def setupUi(self, window_main):
@@ -159,6 +160,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         clicked from the local files page
         """
         show = self.sender().title
+        self.current_show = show
         self.stack_local_files.setCurrentIndex(1)
         menu_layout = QGridLayout()
         menu = QWidget()
@@ -168,6 +170,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         back_button.clicked.connect(self.on_back_click)
         menu_layout.addWidget(back_button, 0, 0)
         refresh_button = QPushButton("Refresh")
+        refresh_button.clicked.connect(self.refresh_show)
         menu_layout.addWidget(refresh_button, 1, 0)
         label = QLabel(show)
         menu_layout.addWidget(label, 0, 1, 2, 2)
@@ -182,6 +185,19 @@ class MainWindow(QMainWindow, Ui_window_main):
             button.clicked.connect(self.play_episode)
             layout.addWidget(button)
         self.stack_local_files.currentWidget().setLayout(layout)
+
+    def refresh_show(self):
+        """
+        Refreshes the episodes for the current show and dumps the new shows to
+        the database. Triggered by clicking Refresh in the view for a show
+        """
+        new = self.files.refresh_single_show(self.current_show)
+        layout = self.stack_local_files.currentWidget().layout()
+        for episode in new:
+            button = EpisodeButton(episode)
+            button.clicked.connect(self.play_episode)
+            layout.addWidget(button)
+        self.files.dump_to_db()
 
     def play_episode(self):
         """
