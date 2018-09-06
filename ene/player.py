@@ -24,7 +24,6 @@ from time import sleep
 from typing import Union
 import requests
 
-import vlc
 
 from ene.constants import IS_MAC, IS_WIN
 
@@ -64,6 +63,7 @@ class VlcPlayer(AbstractPlayer):
     """
 
     def __init__(self):
+        import vlc
         self.instance = vlc.Instance('--extraintf=hotkeys')
         self.player = self.instance.media_player_new()
         self.player.video_set_key_input(True)
