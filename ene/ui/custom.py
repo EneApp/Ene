@@ -385,12 +385,17 @@ class SeriesButton(QPushButton):
         title_label = QLabel(series)
         title_label.setWordWrap(True)
         layout.addWidget(title_label)
-        layout.addWidget(QLabel('Episodes: ' + str(episodes)))
+        self.episodes_label = QLabel('Episodes: ' + str(episodes))
+        layout.addWidget(self.episodes_label)
         self.setMinimumWidth(200)
         self.setMinimumHeight(200)
         base_layout = QVBoxLayout()
+        base_layout.setContentsMargins(1, 1, 1, 1)
         base_layout.addWidget(self.image_frame)
         super().setLayout(base_layout)
 
     def set_image(self, image):
         self.image_frame.setPixmap(image)
+
+    def update_episode_count(self, count):
+        self.episodes_label.setText('Episodes: ' + str(count))

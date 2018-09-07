@@ -215,3 +215,31 @@ class API:
 }"""
         res = self.query(query)
         return res['data']['MediaTagCollection']
+
+    def get_show(self, show):
+        """
+        Gets information about a single show by name
+
+        Args:
+            show:
+                The show to look up
+
+        Returns:
+            Information about the show
+        """
+        query = """\
+        query ($title: String) {
+            Media(search: $title, type: ANIME) {
+                id
+                coverImage {
+                    large
+                     medium
+                }
+            }
+        }
+        """
+        variables = {
+            'title': show
+        }
+        res = self.query(query, variables)
+        return res

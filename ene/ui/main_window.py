@@ -22,6 +22,7 @@ from PySide2.QtWidgets import (
     QFileDialog,
     QGridLayout,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QMainWindow,
     QPushButton,
@@ -60,6 +61,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         self._setup_tab_files()
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
+        self.action_refresh_library.triggered.connect(self.refresh_library)
         self.widget_tab.currentChanged.connect(self.handle_current_tab_changed)
 
     @Slot(int)
@@ -135,45 +137,57 @@ class MainWindow(QMainWindow, Ui_window_main):
         """
         Sets up the local files tab. Triggered when the tab is selected
         """
-
+        # TODO: Refactor
         self.files.build_all_from_db()
-        layout = FlowLayout()
-        layout.setAlignment(Qt.AlignTop)
+        series_layout = FlowLayout()
+        series_layout.setAlignment(Qt.AlignTop)
 
-        for show in self.files.series:
+        for show in sorted(self.files.series):
             button = SeriesButton(show, len(self.files.series[show]))
             button.clicked.connect(self.on_series_click)
-            layout.addWidget(button)
+            series_layout.addWidget(button)
 
-        layout.setSizeConstraint(FlowLayout.SetMaximumSize)
-        page_widget = QWidget()
-        page_widget.setLayout(layout)
+        series_layout.setSizeConstraint(FlowLayout.SetMaximumSize)
+        self.page_widget = QWidget()
+        self.page_widget.setLayout(series_layout)
         series_page = QScrollArea()
-        series_page.setWidget(page_widget)
+        series_page.setWidget(self.page_widget)
         series_page.setWidgetResizable(True)
         self.stack_local_files.addWidget(series_page)
         self.stack_local_files.addWidget(QWidget())
 
-    def on_series_click(self):
+    def on_series_click(self, *, show=None):
         """
         Sets up the window for the episodes of a show. Triggered when a show is
         clicked from the local files page
         """
-        show = self.sender().title
+        if show is None:
+            show = self.sender().title
         self.current_show = show
         self.stack_local_files.setCurrentIndex(1)
         menu_layout = QGridLayout()
         menu = QWidget()
         layout = FlowLayout()
         layout.setAlignment(Qt.AlignTop)
-        back_button = QPushButton("Back")
+
+        back_button = QPushButton('Back')
         back_button.clicked.connect(self.on_back_click)
         menu_layout.addWidget(back_button, 0, 0)
-        refresh_button = QPushButton("Refresh")
+
+        refresh_button = QPushButton('Refresh')
         refresh_button.clicked.connect(self.refresh_show)
         menu_layout.addWidget(refresh_button, 1, 0)
+
+        delete_button = QPushButton('Delete')
+        delete_button.clicked.connect(self.delete_show)
+        menu_layout.addWidget(delete_button, 0, 1)
+
+        rename_button = QPushButton('Rename')
+        rename_button.clicked.connect(self.rename_show)
+        menu_layout.addWidget(rename_button, 1, 1)
+
         label = QLabel(show)
-        menu_layout.addWidget(label, 0, 1, 2, 2)
+        menu_layout.addWidget(label, 0, 2, 2, 2)
         menu.setLayout(menu_layout)
         menu.setMaximumWidth(self.stack_local_files.width())
         menu.setMinimumWidth(self.stack_local_files.width() / 2)
@@ -216,6 +230,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         Deletes all child widgets of the layout for episodes and the layout
         itself then returns to the shows page
         """
+        self.current_show = None
         layout = self.stack_local_files.currentWidget().layout()
         for i in reversed(range(layout.count())):
             layout.itemAt(i).widget().deleteLater()
@@ -234,3 +249,38 @@ class MainWindow(QMainWindow, Ui_window_main):
         dir_ = QFileDialog.getExistingDirectory(*args)
         # TODO do something with this
         return Path(dir_)
+
+    def refresh_library(self):
+        """
+        Triggers a full refresh of the users library, updating episode counts
+        and adding new shows to the UI as needed
+        """
+        old = set(self.files.series.keys())
+        self.files.refresh_shows()
+        new = set(self.files.series.keys()) - old
+        for show in self.page_widget.children():
+            if isinstance(show, SeriesButton):
+                show.update_episode_count(len(self.files.series[show.title]))
+        for show in new:
+            button = SeriesButton(show, len(self.files.series[show]))
+            button.clicked.connect(self.on_series_click)
+            self.page_widget.layout().addWidget(button)
+        self.files.dump_to_db()
+
+    def rename_show(self):
+        """
+        Renames the current show. Displays an input box to get the new name
+        """
+        title = QInputDialog().getText(self,
+                                       'Rename',
+                                       'New Title:',
+                                       text=self.current_show)
+        if title[1]:
+            self.files.rename_show(self.current_show, title[0])
+
+    def delete_show(self):
+        """
+        Deletes the current show
+        """
+        self.files.delete_show(self.current_show)
+        self.on_back_click()

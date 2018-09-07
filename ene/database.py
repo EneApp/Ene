@@ -30,6 +30,7 @@ class Database:
         sqlite3.register_adapter(PosixPath, str)
         self.connection = sqlite3.connect(str(db_path), isolation_level=None)
         self.cursor = self.connection.cursor()
+        self.cursor.execute('PRAGMA foreign_keys = on;')
         if setup:
             self.initial_setup()
 
@@ -53,7 +54,6 @@ class Database:
             );
         """
         self.cursor.executescript(script)
-        self.cursor.execute('PRAGMA foreign_keys = on;')
 
     def add_show(self, show):
         """
@@ -229,6 +229,41 @@ class Database:
         cur = self.connection.cursor()
         cur.execute('SELECT episode_path FROM Episode')
         return cur.fetchall()
+
+    def delete_show(self, show):
+        """
+        Deletes the given show from the database
+        Args:
+            show:
+                The show to delete
+        """
+        show_id = self.get_show_id_by_name(show)
+        self.cursor.execute('DELETE FROM Episode WHERE show_ID = ?', (show_id,))
+        self.cursor.execute('DELETE FROM Show WHERE show_ID = ?', (show_id,))
+
+    def rename_show(self, old, new):
+        """
+        Renames a show in the database
+        Args:
+            old:
+                The old name of the show
+            new:
+                The new name of the show
+        Returns:
+
+        """
+        old_id = self.get_show_id_by_name(old)
+        new_id = self.get_show_id_by_name(new)
+
+        if new_id is not None:
+            # New name is in use, transfer the episodes over
+            self.cursor.execute('UPDATE Episode SET show_ID = ?'
+                                'WHERE show_ID = ?', (new_id, old_id))
+            self.delete_show(old)
+        else:
+            # New name is not in use, just update the entry
+            self.cursor.execute('UPDATE Show SET show_name = ?'
+                                'WHERE show_ID = ?', (new, old_id))
 
 
 # pylint: disable=W0613

@@ -103,8 +103,6 @@ class FileManager:
             print(type(directory))
             res.extend(self.find_episodes(show, directory))
         new = set(res) - set(self.series[show])
-        print(res)
-        print(new)
         self.series[show].extend(new)
         self.series[show].sort()
         return sorted(new)
@@ -168,6 +166,34 @@ class FileManager:
         """
         for path in self.series[show]:
             yield path.name
+
+    def rename_show(self, old, new):
+        """
+        Renames a given show
+
+        Args:
+            old:
+                The old name of the show
+            new:
+                The new name
+
+        Returns:
+            The episode list for the new show
+        """
+        self.series[new].append(self.series.pop(old))
+        self.db.rename_show(old, new)
+        return self.series[new]
+
+    def delete_show(self, show):
+        """
+        Deletes a given show from the dictionary and the database
+
+        Args:
+            show:
+                The show to remove
+        """
+        self.db.delete_show(show)
+        self.series.pop(show)
 
 
 def clean_titles(series):

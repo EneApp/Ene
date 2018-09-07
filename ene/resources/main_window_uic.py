@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Tue Sep  4 19:27:29 2018
+# Created: Thu Sep  6 18:54:13 2018
 #      by: pyside2-uic  running on PySide2 5.11.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -150,7 +150,7 @@ class Ui_window_main(object):
         self.verticalLayout_2.addWidget(self.widget_tab)
         window_main.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(window_main)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 29))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 30))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -172,7 +172,10 @@ class Ui_window_main(object):
         self.action_source_code.setObjectName("action_source_code")
         self.actionHelp = QtWidgets.QAction(window_main)
         self.actionHelp.setObjectName("actionHelp")
+        self.action_refresh_library = QtWidgets.QAction(window_main)
+        self.action_refresh_library.setObjectName("action_refresh_library")
         self.menuFile.addAction(self.action_open_folder)
+        self.menuFile.addAction(self.action_refresh_library)
         self.menuSettings.addAction(self.action_prefences)
         self.menuHelp.addAction(self.actionHelp)
         self.menuHelp.addSeparator()
@@ -249,4 +252,5 @@ class Ui_window_main(object):
         self.actionAbout_Ene.setText(QtWidgets.QApplication.translate("window_main", "&About Ene", None, -1))
         self.action_source_code.setText(QtWidgets.QApplication.translate("window_main", "&Source Code", None, -1))
         self.actionHelp.setText(QtWidgets.QApplication.translate("window_main", "&Help", None, -1))
+        self.action_refresh_library.setText(QtWidgets.QApplication.translate("window_main", "Refresh Library", None, -1))
 

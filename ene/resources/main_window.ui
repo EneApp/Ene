@@ -472,7 +472,7 @@
      <x>0</x>
      <y>0</y>
      <width>1440</width>
-     <height>29</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -480,6 +480,7 @@
      <string>Fi&amp;le</string>
     </property>
     <addaction name="action_open_folder"/>
+    <addaction name="action_refresh_library"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -524,6 +525,11 @@
   <action name="actionHelp">
    <property name="text">
     <string>&amp;Help</string>
+   </property>
+  </action>
+  <action name="action_refresh_library">
+   <property name="text">
+    <string>Refresh Library</string>
    </property>
   </action>
  </widget>
