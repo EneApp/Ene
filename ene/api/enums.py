@@ -332,5 +332,3 @@ class UserTitleLanguage(Enum):
     ROMAJI_STYLISED = auto()
     ENGLISH_STYLISED = auto()
     NATIVE_STYLISED = auto()
-
-
