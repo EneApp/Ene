@@ -324,14 +324,30 @@ $perPage: Int,
                      medium
                 }
             }
-        }
-        """
+        }"""
         variables = {
             'title': show
         }
         res = self.query(query, variables)
         return res
 
-    def change_media_list_status(self, id_: int, status: MediaListStatus):
-        query = """
+    def change_media_list_status(self, id_: int, status: MediaListStatus) -> Optional[dict]:
         """
+        Update the user's media list status for a given media
+
+        Args:
+            id_: The media ID
+            status: The status to change to
+
+        Returns:
+            The updated status
+        """
+        query = """\
+        mutation ($mediaId: Int, $status: MediaListStatus) {
+            SaveMediaListEntry (mediaId: $mediaId, status: $status) {
+                id
+                status
+            }
+        }"""
+        variables = {"mediaId": id_, "status": status.name}
+        return self.query(query, variables)
