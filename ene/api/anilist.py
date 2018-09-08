@@ -15,14 +15,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains anilist API class."""
+from datetime import date
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 from requests import HTTPError, Session
 
 from ene.constants import CLIENT_ID, GRAPHQL_URL
 from ene.errors import APIError
+from ene.util import dict_filter
 from .auth import OAuth
 from .enums import MediaFormat, MediaListStatus, MediaSeason, MediaSort, MediaStatus
 
@@ -243,7 +245,7 @@ $perPage: Int,
         }
     }
 }"""
-        variables = {k: v for k, v in {
+        variables = dict_filter({
             'page': page,
             'isAdult': is_adult,
             'search': search,
@@ -256,7 +258,7 @@ $perPage: Int,
             'excludedGenres': excluded_genres,
             'includedTags': included_tags,
             'excludedTags': excluded_tags,
-        }.items() if v is not None}
+        })
         if sort:
             variables['sort'] = [s.name for s in sort]
         if year_range and year_range[0] and year_range[1]:
@@ -331,23 +333,86 @@ $perPage: Int,
         res = self.query(query, variables)
         return res
 
-    def change_media_list_status(self, id_: int, status: MediaListStatus) -> Optional[dict]:
+    def update_media_list_entry(  # pylint: disable=R0913
+            self,
+            id_: int,
+            status: Optional[MediaListStatus] = None,
+            score: Optional[float] = None,
+            progress: Optional[int] = None,
+            custom_lists: Optional[Dict[str, bool]] = None,
+            private: Optional[bool] = None,
+            started_at: Optional[date] = None,
+            completed_at: Optional[date] = None,
+            repeat: Optional[int] = None
+    ) -> Optional[dict]:
         """
-        Update the user's media list status for a given media
+        Update a media list entry for the user.
 
         Args:
             id_: The media ID
-            status: The status to change to
+            status: The watching status
+            score: The score of the entry
+            progress: The amount of episodes consumed by the user
+            custom_lists: Map of booleans for which lists the entry are in
+            private: If the entry should only be visible to authenticated user
+            started_at: When the entry was started by the user
+            completed_at: When the entry was completed by the user
+            repeat: The amount of times the user has re-watched the media
 
         Returns:
-            The updated status
+            The updated media entry values.
         """
         query = """\
-        mutation ($mediaId: Int, $status: MediaListStatus) {
-            SaveMediaListEntry (mediaId: $mediaId, status: $status) {
-                id
-                status
-            }
-        }"""
-        variables = {"mediaId": id_, "status": status.name}
+mutation (
+    $mediaId: Int,
+    $status: MediaListStatus,
+    $score: Float,
+    $progress: Int,
+    $customLists: Json,
+    $private: Boolean,
+    $startedAt: FuzzyDate,
+    $completedAt: FuzzyDate,
+    $repeat: Int
+) {
+    SaveMediaListEntry (
+        mediaId: $mediaId,
+        status: $status,
+        score: $score,
+        progress: $progress,
+        customLists: $customLists,
+        private: $private,
+        startedAt: $startedAt,
+        completedAt: $completedAt,
+        repeat: $repeat
+    ) {
+        id
+        status
+        score
+        progress
+        customLists
+        private
+        startedAt
+        completedAt
+        repeat
+    }
+}"""
+        variables = dict_filter({
+            "mediaId": id_,
+            "status": status.name if status else None,
+            "score": score,
+            "progress": progress,
+            "customLists": custom_lists,
+            "private": private,
+            "startedAt": {
+                "year": started_at.year,
+                "month": started_at.month,
+                "day": started_at.day
+            } if started_at else None,
+            "completedAt": {
+                "year": completed_at.year,
+                "month": completed_at.month,
+                "day": completed_at.day
+            } if completed_at else None,
+            "repeat": repeat,
+        })
         return self.query(query, variables)
