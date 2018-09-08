@@ -23,10 +23,10 @@ import qdarkstyle
 from PySide2.QtCore import QTimer, Qt
 from PySide2.QtWidgets import QApplication
 
-from ene.api import API
-from ene.config import Config
-from ene.constants import APP_NAME, CACHE_HOME, CONFIG_HOME, DATA_HOME
-from ene.ui import MainWindow, SettingsWindow
+from .api import API
+from .config import Config
+from .constants import APP_NAME, CACHE_HOME, CONFIG_HOME, DATA_HOME
+from .ui import MainWindow, SettingsWindow
 
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
@@ -75,7 +75,3 @@ def launch(config_home=CONFIG_HOME, data_home=DATA_HOME, cache_home=CACHE_HOME, 
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
     app.main_window.show()
     return app.exec_()
-
-
-if __name__ == '__main__':
-    launch()

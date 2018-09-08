@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/bin/bash
 #  ENE, Automatically track and sync anime watching progress
 #  Copyright (C) 2018 Peijun Ma, Justin Sedge
 #
@@ -15,7 +15,4 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ene.app import launch
-
-if __name__ == '__main__':
-    launch()
+exec python3 -m ene "$@"
