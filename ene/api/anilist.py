@@ -21,11 +21,10 @@ from typing import Iterable, List, Optional, Tuple
 
 from requests import HTTPError, Session
 
-import ene.api
-from ene.constants import CLIENT_ID, GRAPHQL_URL, resources
+from ene.constants import CLIENT_ID, GRAPHQL_URL
 from ene.errors import APIError
 from .auth import OAuth
-from .enums import MediaFormat, MediaSeason, MediaSort, MediaStatus
+from .enums import MediaFormat, MediaListStatus, MediaSeason, MediaSort, MediaStatus
 
 
 class API:
@@ -41,10 +40,6 @@ class API:
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         })
-        self.queries = {}
-        for name in resources.contents(ene.api):
-            if name.endswith('.graphql'):
-                self.queries[name] = resources.read_text(ene.api, name)
 
     def query(self, query: str, variables: Optional[dict] = None) -> dict:
         """
@@ -155,6 +150,99 @@ class API:
         Returns:
             The page anime returned and if there's a next page
         """
+        query = """\
+query (
+$page: Int = 1,
+$isAdult: Boolean = false,
+$search: String,
+$format: MediaFormat
+$status: MediaStatus,
+$season: MediaSeason,
+$year: String,
+$onList: Boolean,
+$yearLesser: FuzzyDateInt,
+$yearGreater: FuzzyDateInt,
+$licensedBy: [String],
+$includedGenres: [String],
+$excludedGenres: [String],
+$includedTags: [String],
+$excludedTags: [String],
+$sort: [MediaSort] = [SCORE_DESC, POPULARITY_DESC],
+$perPage: Int,
+) {
+    Page (page: $page, perPage: $perPage) {
+        pageInfo {
+            total
+            perPage
+            currentPage
+            lastPage
+            hasNextPage
+        }
+        media (
+            type: ANIME,
+            season: $season,
+            format: $format,
+            status: $status,
+            search: $search,
+            onList: $onList,
+            startDate_like: $year,
+            startDate_lesser: $yearLesser,
+            startDate_greater: $yearGreater,
+            licensedBy_in: $licensedBy,
+            genre_in: $includedGenres,
+            genre_not_in: $excludedGenres,
+            tag_in: $includedTags,
+            tag_not_in: $excludedTags,
+            sort: $sort,
+            isAdult: $isAdult
+        ) {
+            id
+            title {
+                userPreferred
+            }
+            coverImage {
+                large
+            }
+            bannerImage
+            startDate {
+                year
+                month
+                day
+            }
+            endDate {
+                year
+                month
+                day
+            }
+            season
+            description
+            type
+            format
+            status
+            genres
+            isAdult
+            averageScore
+            popularity
+            mediaListEntry {
+                status
+            }
+            nextAiringEpisode {
+                airingAt
+                timeUntilAiring
+                episode
+            }
+            studios (isMain: true) {
+                edges {
+                    isMain
+                    node {
+                        id
+                        name
+                    }
+                }
+            }
+        }
+    }
+}"""
         variables = {k: v for k, v in {
             'page': page,
             'isAdult': is_adult,
@@ -178,7 +266,7 @@ class API:
             else:
                 variables['yearGreater'] = start * 10000
                 variables['yearLesser'] = fin * 10000
-        res = self.query(self.queries['browse.graphql'], variables).get('data', {}).get('Page', {})
+        res = self.query(query, variables).get('data', {}).get('Page', {})
         has_next = res.get('pageInfo', {}).get('hasNextPage', False)
         return res.get('media', []), has_next
 
@@ -243,3 +331,7 @@ class API:
         }
         res = self.query(query, variables)
         return res
+
+    def change_media_list_status(self, id_: int, status: MediaListStatus):
+        query = """
+        """

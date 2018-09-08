@@ -32,10 +32,10 @@ ui:
 gql:
 	echo -e ${graphqlconfig} > .graphqlconfig
 	graphql get-schema
-	tools/format_graphql_schema.py schema.graphql > ene/api/schema.graphqls
+	tools/format_graphql_schema.py schema.graphql > tools/schema.graphqls
 	rm schema.graphql
 	rm .graphqlconfig
-	tools/make_enums.py ene/api/schema.graphqls > ene/api/enums.py
+	tools/make_enums.py tools/schema.graphqls > ene/api/enums.py
 
 ci_setup:
 	pip install -U pip
@@ -50,6 +50,6 @@ test:
 	python -m pytest -s -vvv tests;
 
 coverage:
-	python -m pytest -vvv -s --cov=ene tests 
+	python -m pytest -vvv -s --cov=ene tests
 	pip install codecov
 	codecov
