@@ -15,7 +15,6 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains anilist API class."""
-from datetime import date
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -27,6 +26,7 @@ from ene.errors import APIError
 from ene.util import dict_filter
 from .auth import OAuth
 from .enums import MediaFormat, MediaListStatus, MediaSeason, MediaSort, MediaStatus
+from .types import FuzzyDate
 
 
 class API:
@@ -227,6 +227,13 @@ $perPage: Int,
             popularity
             mediaListEntry {
                 status
+                score
+                progress
+                customLists
+                private
+                startedAt
+                completedAt
+                repeat
             }
             nextAiringEpisode {
                 airingAt
@@ -341,8 +348,8 @@ $perPage: Int,
             progress: Optional[int] = None,
             custom_lists: Optional[Dict[str, bool]] = None,
             private: Optional[bool] = None,
-            started_at: Optional[date] = None,
-            completed_at: Optional[date] = None,
+            started_at: Optional[FuzzyDate] = None,
+            completed_at: Optional[FuzzyDate] = None,
             repeat: Optional[int] = None
     ) -> Optional[dict]:
         """

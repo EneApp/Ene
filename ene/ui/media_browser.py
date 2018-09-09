@@ -25,7 +25,7 @@ from PySide2.QtWidgets import (
     QTextEdit, QToolButton, QVBoxLayout, QWidget,
 )
 
-from ene.api import MediaFormat, MediaSeason, MediaSort, MediaStatus
+from ene.api import MediaFormat, MediaListStatus, MediaSeason, MediaSort, MediaStatus
 from ene.util import get_resource
 from .common import mk_padding, mk_stylesheet
 from .custom import FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
@@ -58,6 +58,7 @@ class MediaDisplay(QWidget):
             score: int,
             description: str,
             genres: List[str],
+            media_list_status: Optional[MediaListStatus],
             *args,
             **kwargs
     ):
@@ -385,15 +386,22 @@ class MediaBrowser(QScrollArea):
         )
 
     @Slot(list)
-    def _media_ready(self, media):
+    def _media_ready(self, media_list):
         with self.reset_media_lock:
-            for anime in media:
+            for anime in media_list:
                 season = anime['season']
                 season = MediaSeason[season] if season else None
                 studios = anime['studios']['edges']
                 studio = studios[0]['node']['name'] if studios else None
                 cache_home = self.app.cache_home
                 image_url = anime['coverImage']['large']
+                media_list_entry = anime['mediaListEntry']
+                if media_list_entry:
+                    media_list_status = media_list_entry['status']
+                    if media_list_status:
+                        media_list_status = MediaListStatus[media_list_status]
+                else:
+                    media_list_status = None
                 display = MediaDisplay(
                     anime_id=anime['id'],
                     title=anime['title']['userPreferred'],
@@ -404,7 +412,8 @@ class MediaBrowser(QScrollArea):
                     media_format=MediaFormat[anime['format']],
                     score=anime['averageScore'],
                     description=anime['description'],
-                    genres=anime['genres']
+                    genres=anime['genres'],
+                    media_list_status=media_list_status
                 )
                 self._layout.addWidget(display)
                 self.app.pool.submit(display.set_image, image_url, cache_home)
