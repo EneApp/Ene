@@ -15,100 +15,122 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Union
 
 import attr
+from result import Ok
 
-from ene.util import get_resource
+from constants import ERR_NONE
+from ene.util import Maybe, get_resource, maybe
 from .enums import MediaFormat, MediaSeason, MediaStatus, MediaType
-from .types import FuzzyDate
+from .types_ import AiringEpisode, FuzzyDate, MediaList, Studio
 
 
-@attr.s
+@attr.s(repr=False, slots=True, auto_attribs=True)
 class Media:
-    values: dict
+    data: dict
     cache_home: Union[str, Path]
 
     @property
     def id(self) -> int:
-        return self.values['id']
+        return self.data['id']
 
     @property
-    def title(self) -> str:
-        return self.values['title']['userPreferred']
+    def title(self) -> Maybe[str]:
+        return maybe((self.data['title'] or {}).get('userPreferred'))
 
     @property
-    def cover_image(self) -> Optional[Path]:
-        img = self.values['coverImage']
-        if img:
-            url = img.get('large')
-            if url:
-                return get_resource(url, self.cache_home)
+    def type(self) -> Maybe[MediaType]:
+        return maybe(MediaType.get(self.data['type']))
 
     @property
-    def banner_image(self) -> Optional[Path]:
-        url = self.values['bannerImage']
-        if url:
-            return get_resource(url, self.cache_home)
+    def format(self) -> Maybe[MediaFormat]:
+        return maybe(MediaFormat.get(self.data['format']))
 
     @property
-    def start_date(self) -> Optional[FuzzyDate]:
-        start_date = self.values['startDate']
-        if start_date:
-            return FuzzyDate(
-                start_date['year'],
-                start_date['month'],
-                start_date['day']
-            )
+    def status(self) -> Maybe[MediaStatus]:
+        return maybe(MediaStatus.get(self.data['status']))
 
     @property
-    def end_date(self) -> Optional[FuzzyDate]:
-        end_date = self.values['endDate']
-        if end_date:
-            return FuzzyDate(
-                end_date['year'],
-                end_date['month'],
-                end_date['day']
-            )
+    def description(self) -> Maybe[str]:
+        return maybe(self.data['description'])
 
     @property
-    def season(self) -> Optional[MediaSeason]:
-        season = self.values['season']
-        if season:
-            return MediaSeason[season]
+    def start_date(self) -> Maybe[FuzzyDate]:
+        start_date = self.data['startDate']
+        return Ok(FuzzyDate.from_dict(start_date)) if start_date else ERR_NONE
 
     @property
-    def description(self) -> Optional[str]:
-        return self.values['description']
+    def end_date(self) -> Maybe[FuzzyDate]:
+        end_date = self.data['endDate']
+        return Ok(FuzzyDate.from_dict(end_date)) if end_date else ERR_NONE
 
     @property
-    def type(self) -> MediaType:
-        return MediaType[self.values['type']]
+    def season(self) -> Maybe[MediaSeason]:
+        return maybe(MediaSeason.get(self.data['season']))
 
     @property
-    def format(self) -> MediaFormat:
-        return MediaFormat[self.values['format']]
+    def cover_image(self) -> Maybe[Path]:
+        url = (self.data['coverImage'] or {}).get('large')
+        return Ok(get_resource(url, self.cache_home)) if url else ERR_NONE
 
     @property
-    def status(self) -> MediaStatus:
-        return MediaStatus[self.values['status']]
+    def banner_image(self) -> Maybe[Path]:
+        url = self.data['bannerImage']
+        return Ok(get_resource(url, self.cache_home)) if url else ERR_NONE
 
     @property
     def genres(self) -> List[str]:
-        return self.values['genres'] or []
+        return self.data['genres'] or []
 
     @property
     def is_adult(self) -> bool:
-        return self.values['isAdult']
+        return self.data['isAdult'] or False
 
     @property
-    def average_score(self) -> Optional[int]:
-        return self.values['averageScore']
+    def average_score(self) -> Maybe[int]:
+        return maybe(self.data['averageScore'])
 
     @property
-    def popularity(self) -> int:
-        return self.values['popularity']
+    def popularity(self) -> Maybe[int]:
+        return maybe(self.data['popularity'])
 
     @property
-    def media(self) -> Optional:
-        return
+    def media_list_entry(self) -> Maybe[MediaList]:
+        media_list_entry = self.data['mediaListEntry']
+        return Ok(MediaList(
+            id=media_list_entry['id'],
+            media_id=self.id,
+            status=media_list_entry.get('status'),
+            score=media_list_entry.get('score'),
+            progress=media_list_entry.get('progress'),
+            repeat=media_list_entry.get('repeat'),
+            private=media_list_entry.get('private'),
+            notes=media_list_entry.get('notes'),
+            custom_lists=media_list_entry.get('customLists'),
+            started_at=media_list_entry.get('startedAt'),
+            completed_at=media_list_entry.get('completedAt')
+        )) if media_list_entry else ERR_NONE
+
+    @property
+    def next_airing_episode(self) -> Maybe[AiringEpisode]:
+        if self.type != MediaType.ANIME:
+            raise NotImplementedError('Only available for anime.')
+        airing_episode = self.data['nextAiringEpisode']
+        return Ok(AiringEpisode(
+            id=airing_episode['id'],
+            airing_at=airing_episode['airingAt'],
+            episode=airing_episode['episode'],
+            media_id=self.id
+        )) if airing_episode else ERR_NONE
+
+    @property
+    def studio(self) -> Maybe[Studio]:
+        studios = (self.data['studios'] or {}).get('nodes', [])
+        if studios:
+            node = studios[0]
+            return Ok(Studio(id=node['id'], name=node['name']))
+        return ERR_NONE
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(id={self.id}, data={self.data!r})'

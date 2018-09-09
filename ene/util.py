@@ -17,11 +17,19 @@
 """This module contains various helper function"""
 import re
 import webbrowser
-from functools import lru_cache
+from functools import lru_cache, singledispatch, update_wrapper
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, TypeVar
 
 from requests import get
+from result import Ok, Result
+
+from .constants import ERR_NONE
+
+E = TypeVar['E']
+T = TypeVar['T']
+
+Maybe = Result[None, T]
 
 
 @lru_cache(None)
@@ -77,3 +85,27 @@ def dict_filter(dict_: dict, filter_: Optional[Callable] = None) -> dict:
     """
     filter_func = filter_ if filter_ else lambda key, val: key is not None and val is not None
     return {key: val for key, val in dict_.items() if filter_func(key, val)}
+
+
+def method_dispatch(func):
+    """
+    Decorator to use functools.singledispatch on methods
+
+    Args:
+        func: The method to dispatch
+
+    Returns:
+        The single dispatched method
+    """
+    dispatcher = singledispatch(func)
+
+    def wrapper(*args, **kw):
+        return dispatcher.dispatch(args[1].__class__)(*args, **kw)
+
+    wrapper.register = dispatcher.register
+    update_wrapper(wrapper, func)
+    return wrapper
+
+
+def maybe(value: T) -> Maybe[T]:
+    return Ok(value) if value is not None else ERR_NONE

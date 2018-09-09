@@ -13,11 +13,14 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from datetime import date
-from typing import Dict, Optional
+from time import time
+from typing import Dict, Optional, Union
 
 import attr
 
+from util import method_dispatch
 from .enums import MediaListStatus
 
 
@@ -53,6 +56,26 @@ class FuzzyDate:
             return None
         return res
 
+    @classmethod
+    def from_date(cls, date_: date) -> 'FuzzyDate':
+        """
+
+        Args:
+            date_:
+
+        Returns:
+
+        """
+        return cls(date_.year, date_.month, date_.day)
+
+    @classmethod
+    def from_dict(cls, dict_: dict) -> 'FuzzyDate':
+        return cls(
+            dict_.get('year'),
+            dict_.get('month'),
+            dict_.get('day')
+        )
+
 
 @attr.s(auto_attribs=True, slots=True)
 class MediaList:
@@ -74,15 +97,68 @@ class MediaList:
     """
     id: int
     media_id: int
-    status: Optional[MediaListStatus] = None
+    _status: Optional[Union[str, MediaListStatus]] = None
     score: Optional[float] = None
     progress: Optional[int] = None
     repeat: Optional[int] = None
     private: Optional[bool] = None
     notes: Optional[str] = None
     custom_lists: Optional[Dict[str, bool]] = None
-    started_at: Optional[FuzzyDate] = None
-    completed_at: Optional[FuzzyDate] = None
+    _started_at: Optional[Union[dict, FuzzyDate, date]] = None
+    _completed_at: Optional[Union[dict, FuzzyDate, date]] = None
+
+    @property
+    def status(self) -> Optional[MediaListStatus]:
+        if not self._status:
+            return None
+        if isinstance(self._status, str):
+            self._status = MediaListStatus[self._status]
+        return self._status
+
+    @status.setter
+    def status(self, value):
+        if value is None or isinstance(value, (str, MediaListStatus)):
+            self._status = value
+        else:
+            raise TypeError("status must be None, a str, or a MediaListStatus.")
+
+    @method_dispatch
+    def _get_date(self, value, name):
+        return value
+
+    @_get_date.register
+    def _(self, value: Dict, name):
+        val = FuzzyDate.from_dict(value)
+        setattr(self, name, val)
+        return val
+
+    @_get_date.register
+    def _(self, value: date, name):
+        val = FuzzyDate.from_date(value)
+        setattr(self, name, val)
+        return val
+
+    def _set_date(self, value, name):
+        if value is None or isinstance(value, (FuzzyDate, date, Dict)):
+            setattr(self, name, value)
+        else:
+            raise TypeError(f"{name} must be None, a dict, a FuzzyDate, or a date.")
+
+    @property
+    def started_at(self) -> Optional[FuzzyDate]:
+        return self._get_date(self._started_at, '_started_at')
+
+    @started_at.setter
+    def started_at(self, value):
+        self._set_date(value, '_started_at')
+
+    @property
+    def completed_at(self) -> Optional[FuzzyDate]:
+        return self._get_date(self._completed_at, '_completed_at')
+
+    @completed_at.setter
+    def completed_at(self, value):
+        self._set_date(value, '_completed_at')
 
     def update(self, api) -> Optional[dict]:
         """
@@ -106,3 +182,21 @@ class MediaList:
             started_at=self.started_at,
             completed_at=self.completed_at
         )
+
+
+@attr.s(slots=True, auto_attribs=True)
+class AiringEpisode:
+    id: int
+    airing_at: int
+    episode: int
+    media_id: int
+
+    @property
+    def time_until_airing(self) -> int:
+        return int(self.airing_at - time())
+
+
+@attr.s(slots=True, auto_attribs=True)
+class Studio:
+    id: int
+    name: str

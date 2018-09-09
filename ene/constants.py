@@ -19,6 +19,8 @@ import sys
 from os import getenv
 from pathlib import Path
 
+from result import Err
+
 IS_37 = sys.version_info >= (3, 7)
 
 IS_WIN = sys.platform in ('win32', 'cygwin')
@@ -63,3 +65,5 @@ CLIENT_ID = 584
 GRAPHQL_URL = 'https://graphql.anilist.co'
 
 STREAMERS = ('Crunchyroll', 'Funimation', 'Netflix', 'Amazaon', 'Hidive', 'Hulu', 'Animelab')
+
+ERR_NONE = Err(None)
