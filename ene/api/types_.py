@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from datetime import date
 from typing import Dict, Optional
 
 import attr
@@ -21,7 +21,7 @@ import attr
 from .enums import MediaListStatus
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, slots=True)
 class FuzzyDate:
     """
     Date object that allows for incomplete date values (fuzzy).
@@ -40,8 +40,21 @@ class FuzzyDate:
         yield self.month
         yield self.day
 
+    def as_date(self) -> Optional[date]:
+        """
+        Convert this fuzzy date to a python date.
 
-@attr.s(auto_attribs=True)
+        Returns:
+            The fuzzy date as a date
+        """
+        try:
+            res = date(year=self.year, month=self.month, day=self.day)
+        except (ValueError, TypeError):
+            return None
+        return res
+
+
+@attr.s(auto_attribs=True, slots=True)
 class MediaList:
     """
     List entry of anime or manga.
