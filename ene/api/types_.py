@@ -127,7 +127,7 @@ class MediaList:
         return value
 
     @_get_date.register
-    def _(self, value: Dict, name):
+    def _(self, value: dict, name):
         val = FuzzyDate.from_dict(value)
         setattr(self, name, val)
         return val
