@@ -19,17 +19,9 @@ import re
 import webbrowser
 from functools import lru_cache, singledispatch, update_wrapper
 from pathlib import Path
-from typing import Callable, Optional, TypeVar
+from typing import Callable, Optional
 
 from requests import get
-from result import Ok, Result
-
-from .constants import ERR_NONE
-
-E = TypeVar['E']
-T = TypeVar['T']
-
-Maybe = Result[None, T]
 
 
 @lru_cache(None)
@@ -105,7 +97,3 @@ def method_dispatch(func):
     wrapper.register = dispatcher.register
     update_wrapper(wrapper, func)
     return wrapper
-
-
-def maybe(value: T) -> Maybe[T]:
-    return Ok(value) if value is not None else ERR_NONE

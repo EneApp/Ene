@@ -22,7 +22,7 @@ PySide2 = "^5.11"
 python-Levenshtein = "^0.12.0"
 qdarkstyle = {git = "https://github.com/ColinDuquesnoy/QDarkStyleSheet.git", branch = "master"}
 attrs = "^18.2"
-result = "^0.3.0"
+option = "^0.1.5"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.5"
