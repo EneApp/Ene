@@ -16,7 +16,6 @@
 
 """This module contains anilist API class."""
 from functools import lru_cache
-from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import attr
@@ -35,9 +34,9 @@ class API:
     """
     Handles requests to the Anilist API
     """
-    data_home: Path = attr.ib()
-    session: Session = attr.ib(factory=Session, init=False)
-    token: str = attr.ib(init=False)
+    data_home = attr.ib()
+    session = attr.ib(factory=Session, init=False)
+    token = attr.ib(init=False)
 
     def __attrs_post_init__(self):
         self.token = OAuth.get_token(self.data_home, CLIENT_ID, '127.0.0.1', 50000)
