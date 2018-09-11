@@ -19,6 +19,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
+import attr
 from requests import HTTPError, Session
 
 from ene.constants import CLIENT_ID, GRAPHQL_URL
@@ -26,17 +27,20 @@ from ene.errors import APIError
 from ene.util import dict_filter
 from .auth import OAuth
 from .enums import MediaFormat, MediaListStatus, MediaSeason, MediaSort, MediaStatus
-from .types import FuzzyDate
+from .types_ import FuzzyDate
 
 
+@attr.s(slots=True)
 class API:
     """
     Handles requests to the Anilist API
     """
+    data_home: Path = attr.ib()
+    session: Session = attr.ib(factory=Session, init=False)
+    token: str = attr.ib(init=False)
 
-    def __init__(self, data_home: Path):
-        self.token = OAuth.get_token(data_home, CLIENT_ID, '127.0.0.1', 50000)
-        self.session = Session()
+    def __attrs_post_init__(self):
+        self.token = OAuth.get_token(self.data_home, CLIENT_ID, '127.0.0.1', 50000)
         self.session.headers.update({
             'Authorization': f'Bearer {self.token}',
             'Content-Type': 'application/json',
@@ -226,18 +230,20 @@ $perPage: Int,
             averageScore
             popularity
             mediaListEntry {
+                id
                 status
                 score
                 progress
-                customLists
+                repeat
                 private
+                notes
+                customLists
                 startedAt
                 completedAt
-                repeat
             }
             nextAiringEpisode {
+                id
                 airingAt
-                timeUntilAiring
                 episode
             }
             studios (isMain: true) {
@@ -342,26 +348,28 @@ $perPage: Int,
 
     def update_media_list_entry(  # pylint: disable=R0913
             self,
-            id_: int,
+            media_id: int,
             status: Optional[MediaListStatus] = None,
             score: Optional[float] = None,
             progress: Optional[int] = None,
-            custom_lists: Optional[Dict[str, bool]] = None,
+            repeat: Optional[int] = None,
             private: Optional[bool] = None,
+            notes: Optional[str] = None,
+            custom_lists: Optional[Dict[str, bool]] = None,
             started_at: Optional[FuzzyDate] = None,
             completed_at: Optional[FuzzyDate] = None,
-            repeat: Optional[int] = None
     ) -> Optional[dict]:
         """
         Update a media list entry for the user.
 
         Args:
-            id_: The media ID
+            media_id: The media ID
             status: The watching status
             score: The score of the entry
             progress: The amount of episodes consumed by the user
             custom_lists: Map of booleans for which lists the entry are in
             private: If the entry should only be visible to authenticated user
+            notes: Text notes
             started_at: When the entry was started by the user
             completed_at: When the entry was completed by the user
             repeat: The amount of times the user has re-watched the media
@@ -377,6 +385,7 @@ mutation (
     $progress: Int,
     $customLists: Json,
     $private: Boolean,
+    $notes: String,
     $startedAt: FuzzyDate,
     $completedAt: FuzzyDate,
     $repeat: Int
@@ -388,28 +397,31 @@ mutation (
         progress: $progress,
         customLists: $customLists,
         private: $private,
+        notes: $notes,
         startedAt: $startedAt,
         completedAt: $completedAt,
         repeat: $repeat
     ) {
-        id
-        status
-        score
-        progress
-        customLists
-        private
-        startedAt
-        completedAt
-        repeat
+            id
+            status
+            score
+            progress
+            repeat
+            private
+            notes
+            customLists
+            startedAt
+            completedAt
     }
 }"""
         variables = dict_filter({
-            "mediaId": id_,
+            "mediaId": media_id,
             "status": status.name if status else None,
             "score": score,
             "progress": progress,
             "customLists": custom_lists,
             "private": private,
+            "notes": notes,
             "startedAt": {
                 "year": started_at.year,
                 "month": started_at.month,
