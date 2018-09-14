@@ -20,7 +20,7 @@ from typing import Dict, Optional, Union
 
 import attr
 
-from util import method_dispatch
+from ene.util import method_dispatch
 from .enums import MediaListStatus
 
 
