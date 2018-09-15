@@ -22,9 +22,13 @@ from os import walk
 from pathlib import Path
 from typing import Iterable
 
-from fuzzywuzzy import fuzz
 
 from ene.database import Database
+
+EXTENSIONS = ['.mkv',
+              '.mp4',
+              '.avi',
+              '.m4v']
 
 
 class FileManager:
@@ -81,9 +85,9 @@ class FileManager:
         Discovers episodes from each path defined in the config and tidies up
         their titles
         """
+        self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
         for directory in self.dirs:
             self.discover_episodes(directory)
-        self.series = clean_titles(self.series)
 
     def refresh_single_show(self, show):
         """
@@ -141,18 +145,16 @@ class FileManager:
         Search through a directory to find all files which have a close enough
         name to be considered a part of the same series
         """
+        op_or_ed = re.compile(r'(NCOP)|(NCED)|(\sOP[0-9]+)|(\sED[0-9]+)')
         for path, dirs, files in walk(directory):  # pylint: disable=W0612
             for file in files:
-                if file == 'ene.db':
+                episode = Path(file)
+                if episode.suffix not in EXTENSIONS:
                     continue
-                matched = False
-                for show in self.series:
-                    if fuzz.token_set_ratio(show, file) >= 90:
-                        self.series[show].append(Path(path) / file)
-                        matched = True
-                        break
-                if not matched:
-                    self.series[file].append(Path(path) / file)
+                if op_or_ed.search(episode.name):
+                    continue
+                title = clean_title(episode.stem)
+                self.series[title].append(path / episode)
 
     def get_readable_names(self, show: str) -> Iterable[str]:
         """
@@ -196,43 +198,30 @@ class FileManager:
         self.series.pop(show)
 
 
-def clean_titles(series):
+def clean_title(title):
     """
-    Attempts to clean up the title in the series dictionary by comparing
-    the names of two files
+    Removes things from a file name that are not part of the title
 
     Args:
-        series:
-            A dictionary with the series name as a key and a list of files
+        title:
+            The original title to reformat
 
     Returns:
-        A dictionary with a slightly more well formatted name
+        The title of the series without extra things
     """
-    updated_titles = defaultdict(list)
-    for key, item in series.items():
-        # First iterate through the list to find title that can be updated
-        if len(item) > 1:
-            # Split both names on commas, underscores and whitespace
-            name_a = re.split(r'[,_\s]', key)
-            name_b = re.split(r'[,_\s]', item[1].name)
-
-            title = ' '.join(x for x in name_a if x in name_b)
-        else:
-            # When we can't compare to a similar title, just remove separators
-            title = re.sub(r'[,_\s]', ' ', key)
-        # pull out a few common things that should not be part of a title
-        # Adding detailed comments because coming back to regex after a break is confusing
-        title = re.sub(r'\[[^]]*\]', '', title)  # Removes things between square brackets
-        title = re.sub(r'\..*$', '', title)  # Removes file extensions
-        title = re.sub(r'-\s*[0-9v]*\s*$', '', title)  # Removes trailing episode numbers
-        title = title.strip()
-
-        if title == '':
-            title = key
-
-        updated_titles[title] = sorted(series[key])
-
-    return updated_titles
+    # pull out a few common things that should not be part of a title
+    # Adding detailed comments because coming back to regex after a break is confusing
+    title = re.sub(r'[_,]', ' ', title)
+    title = re.sub(r'\[[^]]*\]', '', title)  # Removes things between square brackets
+    title = re.sub(r'\([^O)]*\)', '', title)  # Parenthesis
+    title = re.sub(r'[sS]0?1', '', title)  # Remove season if its season one
+    title = re.sub(r'^[0-9]+\.', '', title)  # Episode number at the beginning
+    title = re.sub(r'[eE][pP]?[0-9]+.*', '', title)  # Anything after an episode number
+    title = re.sub(r'-?\s+[0-9v]*\s*$', '', title)  # Removes trailing episode numbers
+    title = re.sub(r'-\s(Episode)?\s?([0-9v])+.*', '', title)  # '- 08 - episode name
+    title = re.sub(r'[sS]0?([2-9])', r'Season \1', title)  # Replace S02 with Season 2
+    title = title.strip()
+    return title
 
 
 def _build_regex(name):
