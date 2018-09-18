@@ -70,7 +70,7 @@ class API:
         except HTTPError as http_ex:
             try:
                 json = res.json()
-            except Exception as e:  # pylint: disable=W0703
+            except ValueError as e:
                 msg = f'{http_ex}\n{e}'
             else:
                 msg_lst = []
