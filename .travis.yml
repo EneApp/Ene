@@ -42,6 +42,13 @@ install:
     fi
   - "make ci_setup"
 
+before_script:
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "UPLOAD_COV" == "true" ]]; then 
+      curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter;
+      chmod +x ./cc-test-reporter;
+      ./cc-test-reporter before-build;
+    fi
+
 script:
   - make lint
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -51,6 +58,10 @@ script:
     else
       xvfb-run --server-args="-screen 0 1920x1080x24" make test;
     fi
+
+after_script:
+  - coverage xml
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "UPLOAD_COV" == "true" ]]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
 
 notifications:
   email: false

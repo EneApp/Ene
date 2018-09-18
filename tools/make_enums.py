@@ -42,6 +42,15 @@ copyright = '''\
 
 from enum import Enum, auto
 
+
+class GettableEnum(Enum):
+    @classmethod
+    def get(cls, key, default=None):
+        try:
+            res = cls[key]
+        except KeyError:
+            res = default
+        return res
 '''
 
 if __name__ == '__main__':
@@ -64,7 +73,7 @@ if __name__ == '__main__':
                 start = True
                 current_name = name.groups()[0]
             elif start and line.strip() == '}':
-                print(f'class {current_name}(Enum):')
+                print(f'class {current_name}(GettableEnum):')
                 for item in current_items:
                     print(f'    {item} = auto()')
                 print('\n')

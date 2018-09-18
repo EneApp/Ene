@@ -20,12 +20,22 @@
 from enum import Enum, auto
 
 
-class ActivitySort(Enum):
+class GettableEnum(Enum):
+    @classmethod
+    def get(cls, key, default=None):
+        try:
+            res = cls[key]
+        except KeyError:
+            res = default
+        return res
+
+
+class ActivitySort(GettableEnum):
     ID = auto()
     ID_DESC = auto()
 
 
-class ActivityType(Enum):
+class ActivityType(GettableEnum):
     TEXT = auto()
     ANIME_LIST = auto()
     MANGA_LIST = auto()
@@ -33,7 +43,7 @@ class ActivityType(Enum):
     MEDIA_LIST = auto()
 
 
-class AiringSort(Enum):
+class AiringSort(GettableEnum):
     ID = auto()
     ID_DESC = auto()
     MEDIA_ID = auto()
@@ -44,13 +54,13 @@ class AiringSort(Enum):
     EPISODE_DESC = auto()
 
 
-class CharacterRole(Enum):
+class CharacterRole(GettableEnum):
     MAIN = auto()
     SUPPORTING = auto()
     BACKGROUND = auto()
 
 
-class CharacterSort(Enum):
+class CharacterSort(GettableEnum):
     ID = auto()
     ID_DESC = auto()
     ROLE = auto()
@@ -60,14 +70,14 @@ class CharacterSort(Enum):
     FAVOURITES_DESC = auto()
 
 
-class LikeableType(Enum):
+class LikeableType(GettableEnum):
     THREAD = auto()
     THREAD_COMMENT = auto()
     ACTIVITY = auto()
     ACTIVITY_REPLY = auto()
 
 
-class MediaFormat(Enum):
+class MediaFormat(GettableEnum):
     TV = auto()
     TV_SHORT = auto()
     MOVIE = auto()
@@ -80,7 +90,7 @@ class MediaFormat(Enum):
     ONE_SHOT = auto()
 
 
-class MediaListSort(Enum):
+class MediaListSort(GettableEnum):
     MEDIA_ID = auto()
     MEDIA_ID_DESC = auto()
     SCORE = auto()
@@ -105,7 +115,7 @@ class MediaListSort(Enum):
     UPDATED_TIME_DESC = auto()
 
 
-class MediaListStatus(Enum):
+class MediaListStatus(GettableEnum):
     CURRENT = auto()
     PLANNING = auto()
     COMPLETED = auto()
@@ -114,12 +124,12 @@ class MediaListStatus(Enum):
     REPEATING = auto()
 
 
-class MediaRankType(Enum):
+class MediaRankType(GettableEnum):
     RATED = auto()
     POPULAR = auto()
 
 
-class MediaRelation(Enum):
+class MediaRelation(GettableEnum):
     ADAPTATION = auto()
     PREQUEL = auto()
     SEQUEL = auto()
@@ -132,14 +142,14 @@ class MediaRelation(Enum):
     OTHER = auto()
 
 
-class MediaSeason(Enum):
+class MediaSeason(GettableEnum):
     WINTER = auto()
     SPRING = auto()
     SUMMER = auto()
     FALL = auto()
 
 
-class MediaSort(Enum):
+class MediaSort(GettableEnum):
     ID = auto()
     ID_DESC = auto()
     TITLE_ROMAJI = auto()
@@ -179,7 +189,7 @@ class MediaSort(Enum):
     FAVOURITES_DESC = auto()
 
 
-class MediaSource(Enum):
+class MediaSource(GettableEnum):
     ORIGINAL = auto()
     MANGA = auto()
     LIGHT_NOVEL = auto()
@@ -188,14 +198,14 @@ class MediaSource(Enum):
     OTHER = auto()
 
 
-class MediaStatus(Enum):
+class MediaStatus(GettableEnum):
     FINISHED = auto()
     RELEASING = auto()
     NOT_YET_RELEASED = auto()
     CANCELLED = auto()
 
 
-class MediaTrendSort(Enum):
+class MediaTrendSort(GettableEnum):
     ID = auto()
     ID_DESC = auto()
     MEDIA_ID = auto()
@@ -212,12 +222,12 @@ class MediaTrendSort(Enum):
     EPISODE_DESC = auto()
 
 
-class MediaType(Enum):
+class MediaType(GettableEnum):
     ANIME = auto()
     MANGA = auto()
 
 
-class NotificationType(Enum):
+class NotificationType(GettableEnum):
     ACTIVITY_MESSAGE = auto()
     ACTIVITY_REPLY = auto()
     FOLLOWING = auto()
@@ -232,13 +242,13 @@ class NotificationType(Enum):
     THREAD_COMMENT_LIKE = auto()
 
 
-class ReviewRating(Enum):
+class ReviewRating(GettableEnum):
     NO_VOTE = auto()
     UP_VOTE = auto()
     DOWN_VOTE = auto()
 
 
-class ReviewSort(Enum):
+class ReviewSort(GettableEnum):
     ID = auto()
     ID_DESC = auto()
     SCORE = auto()
@@ -251,7 +261,7 @@ class ReviewSort(Enum):
     UPDATED_AT_DESC = auto()
 
 
-class ScoreFormat(Enum):
+class ScoreFormat(GettableEnum):
     POINT_100 = auto()
     POINT_10_DECIMAL = auto()
     POINT_10 = auto()
@@ -259,7 +269,7 @@ class ScoreFormat(Enum):
     POINT_3 = auto()
 
 
-class StaffLanguage(Enum):
+class StaffLanguage(GettableEnum):
     JAPANESE = auto()
     ENGLISH = auto()
     KOREAN = auto()
@@ -272,7 +282,7 @@ class StaffLanguage(Enum):
     HUNGARIAN = auto()
 
 
-class StaffSort(Enum):
+class StaffSort(GettableEnum):
     ID = auto()
     ID_DESC = auto()
     ROLE = auto()
@@ -284,7 +294,7 @@ class StaffSort(Enum):
     FAVOURITES_DESC = auto()
 
 
-class StudioSort(Enum):
+class StudioSort(GettableEnum):
     ID = auto()
     ID_DESC = auto()
     NAME = auto()
@@ -294,7 +304,7 @@ class StudioSort(Enum):
     FAVOURITES_DESC = auto()
 
 
-class ThreadSort(Enum):
+class ThreadSort(GettableEnum):
     ID = auto()
     ID_DESC = auto()
     TITLE = auto()
@@ -313,7 +323,7 @@ class ThreadSort(Enum):
     SEARCH_MATCH = auto()
 
 
-class UserSort(Enum):
+class UserSort(GettableEnum):
     ID = auto()
     ID_DESC = auto()
     USERNAME = auto()
@@ -325,7 +335,7 @@ class UserSort(Enum):
     SEARCH_MATCH = auto()
 
 
-class UserTitleLanguage(Enum):
+class UserTitleLanguage(GettableEnum):
     ROMAJI = auto()
     ENGLISH = auto()
     NATIVE = auto()
