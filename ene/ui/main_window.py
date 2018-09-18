@@ -261,7 +261,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         for show in self.page_widget.children():
             if isinstance(show, SeriesButton):
                 show.update_episode_count(len(self.files.series[show.title]))
-        for show in new:
+        for show in sorted(new):
             button = SeriesButton(show, len(self.files.series[show]))
             button.clicked.connect(self.on_series_click)
             self.page_widget.layout().addWidget(button)

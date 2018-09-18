@@ -8,36 +8,36 @@ from pathlib import Path
 import pytest
 
 TEST_PATH = HERE / 'ene'
-MOCK_FILES = ['foo e1.avi',
-              'foo e2.avi',
-              'foo e3.avi',
-              'foo e4.avi',
-              'foo e5.avi',
-              'bar 01.mkv',
-              'bar 02.mkv',
-              'bar 03.mkv',
-              'baz ep1.mp4',
-              'baz ep2.mp4',
-              'baz ep3.mp4',
-              'baz ep4.mp4'
+MOCK_FILES = ['isekai foo e1.mkv',
+              'isekai foo e2.mkv',
+              'isekai foo e3.mkv',
+              'isekai foo e4.mkv',
+              'isekai foo e5.mkv',
+              'bar quest 01.avi',
+              'bar quest 02.avi',
+              'bar quest 03.avi',
+              'adventures of baz ep1.mp4',
+              'adventures of baz ep2.mp4',
+              'adventures of baz ep3.mp4',
+              'adventures of baz ep4.mp4'
               ]
 
 
 @pytest.fixture()
 def mock_shows(directory):
     yield {
-        'foo': [directory / 'foo e1.avi',
-                directory / 'foo e2.avi',
-                directory / 'foo e3.avi',
-                directory / 'foo e4.avi',
-                directory / 'foo e5.avi'],
-        'bar': [directory / 'bar 01.mkv',
-                directory / 'bar 02.mkv',
-                directory / 'bar 03.mkv'],
-        'baz': [directory / 'baz ep1.mp4',
-                directory / 'baz ep2.mp4',
-                directory / 'baz ep3.mp4',
-                directory / 'baz ep4.mp4']
+        'isekai foo': [directory / 'isekai foo e1.mkv',
+                       directory / 'isekai foo e2.mkv',
+                       directory / 'isekai foo e3.mkv',
+                       directory / 'isekai foo e4.mkv',
+                       directory / 'isekai foo e5.mkv'],
+        'bar quest': [directory / 'bar quest 01.avi',
+                      directory / 'bar quest 02.avi',
+                      directory / 'bar quest 03.avi'],
+        'adventures of baz': [directory / 'adventures of baz ep1.mp4',
+                              directory / 'adventures of baz ep2.mp4',
+                              directory / 'adventures of baz ep3.mp4',
+                              directory / 'adventures of baz ep4.mp4']
     }
 
 
@@ -63,21 +63,22 @@ def test_regex():
 
 
 def test_clean_titles():
-    res = ene.files.clean_titles({
-        '[foo] foo[1080p].mkv': [],
-        '[bar] bar - 01.mp4': [],
-        '[baz] bar - 02 [720p].wav': [],
-        'foo bar baz': [Path('foo bar baz'),
-                        Path('cat baz dog')],
-        '[Foobar the Film]': []
-    })
-    assert set(res.keys()) == {'foo', 'bar', 'baz', '[Foobar the Film]'}
+    test_titles = ['[Bar] foo',
+                   '(Bar) foo',
+                   '01. foo',
+                   'foo e1',
+                   'foo s1e3',
+                   'foo - 4 - bar',
+                   ' foo ']
+    for title in test_titles:
+        assert ene.files.clean_title(title) == 'foo'
+    assert ene.files.clean_title('foo s2') == 'foo Season 2'
 
 
 def test_discover(manager, mock_shows):
     manager.refresh_shows()
     for show in mock_shows:
-        assert mock_shows[show] == manager.series[show]
+        assert set(mock_shows[show]) == set(manager.series[show])
 
 
 def test_find(manager, mock_shows):
