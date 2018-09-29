@@ -320,9 +320,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         print(search_text)
         # TODO: Make this not break the FlowLayout
         for show in self.page_widget.findChildren(SeriesButton):
-            print(show.title)
             if search_text not in show.title.lower():
-                print('DIFFERENT')
                 show.hide()
             else:
                 show.show()

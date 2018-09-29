@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import List, Union
 
 import attr
-from option import NONE, Option, maybe, some
+from option import NONE, Option, Some, maybe
 
 from ene.util import get_resource
 from .enums import MediaFormat, MediaSeason, MediaStatus, MediaType
@@ -93,7 +93,7 @@ class Media:
     @property
     def media_list_entry(self) -> Option[MediaList]:
         media_list_entry = self.data['mediaListEntry']
-        return some(MediaList(
+        return Some(MediaList(
             id=media_list_entry['id'],
             media_id=self.id,
             status=media_list_entry.get('status'),
@@ -112,7 +112,7 @@ class Media:
         if self.type != MediaType.ANIME:
             raise NotImplementedError('Only available for anime.')
         airing_episode = self.data['nextAiringEpisode']
-        return some(AiringEpisode(
+        return Some(AiringEpisode(
             id=airing_episode['id'],
             airing_at=airing_episode['airingAt'],
             episode=airing_episode['episode'],
@@ -124,7 +124,7 @@ class Media:
         studios = maybe(self.data['studios']).get('nodes').unwrap_or(None)
         if studios:
             node = studios[0]
-            return some(Studio(id=node['id'], name=node['name']))
+            return Some(Studio(id=node['id'], name=node['name']))
         return NONE
 
     def _get_resource(self, url) -> Path:
