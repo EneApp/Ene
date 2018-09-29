@@ -15,18 +15,21 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains anilist API class."""
-from functools import lru_cache
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import attr
+from option import Err, Ok, Result
 from requests import HTTPError, Session
 
 from ene.constants import CLIENT_ID, GRAPHQL_URL
-from ene.errors import APIError
 from ene.util import dict_filter
 from .auth import OAuth
 from .enums import MediaFormat, MediaListStatus, MediaSeason, MediaSort, MediaStatus
+from .media import Media
 from .types_ import FuzzyDate
+
+HTTP_ERROR = Tuple[int, str]
+API_RES = Result[Dict, HTTP_ERROR]
 
 
 @attr.s(slots=True)
@@ -35,6 +38,7 @@ class API:
     Handles requests to the Anilist API
     """
     data_home = attr.ib()
+    cache_home = attr.ib()
     session = attr.ib(factory=Session, init=False)
     token = attr.ib(init=False)
 
@@ -46,7 +50,7 @@ class API:
             'Accept': 'application/json'
         })
 
-    def query(self, query: str, variables: Optional[dict] = None) -> dict:
+    def query(self, query: str, variables: Optional[dict] = None) -> API_RES:
         """
         Makes HTTP request to the Anilist API
 
@@ -55,10 +59,7 @@ class API:
             variables: variables for the query, can be None
 
         Returns:
-            The API response
-
-        Raises:
-            APIHTTPError if request failed
+            The API response or error
         """
         post_json = {'query': query}
         if variables:
@@ -66,29 +67,24 @@ class API:
 
         res = self.session.post(GRAPHQL_URL, json=post_json)
         try:
+            json_ = res.json()
+        except ValueError:
+            json_ = None
+        try:
             res.raise_for_status()
         except HTTPError as http_ex:
-            try:
-                json = res.json()
-            except ValueError as e:
-                msg = f'{http_ex}\n{e}'
-            else:
-                msg_lst = []
-                errors = json.get('errors', [])
-                if errors:
-                    for err in errors:
-                        msg_lst.append(err.get('message'))
-                msg = '\n'.join(m for m in msg_lst if m) or str(http_ex)
-            raise APIError(res.status_code, msg)
-        else:
-            return res.json()
+            errors = (json_ or {}).get('errors', [])
+            msgs = filter(len, (str(err.get('message', '') for err in errors)))
+            msg = '\n'.join(msgs) or str(http_ex)
+            return Err((res.status_code, msg))
+        return Ok(json_)
 
     def query_pages(
             self,
             query: str,
             per_page: int,
             variables: Optional[dict] = None
-    ) -> Iterable[dict]:
+    ) -> Iterable[API_RES]:
         """
         Make paged requests to the Anilist API
 
@@ -109,7 +105,10 @@ class API:
 
         while True:
             res = self.query(query, variables)
-            has_next = res['data']['Page']['pageInfo']['hasNextPage']
+            has_next = res.ok().map_or(
+                lambda val: val['data']['Page']['pageInfo']['hasNextPage'],
+                False
+            )
             yield res
             if not has_next:
                 return
@@ -132,7 +131,8 @@ class API:
             included_tags: List[str] = None,
             excluded_tags: List[str] = None,
             sort: List[MediaSort] = None
-    ) -> Tuple[List[dict], bool]:
+    ) -> Result[Tuple[Iterable[Media], bool], HTTP_ERROR]:
+
         """
         Browse anime by the given filters.
 
@@ -280,12 +280,17 @@ $perPage: Int,
             else:
                 variables['yearGreater'] = start * 10000
                 variables['yearLesser'] = fin * 10000
-        res = self.query(query, variables).get('data', {}).get('Page', {})
-        has_next = res.get('pageInfo', {}).get('hasNextPage', False)
-        return res.get('media', []), has_next
+        res = self.query(query, variables)
 
-    @lru_cache(maxsize=None)
-    def get_genres(self) -> List[str]:
+        def _process_results(_res):
+            _page = _res.get('data', {}).get('Page', {})
+            has_next = _res.get('pageInfo', {}).get('hasNextPage', False)
+            media_lst = _page.get('media', [])
+            return (Media(media, self.cache_home) for media in media_lst if media), has_next
+
+        return res.map(_process_results)
+
+    def get_genres(self) -> Result[List[str], HTTP_ERROR]:
         """
         Get all genres
 
@@ -294,10 +299,9 @@ $perPage: Int,
         """
         query = '{GenreCollection}'
         res = self.query(query)
-        return res['data']['GenreCollection']
+        return res.map(lambda v: v['data']['GenreCollection'])
 
-    @lru_cache(maxsize=None)
-    def get_tags(self) -> List[dict]:
+    def get_tags(self) -> Result[List[dict], HTTP_ERROR]:
         """
         Get all tags
 
@@ -316,9 +320,9 @@ $perPage: Int,
     }
 }"""
         res = self.query(query)
-        return res['data']['MediaTagCollection']
+        return res.map(lambda v: v['data']['MediaTagCollection'])
 
-    def get_show(self, show):
+    def get_show(self, show: str) -> Result[Media, HTTP_ERROR]:
         """
         Gets information about a single show by name
 
@@ -342,8 +346,7 @@ $perPage: Int,
         variables = {
             'title': show
         }
-        res = self.query(query, variables)
-        return res
+        return self.query(query, variables).map(lambda v: Media(v, self.cache_home))
 
     def update_media_list_entry(  # pylint: disable=R0913
             self,
@@ -357,7 +360,7 @@ $perPage: Int,
             custom_lists: Optional[Dict[str, bool]] = None,
             started_at: Optional[FuzzyDate] = None,
             completed_at: Optional[FuzzyDate] = None,
-    ) -> Optional[dict]:
+    ) -> API_RES:
         """
         Update a media list entry for the user.
 
