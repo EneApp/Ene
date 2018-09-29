@@ -21,8 +21,19 @@ from typing import List, Optional, Tuple
 from PySide2.QtCore import Qt, Signal, Slot
 from PySide2.QtGui import QPixmap, QTextOption
 from PySide2.QtWidgets import (
-    QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel, QLayout, QScrollArea, QSizePolicy, QSpinBox,
-    QTextEdit, QToolButton, QVBoxLayout, QWidget,
+    QCheckBox,
+    QComboBox,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLayout,
+    QScrollArea,
+    QSizePolicy,
+    QSpinBox,
+    QTextEdit,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
 )
 
 from ene.api import MediaFormat, MediaListStatus, MediaSeason, MediaSort, MediaStatus
