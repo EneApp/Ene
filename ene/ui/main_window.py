@@ -24,6 +24,7 @@ from PySide2.QtWidgets import (
     QHBoxLayout,
     QInputDialog,
     QLabel,
+    QLineEdit,
     QMainWindow,
     QPushButton,
     QScrollArea,
@@ -140,11 +141,13 @@ class MainWindow(QMainWindow, Ui_window_main):
         # TODO: Refactor
         self.files.build_all_from_db()
         series_layout = FlowLayout()
+        series_layout.setContentsMargins(11, 75, 11, 11)
         series_layout.setAlignment(Qt.AlignTop)
 
         for show in sorted(self.files.series):
             button = SeriesButton(show, len(self.files.series[show]))
             button.clicked.connect(self.on_series_click)
+            button.add_action('Delete', self.delete_show_action)
             series_layout.addWidget(button)
 
         series_layout.setSizeConstraint(FlowLayout.SetMaximumSize)
@@ -153,8 +156,25 @@ class MainWindow(QMainWindow, Ui_window_main):
         series_page = QScrollArea()
         series_page.setWidget(self.page_widget)
         series_page.setWidgetResizable(True)
+        self._setup_search()
+        self.search.setParent(series_page)
         self.stack_local_files.addWidget(series_page)
         self.stack_local_files.addWidget(QWidget())
+
+    def _setup_search(self):
+        """
+        Sets up the search area
+        """
+        self.search = QWidget()
+        search_bar = QLineEdit()
+        search_bar.setParent(self.search)
+        search_bar.setGeometry(11, 11, self.page_widget.width(), 35)
+        search_bar.setPlaceholderText("Search...")
+        search_button = QPushButton()
+        search_button.setParent(self.search)
+        search_button.setGeometry(self.page_widget.width() + 15, 11, 150, 35)
+        search_button.setText("Search")
+        search_button.clicked.connect(self.search_shows)
 
     def on_series_click(self, *, show=None):
         """
@@ -284,3 +304,26 @@ class MainWindow(QMainWindow, Ui_window_main):
         """
         self.files.delete_show(self.current_show)
         self.on_back_click()
+
+    def delete_show_action(self):
+        """
+        Deletes a single show using right click > Delete on a show
+        """
+        self.sender().parentWidget().deleteLater()
+        self.files.delete_show(self.sender().parentWidget().title)
+
+    def search_shows(self):
+        """
+        Hides all shows that do not match the search criteria
+        """
+        search_text = self.search.findChild(QLineEdit).text().lower()
+        print(search_text)
+        # TODO: Make this not break the FlowLayout
+        for show in self.page_widget.findChildren(SeriesButton):
+            print(show.title)
+            if search_text not in show.title.lower():
+                print('DIFFERENT')
+                show.hide()
+            else:
+                show.show()
+        self.page_widget.layout().do_layout(self.page_widget.rect(), False)

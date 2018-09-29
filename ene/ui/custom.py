@@ -22,7 +22,7 @@ from typing import Any, Iterable, List, Optional, Tuple, Union
 from PySide2.QtCore import QModelIndex, QObject, QPoint, QRect, QSize, Qt
 from PySide2.QtGui import QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import (
-    QComboBox, QLabel, QLayout, QPushButton, QSizePolicy, QStyle, QStyleOptionViewItem,
+    QAction, QComboBox, QLabel, QLayout, QPushButton, QSizePolicy, QStyle, QStyleOptionViewItem,
     QStyledItemDelegate, QToolButton, QVBoxLayout,
 )
 
@@ -378,6 +378,7 @@ class SeriesButton(QPushButton):
     def __init__(self, series, episodes):
         super().__init__()
         self.title = series
+        self.setContextMenuPolicy(Qt.ActionsContextMenu)
         self.image_frame = QLabel()
         layout = QVBoxLayout()
         self.image_frame.setLayout(layout)
@@ -393,6 +394,12 @@ class SeriesButton(QPushButton):
         base_layout.setContentsMargins(1, 1, 1, 1)
         base_layout.addWidget(self.image_frame)
         super().setLayout(base_layout)
+
+    def add_action(self, label, callback):
+        action = QAction(self)
+        action.setText(label)
+        action.triggered.connect(callback)
+        self.addAction(action)
 
     def set_image(self, image):
         self.image_frame.setPixmap(image)
