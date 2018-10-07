@@ -36,8 +36,8 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from api.media import Media
 from ene.api import MediaFormat, MediaSeason, MediaSort, MediaStatus
+from ene.api.media import Media
 from .common import mk_padding, mk_stylesheet
 from .custom import FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
 
