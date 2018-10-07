@@ -51,7 +51,7 @@ class App(QApplication):
             path.mkdir(parents=True, exist_ok=True)
         self.config = Config(config_home)
         self.pool = ThreadPoolExecutor()
-        self.api = API(data_home)
+        self.api = API(data_home, cache_home)
         self.main_window = MainWindow(self)
         self.settings_window = SettingsWindow(self)
         self.main_window.action_prefences.triggered.connect(self.settings_window.show)
