@@ -74,8 +74,7 @@ class API:
             res.raise_for_status()
         except HTTPError as http_ex:
             errors = (json_ or {}).get('errors', [])
-            msgs = filter(len, (str(err.get('message', '') for err in errors)))
-            msg = '\n'.join(msgs) or str(http_ex)
+            msg = f'{errors}\n{http_ex}' if errors else str(http_ex)
             return Err((res.status_code, msg))
         return Ok(json_)
 
@@ -237,8 +236,16 @@ $perPage: Int,
                 private
                 notes
                 customLists
-                startedAt
-                completedAt
+                startedAt{
+                    year
+                    month
+                    day
+                }
+                completedAt {
+                    year
+                    month
+                    day
+                }
             }
             nextAiringEpisode {
                 id
@@ -284,7 +291,7 @@ $perPage: Int,
 
         def _process_results(_res):
             _page = _res.get('data', {}).get('Page', {})
-            has_next = _res.get('pageInfo', {}).get('hasNextPage', False)
+            has_next = _page.get('pageInfo', {}).get('hasNextPage', False)
             media_lst = _page.get('media', [])
             return (Media(media, self.cache_home) for media in media_lst if media), has_next
 

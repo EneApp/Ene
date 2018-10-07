@@ -36,8 +36,8 @@ from PySide2.QtWidgets import (
     QWidget,
 )
 
-from ene.api import MediaFormat, MediaListStatus, MediaSeason, MediaSort, MediaStatus
-from ene.util import get_resource
+from api.media import Media
+from ene.api import MediaFormat, MediaSeason, MediaSort, MediaStatus
 from .common import mk_padding, mk_stylesheet
 from .custom import FlowLayout, GenreTagSelector, StreamerSelector, ToggleToolButton
 
@@ -56,48 +56,28 @@ class MediaDisplay(QWidget):
     light_white = '#9FADBD'
     lighter_white = '#EDF1F5'
 
-    # pylint: disable=R0913,R0914
-    def __init__(
-            self,
-            anime_id: int,
-            title: str,
-            season: MediaSeason,
-            year: int,
-            studio: Optional[str],
-            next_airing_episode: Optional[dict],
-            media_format: MediaFormat,
-            score: int,
-            description: str,
-            genres: List[str],
-            media_list_status: Optional[MediaListStatus],
-            *args,
-            **kwargs
-    ):
+    def __init__(self, media: Media, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setFixedWidth(self.image_w * 2)
         self.setFixedHeight(self.image_h)
-        self.anime_id = anime_id
+        self.media = media
 
         self._setup_layouts()
-        self._setup_left(title, studio)
-        self._setup_airing(next_airing_episode, season, year)
-        self._setup_format(media_format, score)
-        qss = self._setup_des(description)
-        self._setup_bottom_bar(genres, qss)
+        self._setup_left()
+        self._setup_airing()
+        self._setup_format()
+        qss = self._setup_des()
+        self._setup_bottom_bar(qss)
 
-    def set_image(self, image_url, cache_home):
+    def set_image(self):
         """
         Set the cover image of the display
-
-        Args:
-            image_url: The image url
-            cache_home: The cache directory
         """
         if not self.parent():
             return
-        image_path = str(get_resource(image_url, cache_home))
-        img = QPixmap(image_path).scaled(self.image_w, self.image_h)
-        self.image_label.setPixmap(img)
+        self.media.cover_image \
+            .map(lambda p: QPixmap(str(p)).scaled(self.image_w, self.image_h)) \
+            .map(lambda img: self.image_label.setPixmap(img))
 
     def _setup_layouts(self):
         self.master_layout = QHBoxLayout()
@@ -119,7 +99,7 @@ class MediaDisplay(QWidget):
             layout.setSpacing(0)
             layout.setMargin(0)
 
-    def _setup_left(self, title, studio):
+    def _setup_left(self):
         self.image_label = QLabel()
         self.image_label.setFixedSize(self.image_w, self.image_h)
         stylesheet = {
@@ -131,62 +111,70 @@ class MediaDisplay(QWidget):
             'qproperty-alignment': '"AlignVCenter | AlignLeft"',
         }
 
-        title_label = QLabel(title)
-        title_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
-
-        if studio:
-            studio_label = QLabel(studio)
-            stylesheet['color'] = self.aqua
-            stylesheet['padding'] = mk_padding(0, 10, 10, 10)
-            stylesheet['font-size'] = '12pt'
-            studio_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
-        else:
-            studio_label = None
-
         self.image_label.setLayout(self.left_layout)
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
         self.left_layout.addWidget(spacer)
-        self.left_layout.addWidget(title_label)
+
+        title_label = self.media.title.map_or(lambda s: QLabel(s), None)
+        studio_label = self.media.studio.map_or(lambda s: QLabel(s.name), None)
+        if title_label:
+            title_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
+            self.left_layout.addWidget(title_label)
         if studio_label:
+            stylesheet['color'] = self.aqua
+            stylesheet['padding'] = mk_padding(0, 10, 10, 10)
+            stylesheet['font-size'] = '12pt'
+            studio_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
             self.left_layout.addWidget(studio_label)
 
         self.master_layout.addWidget(self.image_label)
         self.master_layout.addLayout(self.right_layout)
 
-    def _setup_airing(self, next_airing_episode, season, year):
-        next_airing_episode = next_airing_episode or {}
-        next_episode = next_airing_episode.get('episode')
-        time_until = next_airing_episode.get('timeUntilAiring')
-        if next_episode and time_until:
-            days, seconds = divmod(time_until, 86400)
-            hours, seconds = divmod(seconds, 3600)
-            minutes = seconds // 60
-            time_parts = []
-            if days:
-                time_parts.append(f'{days}d')
-            if hours:
-                time_parts.append(f'{hours}h')
-            time_parts.append(f'{minutes}m')
-            time_str = ' '.join(time_parts)
-            next_airing_label = QLabel(f'Ep {next_episode} - {time_str}')
-        elif season:
-            next_airing_label = QLabel(f'{season.name.title()} {year}')
-        else:
-            next_airing_label = QLabel(str(year))
+    def _setup_airing(self):
+        def get_airing_lbl(next_airing):
+            next_episode = next_airing.episode
+            time_until = next_airing.time_until_airing
+            if next_episode and time_until:
+                days, seconds = divmod(time_until, 86400)
+                hours, seconds = divmod(seconds, 3600)
+                minutes = seconds // 60
+                time_parts = []
+                if days:
+                    time_parts.append(f'{days}d')
+                if hours:
+                    time_parts.append(f'{hours}h')
+                time_parts.append(f'{minutes}m')
+                time_str = ' '.join(time_parts)
+                return QLabel(f'Ep {next_episode} - {time_str}')
 
-        next_airing_label.setStyleSheet(mk_stylesheet({
-            'color': self.aqua,
-            'background-color': self.dark_grey,
-            'padding': '5px',
-            'font-size': '11pt',
-            'qproperty-alignment': '"AlignCenter"'
-        }, 'QLabel'))
-        self.right_layout.addWidget(next_airing_label)
+        def get_season_lbl():
+            year = self.media.start_date.map_or(lambda d: d.year, None)
+            if self.media.season and year:
+                return QLabel(f'{self.media.season.value.name.title()} {year}')
+            elif year:
+                return QLabel(str(year))
+
+        next_airing_label = self.media.next_airing_episode \
+            .map_or_else(get_airing_lbl, get_season_lbl)
+        if next_airing_label:
+            next_airing_label.setStyleSheet(mk_stylesheet({
+                'color': self.aqua,
+                'background-color': self.dark_grey,
+                'padding': '5px',
+                'font-size': '11pt',
+                'qproperty-alignment': '"AlignCenter"'
+            }, 'QLabel'))
+            self.right_layout.addWidget(next_airing_label)
         self.right_layout.addLayout(self.right_mid_layout)
 
-    def _setup_format(self, media_format, score):
-        format_label = QLabel(media_format.name)
+    def _setup_format(self):
+        format_label = self.media.format.map(lambda f: QLabel(f.name))
+        score_label = self.media.average_score.map(lambda s: QLabel(f'{s}%'))
+
+        if not format_label and not score_label:
+            return
+
         stylesheet = mk_stylesheet({
             'color': self.dark_white,
             'background-color': self.grey,
@@ -195,16 +183,17 @@ class MediaDisplay(QWidget):
             'qproperty-alignment': '"AlignCenter"',
             'qproperty-wordWrap': 'true'
         }, 'QLabel')
-        format_label.setStyleSheet(stylesheet)
-        self.right_mid_layout.addWidget(format_label)
-        if score is not None:
-            score_label = QLabel(f'{score}%')
-            score_label.setStyleSheet(stylesheet)
-            self.right_mid_layout.addWidget(score_label)
 
-    def _setup_des(self, description):
+        def _add(l):
+            l.setStyleSheet(stylesheet)
+            self.right_mid_layout.addWidget(l)
+
+        format_label.map(_add)
+        score_label.map(_add)
+
+    def _setup_des(self):
         desc_text_edit = QTextEdit()
-        desc_text_edit.setHtml(description)
+        self.media.description.map(lambda d: desc_text_edit.setHtml(d))
         desc_text_edit.setReadOnly(True)
         desc_text_edit.setFrameStyle(QFrame.NoFrame)
         desc_text_edit.setLineWrapMode(QTextEdit.WidgetWidth)
@@ -221,9 +210,9 @@ class MediaDisplay(QWidget):
         self.right_layout.addWidget(desc_text_edit)
         return stylesheet
 
-    def _setup_bottom_bar(self, genres, stylesheet):
+    def _setup_bottom_bar(self, stylesheet):
         # TODO Need to show buttons on hover
-        genre_label = QLabel(', '.join(genres))
+        genre_label = QLabel(', '.join(self.media.genres))
         stylesheet['qproperty-alignment'] = '"AlignCenter"'
         stylesheet['background-color'] = self.dark_grey
         genre_label.setStyleSheet(mk_stylesheet(stylesheet, 'QLabel'))
@@ -387,10 +376,13 @@ class MediaBrowser(QScrollArea):
         """
         genre_future = self.app.pool.submit(self.app.api.get_genres)
         tags_future = self.app.pool.submit(self.app.api.get_tags)
-        tags = [tag['name'] for tag in tags_future.result()]
-        genres = genre_future.result()
+        tags_result = tags_future.result()
+        genres_result = genre_future.result()
+        if not tags_result or not genres_result:
+            raise ValueError("Failed to fetch tags/genres.")
+        tags = [tag['name'] for tag in tags_result.unwrap()]
         self.ctrl_ready_signal.emit(
-            genres,
+            genres_result.unwrap(),
             tags,
             combobox_genre_tag,
             combobox_streaming
@@ -400,34 +392,11 @@ class MediaBrowser(QScrollArea):
     def _media_ready(self, media_list):
         with self.reset_media_lock:
             for anime in media_list:
-                season = anime['season']
-                season = MediaSeason[season] if season else None
-                studios = anime['studios']['edges']
-                studio = studios[0]['node']['name'] if studios else None
-                cache_home = self.app.cache_home
-                image_url = anime['coverImage']['large']
-                media_list_entry = anime['mediaListEntry']
-                if media_list_entry:
-                    media_list_status = media_list_entry['status']
-                    if media_list_status:
-                        media_list_status = MediaListStatus[media_list_status]
-                else:
-                    media_list_status = None
-                display = MediaDisplay(
-                    anime_id=anime['id'],
-                    title=anime['title']['userPreferred'],
-                    season=season,
-                    year=anime['startDate']['year'],
-                    studio=studio,
-                    next_airing_episode=anime['nextAiringEpisode'],
-                    media_format=MediaFormat[anime['format']],
-                    score=anime['averageScore'],
-                    description=anime['description'],
-                    genres=anime['genres'],
-                    media_list_status=media_list_status
-                )
+                if not anime:
+                    continue
+                display = MediaDisplay(anime)
                 self._layout.addWidget(display)
-                self.app.pool.submit(display.set_image, image_url, cache_home)
+                self.app.pool.submit(display.set_image)
 
     def get_media(self):
         """
@@ -438,7 +407,7 @@ class MediaBrowser(QScrollArea):
     def _get_media(self):
         self.current_page += 1
         genres, tags = self.genre_tag_selector.genre_tags()
-        res, has_next = self.api.browse_anime(
+        res = self.api.browse_anime(
             self.current_page,
             season=self.season,
             year_range=self.year_range,
@@ -451,8 +420,12 @@ class MediaBrowser(QScrollArea):
             on_list=self.on_list,
             is_adult=self.adult
         )
-        self.has_next_page = has_next
-        self.media_ready_signal.emit(res)
+        if res:
+            media_lst, has_next = res.unwrap()
+            self.has_next_page = has_next
+            self.media_ready_signal.emit(media_lst)
+        else:
+            self.has_next_page = False
 
     @Slot(list, list, QWidget, QWidget)
     def _setup_controls(self, genres, tags, combobox_genre_tag, combobox_streaming):

@@ -109,7 +109,7 @@ class Media:
 
     @property
     def next_airing_episode(self) -> Option[AiringEpisode]:
-        if self.type != MediaType.ANIME:
+        if self.type.unwrap_or(None) != MediaType.ANIME:
             raise NotImplementedError('Only available for anime.')
         airing_episode = self.data['nextAiringEpisode']
         return Some(AiringEpisode(
@@ -121,10 +121,11 @@ class Media:
 
     @property
     def studio(self) -> Option[Studio]:
-        studios = maybe(self.data['studios']).get('nodes').unwrap_or(None)
-        if studios:
-            node = studios[0]
-            return Some(Studio(id=node['id'], name=node['name']))
+        studios = maybe(self.data['studios']).get('edges').unwrap_or([])
+        for studio in studios:
+            if studio['isMain']:
+                node = studio['node']
+                return Some(Studio(id=node['id'], name=node['name']))
         return NONE
 
     def _get_resource(self, url) -> Path:
