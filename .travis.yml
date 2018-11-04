@@ -19,10 +19,10 @@ matrix:
       env: UPLOAD_COV=true
     - os: osx
       language: objective-c
-      env: PYENV_VERSION=3.6.6
+      env: PYENV_VERSION=3.6.7
     - os: osx
       language: objective-c
-      env: PYENV_VERSION=3.7.0
+      env: PYENV_VERSION=3.7.1
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
