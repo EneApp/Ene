@@ -40,6 +40,7 @@ gql:
 ci_setup:
 	pip install -U pip
 	pip install -U poetry
+	poetry check
 	poetry install
 
 lint:
