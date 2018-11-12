@@ -1,6 +1,6 @@
 # Requirements
 
-* Python3.6+
+* Python 3.7+
 
 * QT5: https://qt.io
 
@@ -32,7 +32,7 @@ poetry install
 
 # Coding Style
 
-All code (including tests) must pass `flake8` check.
+All code (including tests) must pass `flake8` and `pylint` checks.
 
 Please follow [PEP8](https://www.python.org/dev/peps/pep-0008/) with a few modifications:
 
@@ -42,4 +42,4 @@ Please follow [PEP8](https://www.python.org/dev/peps/pep-0008/) with a few modif
 
     2.1 Multi-line string literals and docstrings are to be surrounded with triple double quotes (""")
 
-3. Doc-strings should follow the Google doc-string style: http://www.sphinx-doc.org/en/stable/ext/example_google.html
+3. Doc-strings should follow the Google doc-string style: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
