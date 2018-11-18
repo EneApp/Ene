@@ -86,6 +86,7 @@ class FileManager:
         their titles
         """
         self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
+        self.series.clear()
         for directory in self.dirs:
             self.discover_episodes(directory)
 
