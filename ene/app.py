@@ -19,7 +19,6 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-import qdarkstyle
 from PySide2.QtCore import QTimer, Qt
 from PySide2.QtWidgets import QApplication
 
@@ -72,6 +71,5 @@ def launch(config_home=CONFIG_HOME, data_home=DATA_HOME, cache_home=CACHE_HOME, 
     app = App(config_home, data_home, cache_home)
     if test:
         QTimer.singleShot(5000, app.quit)
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
     app.main_window.show()
     return app.exec_()

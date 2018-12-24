@@ -17,10 +17,10 @@
 """This module handles local video files."""
 
 import re
-from collections import defaultdict
 from os import walk
 from pathlib import Path
 from typing import Iterable
+from ene.types_ import Show, Episode, ShowList
 
 
 from ene.database import Database
@@ -40,7 +40,7 @@ class FileManager:
         self.config = cfg
         self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
         self.db = Database(data_home / 'ene.db')
-        self.series = defaultdict(list)
+        self.series = ShowList()
 
     def build_shows_from_db(self):
         """
@@ -49,7 +49,7 @@ class FileManager:
         """
         shows = self.db.get_all_shows()
         for show in shows:
-            self.series[show] = []
+            self.series[show] = Show(show)
 
     def build_all_from_db(self):
         """
@@ -71,7 +71,7 @@ class FileManager:
             episodes = self.db.get_episodes_by_show_name(show)
             episodes.sort()
             for episode in episodes:
-                self.series[show].append(Path(episode))
+                self.series[show].add_episode(Episode(Path(episode)))
 
     def dump_to_db(self):
         """
@@ -107,9 +107,9 @@ class FileManager:
             print(directory)
             print(type(directory))
             res.extend(self.find_episodes(show, directory))
-        new = set(res) - set(self.series[show])
-        self.series[show].extend(new)
-        self.series[show].sort()
+        new = set(res) - self.series[show].episodes
+        self.series[show].episodes.extend(new)
+        self.series[show].episodes.sort()
         return sorted(new)
 
     def find_episodes(self, name, directory):
@@ -155,7 +155,9 @@ class FileManager:
                 if op_or_ed.search(episode.name):
                     continue
                 title = clean_title(episode.stem)
-                self.series[title].append(path / episode)
+                ep = Episode(path / episode)
+                ep.parse_episode_number(title)
+                self.series[title].add_episode(ep)
 
     def get_readable_names(self, show: str) -> Iterable[str]:
         """
@@ -167,7 +169,7 @@ class FileManager:
         Yields:
             The file names in the show
         """
-        for path in self.series[show]:
+        for path in self.series[show].episodes:
             yield path.name
 
     def rename_show(self, old, new):
@@ -183,7 +185,10 @@ class FileManager:
         Returns:
             The episode list for the new show
         """
-        self.series[new].append(self.series.pop(old))
+        if new in self.series:
+            self.series[new].episodes.union(self.series[old].episodes)
+        else:
+            self.series[new] = self.series.pop(old)
         self.db.rename_show(old, new)
         return self.series[new]
 

@@ -213,8 +213,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         menu.setMinimumWidth(self.stack_local_files.width() / 2)
         layout.addWidget(menu)
 
-        self.files.series[show].sort()
-        for episode in self.files.series[show]:
+        for episode in sorted(self.files.series[show].episodes):
             button = EpisodeButton(episode)
             button.clicked.connect(self.play_episode)
             layout.addWidget(button)
@@ -242,8 +241,8 @@ class MainWindow(QMainWindow, Ui_window_main):
 
         if self.player is None:
             self.player = ene.player.get_player(self.app.config)
-        episode = self.sender().path
-        self.player.play(str(episode))
+        episode = self.sender().episode
+        self.player.play(episode)
 
     def on_back_click(self):
         """
@@ -285,7 +284,8 @@ class MainWindow(QMainWindow, Ui_window_main):
             button = SeriesButton(show, len(self.files.series[show]))
             button.clicked.connect(self.on_series_click)
             self.page_widget.layout().addWidget(button)
-        self.files.dump_to_db()
+        # TODO: Put this back in
+        # self.files.dump_to_db()
 
     def rename_show(self):
         """

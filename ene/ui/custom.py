@@ -246,9 +246,9 @@ class ToggleToolButton(QObject):
 class EpisodeButton(QPushButton):
     """Button that represents a local episode file."""
 
-    def __init__(self, file):
-        super().__init__(file.name)
-        self.path = file
+    def __init__(self, episode):
+        super().__init__(episode.name)
+        self.episode = episode
 
 
 class FlowLayout(QLayout):

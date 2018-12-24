@@ -15,13 +15,13 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module handles video playback on different players."""
-import os
+
 import subprocess
 from abc import ABC, abstractmethod
+from ene.types_ import Episode
 from shutil import which
 from threading import Event
 from time import sleep
-from typing import Union
 import requests
 
 
@@ -32,12 +32,12 @@ class AbstractPlayer(ABC):
     """Base media player class."""
 
     @abstractmethod
-    def play(self, path: Union[str, os.PathLike]):
+    def play(self, episode: Episode):
         """
         Plays the media file given by path
 
         Args:
-            path: The location of the media file to play
+            episode: The location of the media file to play
         """
         raise NotImplementedError()
 
@@ -69,13 +69,13 @@ class VlcPlayer(AbstractPlayer):
         self.player.video_set_key_input(True)
         self.player.video_set_mouse_input(True)
 
-    def play(self, path):
+    def play(self, episode: Episode):
         """
         Play the media file using vlc by the given path.
         Args:
-            path: Path to the media file
+            episode: Path to the media file
         """
-        media = self.instance.media_new(path)
+        media = self.instance.media_new(episode.path)
         self.player.set_media(media)
         self.player.play()
 
@@ -114,10 +114,9 @@ class HttpVlcPlayer(AbstractPlayer):
         self.process = subprocess.Popen(args)
         sleep(1)
 
-    def play(self, path: Union[str, os.PathLike]):
-        url = f'{self.base}status.json?command=in_play&input={path}'
-        response = requests.get(url)
-        print(response.status_code)
+    def play(self, episode: Episode):
+        url = f'{self.base}status.json?command=in_play&input={episode.path}'
+        requests.get(url)
 
     def stop(self):
         requests.get(f'{self.base}?command=pl_empty')
@@ -152,14 +151,14 @@ class MpvPlayer(AbstractPlayer):
         self.closed = False
         self.setup_listeners()
 
-    def play(self, path):
+    def play(self, episode: Episode):
         """
         Plays the media file given by path
 
         Args:
-            path: The location of the media file to play
+            episode: The location of the media file to play
         """
-        self.player.play(path)
+        self.player.play(str(episode.path))
 
     def stop(self):
         self.player.terminate()
@@ -198,15 +197,15 @@ class GenericPlayer(AbstractPlayer):
         self.player_path = path
         self.player = None
 
-    def play(self, path):
+    def play(self, episode):
         """
         Plays the media file given by path
 
         Args:
-            path: The location of the media file to play
+            episode: The location of the media file to play
         """
         if self.player is None:
-            self.player = subprocess.Popen([self.player_path, path])
+            self.player = subprocess.Popen([self.player_path, episode.path])
 
     def stop(self):
         if self.player is not None:
