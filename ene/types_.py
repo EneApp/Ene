@@ -1,6 +1,6 @@
 from pathlib import Path
 import re
-
+from enum import Enum
 
 class Show:
     """
@@ -35,10 +35,15 @@ class Show:
 
 
 class Episode:
-    def __init__(self, path: Path, new=False):
+
+    class State(Enum):
+        NEW = 1
+        UNWATCHED = 2
+        WATCHED = 3
+
+    def __init__(self, path: Path, state=State.NEW):
         self.path = path
-        self.watched = False
-        self.new = new
+        self.state = state
         self.name = path.name
         self.number = 0
 

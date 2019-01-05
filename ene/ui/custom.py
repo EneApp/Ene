@@ -20,13 +20,14 @@ from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple, Union
 
 from PySide2.QtCore import QModelIndex, QObject, QPoint, QRect, QSize, Qt
-from PySide2.QtGui import QStandardItem, QStandardItemModel
+from PySide2.QtGui import QIcon, QStandardItem, QStandardItemModel
 from PySide2.QtWidgets import (
     QAction, QComboBox, QLabel, QLayout, QPushButton, QSizePolicy, QStyle, QStyleOptionViewItem,
     QStyledItemDelegate, QToolButton, QVBoxLayout,
 )
 
 from ene.constants import STREAMERS
+from ene.types_ import *
 
 
 class CheckMarkDelegate(QStyledItemDelegate):
@@ -246,9 +247,18 @@ class ToggleToolButton(QObject):
 class EpisodeButton(QPushButton):
     """Button that represents a local episode file."""
 
-    def __init__(self, episode):
+    def __init__(self, episode: Episode):
         super().__init__(episode.name)
+
         self.episode = episode
+        if episode.state is Episode.State.WATCHED:
+            self.setFlat(True)
+        elif episode.state is Episode.State.NEW:
+            self.setIcon(QIcon.fromTheme('mail-unread'))
+
+    def mark_watched(self):
+        self.episode.state = Episode.State.WATCHED
+        self.setIcon(QIcon.fromTheme('mail-read'))
 
 
 class FlowLayout(QLayout):
