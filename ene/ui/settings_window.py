@@ -69,7 +69,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         self.path_remove.clicked.connect(self.remove_path)
         self.path_model = self.populate_paths()
         self.path_model.itemChanged.connect(self.on_changed)
-        if self.path_model.rowCount() is 0:
+        if not self.path_model.rowCount():
             self.path_remove.setEnabled(False)
         self.local_paths.setModel(self.path_model)
         self.button_browse_player.clicked.connect(self.pick_player_path)
@@ -249,7 +249,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
                 The index of the selected item
         """
         self.on_changed()
-        if selection is not 0:
+        if selection:
             self.label_http.hide()
             self.use_http.hide()
         else:
@@ -268,7 +268,7 @@ class SettingsWindow(QMdiSubWindow, Ui_window_settings):
         """Remove a path from the user specified path list."""
         self.path_model.removeRow(self.local_paths.selectionModel().selectedIndexes()[0].row())
         self.on_changed()
-        if self.path_model.rowCount() is 0:
+        if not self.path_model.rowCount():
             self.path_remove.setEnabled(False)
 
     def add_path(self):

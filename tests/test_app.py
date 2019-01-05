@@ -31,7 +31,6 @@ import toml
 from requests import post
 from ene.app import App, launch
 from ene.constants import APP_NAME
-from ene.database import Database
 from . import CACHE_HOME, CONFIG_HOME, DATA_HOME, rmdir, skip_travis_osx
 
 pytestmark = skip_travis_osx
@@ -54,7 +53,6 @@ def set_up_dir(dir_, exists):
         elif dir_ == DATA_HOME:
             with open(DATA_HOME / 'token', 'w+') as f:
                 f.write(MOCK_TOKEN_FILE)
-            Database(DATA_HOME / 'ene.db')
     return lambda: rmdir(dir_, True)
 
 

@@ -20,10 +20,8 @@ import re
 from os import walk
 from pathlib import Path
 from typing import Iterable
-from ene.types_ import Show, Episode, ShowList
-from ene.models import EpisodeModel, ShowModel
+from ene.models import Show, Episode, ShowList, init_db, db
 
-from ene.database import Database
 
 EXTENSIONS = ['.mkv',
               '.mp4',
@@ -39,7 +37,7 @@ class FileManager:
     def __init__(self, cfg, data_home: Path):
         self.config = cfg
         self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
-        self.db = Database(data_home / 'ene.db')
+        init_db(data_home / 'ene.db')
         self.series = ShowList()
         self.build_shows_from_db()
 
@@ -48,45 +46,23 @@ class FileManager:
         Fetches all shows from the database and adds them to the series
         dictionary without episode paths
         """
-        shows = ShowModel.select()
+        shows = Show.ShowModel.select()
         for show_model in shows:
             show = show_model.to_show()
             self.series[show.title] = show
-
-    def build_all_from_db(self):
-        """
-        Fetches all shows and episodes from the database and builds up the full
-        dictionary of series
-        """
-        self.series.update(self.db.get_all())
-
-    def fetch_db_episodes_for_show(self, show):
-        """
-        Fetches all the episodes for a given show from the database and adds
-        them to the episode list for that show in the dictionary
-
-        Args:
-            show:
-                The show to fetch episodes for
-        """
-        if len(self.series[show]) is 0:
-            episodes = self.db.get_episodes_by_show_name(show)
-            episodes.sort()
-            for episode in episodes:
-                self.series[show].add_episode(Episode(Path(episode)))
 
     def dump_to_db(self):
         """
         Dumps the current dictionary to the database
         """
-        #self.db.write_all_shows_delta(self.series.keys())
-        #self.db.write_all_episodes_delta(self.series)
         for show in self.series.values():
-            show_model = ShowModel.from_show(show)
-            show_model.save()
-            for episode in show.episodes:
-                episode_model = EpisodeModel.from_episode(episode, show_model)
-                episode_model.save()
+            with db.atomic():
+                show.model.save()
+                new_episodes = [x.populate_model(show.model) for x in show.episodes
+                                if x.model is None]
+
+                if new_episodes:
+                    Episode.EpisodeModel.bulk_create(new_episodes)
 
     def refresh_shows(self):
         """
@@ -94,7 +70,6 @@ class FileManager:
         their titles
         """
         self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
-        self.series.clear()
         for directory in self.dirs:
             self.discover_episodes(directory)
 
@@ -112,12 +87,10 @@ class FileManager:
         """
         res = []
         for directory in self.dirs:
-            print(directory)
-            print(type(directory))
             res.extend(self.find_episodes(show, directory))
         new = set(res) - self.series[show].episodes
-        self.series[show].episodes.extend(new)
-        self.series[show].episodes.sort()
+        for new_show in new:
+            self.series[show].add_episode(new_show)
         return sorted(new)
 
     def find_episodes(self, name, directory):
@@ -142,7 +115,7 @@ class FileManager:
                     break
                 else:
                     # otherwise just append it to the list
-                    episodes.append(path)
+                    episodes.append(Episode(path))
             elif path.is_dir() and self.config.get('Search Subfolders', default=False):
                 # If folders are sorted differently, e.g. Ongoing/Winter 2018/Plan to Watch
                 episodes += self.find_episodes(name, path)
@@ -163,9 +136,9 @@ class FileManager:
                 if op_or_ed.search(episode.name):
                     continue
                 title = clean_title(episode.stem)
-                ep = Episode(path / episode)
-                ep.parse_episode_number(title)
-                self.series[title].add_episode(ep)
+                episode = Episode(path / episode)
+                episode.parse_episode_number(title)
+                self.series[title].add_episode(episode)
 
     def get_readable_names(self, show: str) -> Iterable[str]:
         """
@@ -196,8 +169,10 @@ class FileManager:
         if new in self.series:
             self.series[new].episodes.union(self.series[old].episodes)
         else:
+            self.series[old].model.title = new
+            self.series[old].title = new
+            self.series[old].model.save()
             self.series[new] = self.series.pop(old)
-        self.db.rename_show(old, new)
         return self.series[new]
 
     def delete_show(self, show):
@@ -208,7 +183,8 @@ class FileManager:
             show:
                 The show to remove
         """
-        self.db.delete_show(show)
+        print(self.series[show].title)
+        self.series[show].model.delete_instance()
         self.series.pop(show)
 
 

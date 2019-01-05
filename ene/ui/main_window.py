@@ -139,7 +139,6 @@ class MainWindow(QMainWindow, Ui_window_main):
         Sets up the local files tab. Triggered when the tab is selected
         """
         # TODO: Refactor
-        self.files.build_all_from_db()
         series_layout = FlowLayout()
         series_layout.setContentsMargins(11, 75, 11, 11)
         series_layout.setAlignment(Qt.AlignTop)

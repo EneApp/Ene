@@ -1,7 +1,6 @@
 import ene.files
 from . import HERE
 
-from itertools import chain
 import re
 from tempfile import TemporaryDirectory
 from pathlib import Path
@@ -78,11 +77,11 @@ def test_clean_titles():
 def test_discover(manager, mock_shows):
     manager.refresh_shows()
     for show in mock_shows:
-        assert set(mock_shows[show]) == set(manager.series[show])
+        assert set(mock_shows[show]) == set([x.path for x in manager.series[show].episodes])
 
 
 def test_find(manager, mock_shows):
     for show in mock_shows:
         manager.refresh_single_show(show)
-        assert mock_shows[show] == manager.series[show]
+        assert mock_shows[show] == sorted([x.path for x in manager.series[show].episodes])
 

@@ -27,7 +27,7 @@ from PySide2.QtWidgets import (
 )
 
 from ene.constants import STREAMERS
-from ene.types_ import *
+from ene.models import Episode
 
 
 class CheckMarkDelegate(QStyledItemDelegate):
@@ -252,12 +252,12 @@ class EpisodeButton(QPushButton):
 
         self.episode = episode
         if episode.state is Episode.State.WATCHED:
-            self.setFlat(True)
+            self.setIcon(QIcon.fromTheme('mail-read'))
         elif episode.state is Episode.State.NEW:
             self.setIcon(QIcon.fromTheme('mail-unread'))
 
     def mark_watched(self):
-        self.episode.state = Episode.State.WATCHED
+        self.episode.update_state(Episode.State.WATCHED)
         self.setIcon(QIcon.fromTheme('mail-read'))
 
 
