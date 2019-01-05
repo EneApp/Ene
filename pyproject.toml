@@ -23,6 +23,7 @@ python-Levenshtein = "*"
 qdarkstyle = {git = "https://github.com/ColinDuquesnoy/QDarkStyleSheet.git", branch = "master"}
 attrs = "*"
 option = "*"
+peewee = "^3.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"

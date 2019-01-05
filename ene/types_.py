@@ -2,6 +2,7 @@ from pathlib import Path
 import re
 from enum import Enum
 
+
 class Show:
     """
     Class containing information about a single show
@@ -41,11 +42,11 @@ class Episode:
         UNWATCHED = 2
         WATCHED = 3
 
-    def __init__(self, path: Path, state=State.NEW):
+    def __init__(self, path: Path, state=State.NEW, number=0):
         self.path = path
         self.state = state
         self.name = path.name
-        self.number = 0
+        self.number = number
 
     def parse_episode_number(self, title):
         """

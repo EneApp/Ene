@@ -21,7 +21,7 @@ from os import walk
 from pathlib import Path
 from typing import Iterable
 from ene.types_ import Show, Episode, ShowList
-
+from ene.models import EpisodeModel, ShowModel
 
 from ene.database import Database
 
@@ -41,15 +41,17 @@ class FileManager:
         self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
         self.db = Database(data_home / 'ene.db')
         self.series = ShowList()
+        self.build_shows_from_db()
 
     def build_shows_from_db(self):
         """
         Fetches all shows from the database and adds them to the series
         dictionary without episode paths
         """
-        shows = self.db.get_all_shows()
-        for show in shows:
-            self.series[show] = Show(show)
+        shows = ShowModel.select()
+        for show_model in shows:
+            show = show_model.to_show()
+            self.series[show.title] = show
 
     def build_all_from_db(self):
         """
@@ -77,8 +79,14 @@ class FileManager:
         """
         Dumps the current dictionary to the database
         """
-        self.db.write_all_shows_delta(self.series.keys())
-        self.db.write_all_episodes_delta(self.series)
+        #self.db.write_all_shows_delta(self.series.keys())
+        #self.db.write_all_episodes_delta(self.series)
+        for show in self.series.values():
+            show_model = ShowModel.from_show(show)
+            show_model.save()
+            for episode in show.episodes:
+                episode_model = EpisodeModel.from_episode(episode, show_model)
+                episode_model.save()
 
     def refresh_shows(self):
         """

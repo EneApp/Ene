@@ -286,7 +286,7 @@ class MainWindow(QMainWindow, Ui_window_main):
             button.clicked.connect(self.on_series_click)
             self.page_widget.layout().addWidget(button)
         # TODO: Put this back in
-        # self.files.dump_to_db()
+        self.files.dump_to_db()
 
     def rename_show(self):
         """
