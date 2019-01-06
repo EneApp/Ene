@@ -186,7 +186,7 @@ class EpisodeModel(BaseModel):
     state = IntegerField()
 
     @classmethod
-    def from_episode(episode: Episode, show: ShowModel):
+    def from_episode(cls, episode: Episode, show: ShowModel):
         """
         Create a new model that represents the given Episode object
 
