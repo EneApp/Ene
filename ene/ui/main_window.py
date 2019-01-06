@@ -284,7 +284,7 @@ class MainWindow(QMainWindow, Ui_window_main):
             button = SeriesButton(show, len(self.files.series[show]))
             button.clicked.connect(self.on_series_click)
             self.page_widget.layout().addWidget(button)
-        # TODO: Put this back in
+
         self.files.dump_to_db()
 
     def rename_show(self):
@@ -317,7 +317,6 @@ class MainWindow(QMainWindow, Ui_window_main):
         Hides all shows that do not match the search criteria
         """
         search_text = self.search.findChild(QLineEdit).text().lower()
-        print(search_text)
         # TODO: Make this not break the FlowLayout
         for show in self.page_widget.findChildren(SeriesButton):
             if search_text not in show.title.lower():

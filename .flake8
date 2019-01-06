@@ -13,7 +13,6 @@ exclude =
     .idea,
     pyside-setup,
     ene/lib,
-    ene/bin,
     /**/__init__.py,
     ene/constants.py,
     ene/resources,

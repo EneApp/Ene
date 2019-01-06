@@ -88,7 +88,7 @@ class FileManager:
         res = []
         for directory in self.dirs:
             res.extend(self.find_episodes(show, directory))
-        new = set(res) - self.series[show].episodes
+        new = set(res) - self.series.get_episodes(show)
         for new_show in new:
             self.series[show].add_episode(new_show)
         return sorted(new)
@@ -150,7 +150,7 @@ class FileManager:
         Yields:
             The file names in the show
         """
-        for path in self.series[show].episodes:
+        for path in self.series.get_episodes(show):
             yield path.name
 
     def rename_show(self, old, new):
@@ -167,7 +167,12 @@ class FileManager:
             The episode list for the new show
         """
         if new in self.series:
-            self.series[new].episodes.union(self.series[old].episodes)
+            for episode in self.series.get_episodes(old):
+                self.series[new].add_episode(episode)
+                episode.model.show = self.series[new].model
+                episode.model.save()
+            self.series[old].model.delete_instance()
+            self.series.pop(old)
         else:
             self.series[old].model.title = new
             self.series[old].title = new
@@ -183,7 +188,6 @@ class FileManager:
             show:
                 The show to remove
         """
-        print(self.series[show].title)
         self.series[show].model.delete_instance()
         self.series.pop(show)
 

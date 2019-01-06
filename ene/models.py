@@ -34,7 +34,6 @@ def init_db(path):
     # need to use global DB so that we can specify the database location at runtime
     global db
     db.init(path)
-    print(path)
     db.connect()
     db.create_tables([Show.ShowModel, Episode.EpisodeModel])
 
