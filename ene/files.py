@@ -20,7 +20,7 @@ import re
 from os import walk
 from pathlib import Path
 from typing import Iterable
-from ene.models import Show, Episode, ShowList, init_db, db
+from ene.models import Show, ShowModel, Episode, EpisodeModel, ShowList, EneDatabase
 
 
 EXTENSIONS = ['.mkv',
@@ -37,7 +37,7 @@ class FileManager:
     def __init__(self, cfg, data_home: Path):
         self.config = cfg
         self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
-        init_db(data_home / 'ene.db')
+        self.database = EneDatabase(data_home / 'ene.db')
         self.series = ShowList()
         self.build_shows_from_db()
 
@@ -46,7 +46,7 @@ class FileManager:
         Fetches all shows from the database and adds them to the series
         dictionary without episode paths
         """
-        shows = Show.ShowModel.select()
+        shows = ShowModel.select()
         for show_model in shows:
             show = show_model.to_show()
             self.series[show.title] = show
@@ -56,13 +56,13 @@ class FileManager:
         Dumps the current dictionary to the database
         """
         for show in self.series.values():
-            with db.atomic():
-                show.model.save()
-                new_episodes = [x.populate_model(show.model) for x in show.episodes
-                                if x.model is None]
-
+            with self.database.database.atomic():
+                show_model = ShowModel.from_show(show)
+                show_model.save()
+                new_episodes = [EpisodeModel.from_episode(x, show_model) for x in show.episodes
+                                if not x.key]
                 if new_episodes:
-                    Episode.EpisodeModel.bulk_create(new_episodes)
+                    EpisodeModel.bulk_create(new_episodes)
 
     def refresh_shows(self):
         """
@@ -190,6 +190,16 @@ class FileManager:
         """
         self.series[show].model.delete_instance()
         self.series.pop(show)
+
+    def mark_seen(self, show):
+        show_model = ShowModel.get_by_id(self.series[show].key)
+        EpisodeModel.update({EpisodeModel.state: Episode.State.UNWATCHED.value})\
+            .where(EpisodeModel.show == show_model)\
+            .where(EpisodeModel.state != Episode.State.WATCHED.value)\
+            .execute()
+        for episode in self.series.get_episodes(show):
+            if episode.state is not Episode.State.WATCHED:
+                episode.update_state(Episode.State.UNWATCHED)
 
 
 def clean_title(title):

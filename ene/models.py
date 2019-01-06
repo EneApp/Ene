@@ -23,17 +23,19 @@ from peewee import Model, SqliteDatabase, TextField, IntegerField, ForeignKeyFie
 db = SqliteDatabase(None)
 
 
-def init_db(path):
-    """
-    Initializes the Ene database, creating any tables as needed
+class EneDatabase:
+    def __init__(self, path):
+        """
+        Initializes the Ene database, creating any tables as needed
 
-    Args:
-        path:
-            The path where the Sqlite database file resides
-    """
-    db.init(path)
-    db.connect()
-    db.create_tables([Show.ShowModel, Episode.EpisodeModel])
+        Args:
+            path:
+                The path where the Sqlite database file resides
+        """
+        self.database = db
+        db.init(path)
+        db.connect()
+        db.create_tables([ShowModel, EpisodeModel])
 
 
 def table_name(table):
@@ -65,7 +67,7 @@ class Show:
     """
     Class containing information about a single show
     """
-    def __init__(self, title, show_id=None, list_id=None, episodes: set = None, model=None):
+    def __init__(self, title, show_id=None, list_id=None, episodes: set = None, key=None):
         self.title = title
         self.show_id = show_id
         self.list_id = list_id
@@ -73,12 +75,7 @@ class Show:
             self.episodes = set()
         else:
             self.episodes = episodes
-        if model is None:
-            self.model = Show.ShowModel(title=self.title,
-                                        show_id=self.show_id,
-                                        list_id=self.list_id)
-        else:
-            self.model = model
+        self.key = key
 
     def add_episode(self, episode):
         """
@@ -98,26 +95,30 @@ class Show:
         """
         return len(self.episodes)
 
-    class ShowModel(BaseModel):
-        """
-        Model representing a Show in the database
-        """
-        title = TextField()
-        anilist_show_id = IntegerField(null=True)
-        list_id = IntegerField(null=True)
-        table = 'Show'
 
-        def to_show(self):
-            """
-            Convert this model to a full Show object
+class ShowModel(BaseModel):
+    """
+    Model representing a Show in the database
+    """
+    title = TextField()
+    anilist_show_id = IntegerField(null=True)
+    list_id = IntegerField(null=True)
 
-            Returns:
-                The Show object represented by this model
-            """
-            episodes = Episode.EpisodeModel.select() \
-                .join(Show.ShowModel).where(Episode.EpisodeModel.show_id == self.id)
-            episodes = {x.to_episode() for x in episodes}
-            return Show(self.title, self.anilist_show_id, self.list_id, episodes, self)
+    @staticmethod
+    def from_show(show: Show):
+        return ShowModel(title=show.title, anilist_show_id=show.show_id, list_id=show.list_id, id=show.key)
+
+    def to_show(self):
+        """
+        Convert this model to a full Show object
+
+        Returns:
+            The Show object represented by this model
+        """
+        episodes = EpisodeModel.select() \
+            .join(ShowModel).where(EpisodeModel.show_id == self.id)
+        episodes = {x.to_episode() for x in episodes}
+        return Show(self.title, self.anilist_show_id, self.list_id, episodes, self.get_id())
 
 
 class Episode:
@@ -128,27 +129,12 @@ class Episode:
         UNWATCHED = 2
         WATCHED = 3
 
-    def __init__(self, path: Path, state=State.NEW, number=0, model=None):
+    def __init__(self, path: Path, state=State.NEW, number=0, key=None):
         self.path = path
         self.state = state
         self.name = path.name
         self.number = number
-        self.model = model
-
-    def populate_model(self, show: Show.ShowModel):
-        """
-        Create a new model that represents this Episode object
-
-        Args:
-            show:
-                The show this Episode belongs to, required for the foreign key
-
-        Returns:
-            The newly created model representing the Episode
-        """
-        self.model = Episode.EpisodeModel(path=str(self.path), number=self.number, show=show,
-                                          state=self.state.value)
-        return self.model
+        self.key = key
 
     def parse_episode_number(self, title):
         """
@@ -173,15 +159,13 @@ class Episode:
 
     def update_state(self, new_state: State):
         """
-        Update the Episode's watch state and persist the change in the database
+        Update the Episode's watch state
 
         Args:
             new_state:
                 The new state for the Episode
         """
         self.state = new_state
-        self.model.state = new_state.value
-        self.model.save()
 
     def __gt__(self, other):
         return self.number > other.number
@@ -192,22 +176,39 @@ class Episode:
     def __hash__(self):
         return hash(self.path)
 
-    class EpisodeModel(BaseModel):
-        """ Model representing an Episode in the database"""
-        path = TextField()
-        number = IntegerField()
-        show = ForeignKeyField(Show.ShowModel, backref='show_id')
-        state = IntegerField()
-        table = 'Episode'
 
-        def to_episode(self):
-            """
-            Convert this model into a full Episode object
+class EpisodeModel(BaseModel):
+    """ Model representing an Episode in the database"""
+    path = TextField()
+    number = IntegerField()
+    show = ForeignKeyField(ShowModel, backref='show_id')
+    state = IntegerField()
 
-            Returns:
-                The new Episode object represented by this model
-            """
-            return Episode(Path(self.path), Episode.State(self.state), self.number, self)
+    @staticmethod
+    def from_episode(episode: Episode, show: ShowModel):
+        """
+        Create a new model that represents the given Episode object
+
+        Args:
+            episode:
+                The episode to build the Model for
+            show:
+                The show this Episode belongs to, required for the foreign key
+
+        Returns:
+            The newly created model representing the Episode
+        """
+        return EpisodeModel(path=str(episode.path), number=episode.number, show=show,
+                            state=episode.state.value)
+
+    def to_episode(self):
+        """
+        Convert this model into a full Episode object
+
+        Returns:
+            The new Episode object represented by this model
+        """
+        return Episode(Path(self.path), Episode.State(self.state), self.number, self.get_id())
 
 
 class ShowList(dict):

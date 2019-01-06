@@ -27,7 +27,7 @@ from PySide2.QtWidgets import (
 )
 
 from ene.constants import STREAMERS
-from ene.models import Episode
+from ene.models import Episode, EpisodeModel
 
 
 class CheckMarkDelegate(QStyledItemDelegate):
@@ -252,13 +252,21 @@ class EpisodeButton(QPushButton):
 
         self.episode = episode
         if episode.state is Episode.State.WATCHED:
-            self.setIcon(QIcon.fromTheme('mail-read'))
+            self.setIcon(QIcon.fromTheme('emblem-default'))
         elif episode.state is Episode.State.NEW:
-            self.setIcon(QIcon.fromTheme('mail-unread'))
+            self.setIcon(QIcon.fromTheme('emblem-important'))
+        elif episode.state is Episode.State.UNWATCHED:
+            self.setIcon(QIcon.fromTheme('media-optical'))
+        self.setToolTip(episode.state.name.title())
 
     def mark_watched(self):
         self.episode.update_state(Episode.State.WATCHED)
-        self.setIcon(QIcon.fromTheme('mail-read'))
+        episode_model = EpisodeModel.get_by_id(self.episode.key)
+        episode_model.state = self.episode.state.value
+        episode_model.save()
+
+        self.setIcon(QIcon.fromTheme('emblem-default'))
+        self.setToolTip(self.episode.state.name.title())
 
 
 class FlowLayout(QLayout):
