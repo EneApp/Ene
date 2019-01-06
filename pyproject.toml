@@ -24,6 +24,7 @@ qdarkstyle = {git = "https://github.com/ColinDuquesnoy/QDarkStyleSheet.git", bra
 attrs = "*"
 option = "*"
 peewee = "^3.8"
+pyinstaller = "^3.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"

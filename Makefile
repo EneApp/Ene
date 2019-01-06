@@ -54,3 +54,6 @@ coverage:
 	python -m pytest -vvv -s --cov=ene tests
 	pip install codecov
 	codecov
+
+build:
+	pyinstaller -F ene/__main__.py
