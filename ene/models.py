@@ -31,8 +31,6 @@ def init_db(path):
         path:
             The path where the Sqlite database file resides
     """
-    # need to use global DB so that we can specify the database location at runtime
-    global db
     db.init(path)
     db.connect()
     db.create_tables([Show.ShowModel, Episode.EpisodeModel])
