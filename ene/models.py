@@ -104,9 +104,10 @@ class ShowModel(BaseModel):
     anilist_show_id = IntegerField(null=True)
     list_id = IntegerField(null=True)
 
-    @staticmethod
-    def from_show(show: Show):
-        return ShowModel(title=show.title, anilist_show_id=show.show_id, list_id=show.list_id, id=show.key)
+    @classmethod
+    def from_show(cls, show: Show):
+        return cls(title=show.title, anilist_show_id=show.show_id, 
+list_id=show.list_id, id=show.key)
 
     def to_show(self):
         """
@@ -184,7 +185,7 @@ class EpisodeModel(BaseModel):
     show = ForeignKeyField(ShowModel, backref='show_id')
     state = IntegerField()
 
-    @staticmethod
+    @classmethod
     def from_episode(episode: Episode, show: ShowModel):
         """
         Create a new model that represents the given Episode object
@@ -198,7 +199,7 @@ class EpisodeModel(BaseModel):
         Returns:
             The newly created model representing the Episode
         """
-        return EpisodeModel(path=str(episode.path), number=episode.number, show=show,
+        return cls(path=str(episode.path), number=episode.number, show=show,
                             state=episode.state.value)
 
     def to_episode(self):

@@ -37,7 +37,7 @@ class FileManager:
     def __init__(self, cfg, data_home: Path):
         self.config = cfg
         self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
-        self.database = EneDatabase(data_home / 'ene.db')
+        self.database = EneDatabase(str(data_home / 'ene.db'))
         self.series = ShowList()
         self.build_shows_from_db()
 
