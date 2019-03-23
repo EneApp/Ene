@@ -220,7 +220,7 @@ class MainWindow(QMainWindow, Ui_window_main):
             button = EpisodeButton(episode)
             button.clicked.connect(self.play_episode)
             layout.addWidget(button)
-        self.files.mark_seen(show)
+        #  self.files.mark_seen(show)
         self.stack_local_files.currentWidget().setLayout(layout)
 
     def refresh_show(self):

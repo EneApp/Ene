@@ -67,12 +67,12 @@ class Show:
     """
     Class containing information about a single show
     """
-    def __init__(self, title, show_id=None, list_id=None, episodes: set = None, key=None):
+    def __init__(self, title, show_id=None, list_id=None, episodes: dict = None, key=None):
         self.title = title
         self.show_id = show_id
         self.list_id = list_id
         if episodes is None:
-            self.episodes = set()
+            self.episodes = dict()
         else:
             self.episodes = episodes
         self.key = key
@@ -84,7 +84,10 @@ class Show:
         Args:
             episode: The episode to add
         """
-        self.episodes.add(episode)
+        if episode in self.episodes:
+            episode.state = self.episodes[episode].state
+
+        self.episodes[episode] = episode
 
     def __len__(self):
         """
@@ -117,8 +120,11 @@ class ShowModel(BaseModel):
         """
         episodes = EpisodeModel.select() \
             .join(ShowModel).where(EpisodeModel.show_id == self.id)
-        episodes = {x.to_episode() for x in episodes}
-        return Show(self.title, self.anilist_show_id, self.list_id, episodes, self.get_id())
+        all_episodes = dict()
+        for episode_model in episodes:
+            episode = episode_model.to_episode()
+            all_episodes[episode] = episode
+        return Show(self.title, self.anilist_show_id, self.list_id, all_episodes, self.get_id())
 
 
 class Episode:
@@ -147,7 +153,7 @@ class Episode:
 
         temp = self.name.replace(title, '')
         # Searches for a number that is not preceded by x or succeeded by x or p
-        num = re.search(r'(?<![x0-9])[0-9]+(?![0-9xp])', temp)
+        num = re.search(r'(?<![\(x0-9])[0-9]+(?![0-9xp])', temp)
         try:
             if num is not None:
                 num = num[0]
