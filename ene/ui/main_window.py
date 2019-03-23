@@ -50,7 +50,11 @@ class MainWindow(QMainWindow, Ui_window_main):
         """
         super().__init__()
         self.app = app
-        self.files = FileManager(self.app.config, self.app.data_home)
+        #  TODO: These three lines should be moved somewhere else
+        self.files = FileManager(self.app.config)
+        self.files.init_db(self.app.data_home)
+        self.files.build_shows_from_db()
+
         self.player = None
         self.current_show = None
         self.setupUi(self)

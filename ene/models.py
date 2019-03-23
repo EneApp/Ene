@@ -106,8 +106,7 @@ class ShowModel(BaseModel):
 
     @classmethod
     def from_show(cls, show: Show):
-        return cls(title=show.title, anilist_show_id=show.show_id, 
-list_id=show.list_id, id=show.key)
+        return cls(title=show.title, anilist_show_id=show.show_id, list_id=show.list_id, id=show.key)
 
     def to_show(self):
         """

@@ -34,12 +34,14 @@ class FileManager:
     Class to manage video files.
     """
 
-    def __init__(self, cfg, data_home: Path):
+    def __init__(self, cfg):
         self.config = cfg
         self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
-        self.database = EneDatabase(str(data_home / 'ene.db'))
+        self.database = None
         self.series = ShowList()
-        self.build_shows_from_db()
+
+    def init_db(self, db_path):
+        self.database = EneDatabase(str(db_path / 'ene.db'))
 
     def build_shows_from_db(self):
         """
@@ -64,15 +66,6 @@ class FileManager:
                 if new_episodes:
                     EpisodeModel.bulk_create(new_episodes)
 
-    def refresh_shows(self):
-        """
-        Discovers episodes from each path defined in the config and tidies up
-        their titles
-        """
-        self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
-        for directory in self.dirs:
-            self.discover_episodes(directory)
-
     def refresh_single_show(self, show):
         """
         Looks for all the episodes of a given show and adds it to the list of
@@ -87,7 +80,7 @@ class FileManager:
         """
         res = []
         for directory in self.dirs:
-            res.extend(self.find_episodes(show, directory))
+            res.extend(self.find_episodes(show, directory.iterdir()))
         new = set(res) - self.series.get_episodes(show)
         for new_show in new:
             self.series[show].add_episode(new_show)
@@ -99,14 +92,15 @@ class FileManager:
 
         Args:
             name: Name of the show to find episodes for
-            directory: None for default directory, otherwise searches a sub folder
+            directory: Directory to search in
 
         Returns:
             episodes: A list of all episodes found
         """
         regex = _build_regex(name)
         episodes = []
-        for path in directory.iterdir():
+        for file in directory:
+            path = Path(file)
             # check each file in the set directory
             if regex.match(path.name.lower()):
                 if path.is_dir():
@@ -120,25 +114,42 @@ class FileManager:
                 # If folders are sorted differently, e.g. Ongoing/Winter 2018/Plan to Watch
                 episodes += self.find_episodes(name, path)
 
-        return episodes
+        return sorted(episodes)
 
-    def discover_episodes(self, directory):
+    def traverse_directories(self, directory=None):
+        """
+        Traverse one or more directories to locate all episodes.
+        Can specify a specific directory to search, otherwise searches
+        all configured directories
+
+        Args:
+            directory:
+                The directory to traverse
+        """
+        if directory is None:
+            folders = [Path(x) for x in self.config.get('Local Paths', [])]
+        else:
+            folders = [Path(directory)]
+        for folder in folders:
+            for path, dirs, files in walk(folder):  # pylint: disable=W0612
+                self.discover_episodes(path, files)
+
+    def discover_episodes(self, base_path, files):
         """
         Search through a directory to find all files which have a close enough
         name to be considered a part of the same series
         """
         op_or_ed = re.compile(r'(NCOP)|(NCED)|(\sOP[0-9]+)|(\sED[0-9]+)')
-        for path, dirs, files in walk(directory):  # pylint: disable=W0612
-            for file in files:
-                episode = Path(file)
-                if episode.suffix not in EXTENSIONS:
-                    continue
-                if op_or_ed.search(episode.name):
-                    continue
-                title = clean_title(episode.stem)
-                episode = Episode(path / episode)
-                episode.parse_episode_number(title)
-                self.series[title].add_episode(episode)
+        for file in files:
+            episode = Path(file)
+            if episode.suffix not in EXTENSIONS:
+                continue
+            if op_or_ed.search(episode.name):
+                continue
+            title = clean_title(episode.stem)
+            episode = Episode(base_path / episode)
+            episode.parse_episode_number(title)
+            self.series[title].add_episode(episode)
 
     def get_readable_names(self, show: str) -> Iterable[str]:
         """
