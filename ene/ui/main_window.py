@@ -280,7 +280,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         and adding new shows to the UI as needed
         """
         old = set(self.files.series.keys())
-        self.files.refresh_shows()
+        self.files.traverse_directories()
         new = set(self.files.series.keys()) - old
         for show in self.page_widget.children():
             if isinstance(show, SeriesButton):
