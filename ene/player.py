@@ -23,7 +23,7 @@ from threading import Event
 from time import sleep
 import requests
 
-from ene.models import Episode
+from ene.persistence.models import Episode
 
 
 from ene.constants import IS_MAC, IS_WIN

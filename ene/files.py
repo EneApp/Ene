@@ -19,8 +19,7 @@
 import re
 from os import walk
 from pathlib import Path
-from typing import Iterable
-from ene.models import Show, ShowModel, Episode, EpisodeModel, ShowList, EneDatabase
+from ene.entities import Episode, ShowList
 
 
 EXTENSIONS = ['.mkv',
@@ -37,34 +36,7 @@ class FileManager:
     def __init__(self, cfg):
         self.config = cfg
         self.dirs = [Path(x) for x in self.config.get('Local Paths', [])]
-        self.database = None
         self.series = ShowList()
-
-    def init_db(self, db_path):
-        self.database = EneDatabase(str(db_path / 'ene.db'))
-
-    def build_shows_from_db(self):
-        """
-        Fetches all shows from the database and adds them to the series
-        dictionary without episode paths
-        """
-        shows = ShowModel.select()
-        for show_model in shows:
-            show = show_model.to_show()
-            self.series[show.title] = show
-
-    def dump_to_db(self):
-        """
-        Dumps the current dictionary to the database
-        """
-        for show in self.series.values():
-            with self.database.database.atomic():
-                show_model = ShowModel.from_show(show)
-                show_model.save()
-                new_episodes = [EpisodeModel.from_episode(x, show_model) for x in show.episodes
-                                if not x.key]
-                if new_episodes:
-                    EpisodeModel.bulk_create(new_episodes)
 
     def refresh_single_show(self, show):
         """
@@ -150,67 +122,6 @@ class FileManager:
             episode = Episode(base_path / episode)
             episode.parse_episode_number(title)
             self.series[title].add_episode(episode)
-
-    def get_readable_names(self, show: str) -> Iterable[str]:
-        """
-        Yields file names of a show
-
-        Args:
-            show: The show name
-
-        Yields:
-            The file names in the show
-        """
-        for path in self.series.get_episodes(show):
-            yield path.name
-
-    def rename_show(self, old, new):
-        """
-        Renames a given show
-
-        Args:
-            old:
-                The old name of the show
-            new:
-                The new name
-
-        Returns:
-            The episode list for the new show
-        """
-        if new in self.series:
-            for episode in self.series.get_episodes(old):
-                self.series[new].add_episode(episode)
-                episode.model.show = self.series[new].model
-                episode.model.save()
-            self.series[old].model.delete_instance()
-            self.series.pop(old)
-        else:
-            self.series[old].model.title = new
-            self.series[old].title = new
-            self.series[old].model.save()
-            self.series[new] = self.series.pop(old)
-        return self.series[new]
-
-    def delete_show(self, show):
-        """
-        Deletes a given show from the dictionary and the database
-
-        Args:
-            show:
-                The show to remove
-        """
-        self.series[show].model.delete_instance()
-        self.series.pop(show)
-
-    def mark_seen(self, show):
-        show_model = ShowModel.get_by_id(self.series[show].key)
-        EpisodeModel.update({EpisodeModel.state: Episode.State.UNWATCHED.value})\
-            .where(EpisodeModel.show == show_model)\
-            .where(EpisodeModel.state != Episode.State.WATCHED.value)\
-            .execute()
-        for episode in self.series.get_episodes(show):
-            if episode.state is not Episode.State.WATCHED:
-                episode.update_state(Episode.State.UNWATCHED)
 
 
 def clean_title(title):
