@@ -111,3 +111,6 @@ class SeriesManager:
         Persists the current series list to the database
         """
         self._db.save_show_list(self._series.values())
+
+    def save_episode(self, episode):
+        self._db.save_episode(episode)

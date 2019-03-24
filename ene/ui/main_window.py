@@ -256,6 +256,7 @@ class MainWindow(QMainWindow, Ui_window_main):
             self.player = ene.player.get_player(self.app.config)
         episode = self.sender().episode
         self.sender().mark_watched()
+        self.series.save_episode(episode)
         self.player.play(episode)
 
     def on_back_click(self):

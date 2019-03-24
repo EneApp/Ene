@@ -80,7 +80,10 @@ class ShowDataAccess:
             self.save_episode(episode, show_model)
 
     @staticmethod
-    def save_episode(episode, parent_show):
+    def get_show_from_episode(episode):
+        return ShowModel.select().join(EpisodeModel).where(EpisodeModel.id == episode.key).get()
+
+    def save_episode(self, episode, parent_show=None):
         """
         Saves a given episode to the database
         Args:
@@ -89,6 +92,8 @@ class ShowDataAccess:
             parent_show:
                 The Show that the episode belongs to
         """
+        if parent_show is None:
+            parent_show = self.get_show_from_episode(episode)
         episode_model = EpisodeModel.from_episode(episode, parent_show)
         episode_model.save()
         episode.key = episode_model.id
