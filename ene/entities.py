@@ -2,7 +2,6 @@
 import re
 from enum import Enum
 from pathlib import Path
-from copy import deepcopy
 
 
 class Show:
