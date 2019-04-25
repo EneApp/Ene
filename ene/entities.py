@@ -19,9 +19,10 @@ class Show:
             self.episodes = episodes
         self.key = key
 
-    def add_episode(self, episode):
+    def add_or_update_episode(self, episode):
         """
         Adds a single episode to the shows set of episodes
+        or updates the episode number if it already exists
 
         Args:
             episode: The episode to add
@@ -40,19 +41,7 @@ class Show:
                 The other Show object to merge with this one
         """
         for episode in other.episodes:
-            self.add_episode(episode)
-
-    def copy(self, force_new=False):
-        """
-        Gets a copy of the given Show object, optionally resetting the key
-        Args:
-            force_new:
-                If true, clear the key so the returned Show is considered new
-        """
-        new = deepcopy(self)
-        if force_new:
-            new.key = None
-        return new
+            self.add_or_update_episode(episode)
 
     def __len__(self):
         """

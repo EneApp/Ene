@@ -55,7 +55,7 @@ class FileManager:
             res.extend(self.find_episodes(show, directory.iterdir()))
         new = set(res) - self.series.get_episodes(show)
         for new_show in new:
-            self.series[show].add_episode(new_show)
+            self.series[show].add_or_update_episode(new_show)
         return sorted(new)
 
     def find_episodes(self, name, directory):
@@ -121,7 +121,7 @@ class FileManager:
             title = clean_title(episode.stem)
             episode = Episode(base_path / episode)
             episode.parse_episode_number(title)
-            self.series[title].add_episode(episode)
+            self.series[title].add_or_update_episode(episode)
 
 
 def clean_title(title):

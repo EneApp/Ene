@@ -100,11 +100,10 @@ class SeriesManager:
         Returns:
             The episode list for the new show
         """
-        new_show = self._series[old].copy(True)
-        new_show.title = new
-        self._series.add(new_show)
-        self.delete_show(old)
-        self._db.save_show(new_show)
+        self._series[old].title = new
+        self._series[new] = self._series[old]
+        self._series.pop(old)
+        self._db.save_show(self._series[new])
 
     def save_shows(self):
         """
