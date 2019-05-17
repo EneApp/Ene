@@ -48,15 +48,15 @@ class FileManager:
                 The show to search for all episodes of
 
         Returns:
-            A list of new shows
+            A list of episodes found
         """
-        res = []
+        episodes = []
         for directory in self.dirs:
-            res.extend(self.find_episodes(show, directory.iterdir()))
-        new = set(res) - self.series.get_episodes(show)
-        for new_show in new:
-            self.series[show].add_or_update_episode(new_show)
-        return sorted(new)
+            episodes.extend(self.find_episodes(show, directory.iterdir()))
+
+        for episode in episodes:
+            self.series[show].add_or_update_episode(episode)
+        return episodes
 
     def find_episodes(self, name, directory):
         """
