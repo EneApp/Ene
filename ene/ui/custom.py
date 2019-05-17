@@ -260,10 +260,7 @@ class EpisodeButton(QPushButton):
         self.setToolTip(episode.state.name.title())
 
     def mark_watched(self):
-        self.episode.update_state(Episode.State.WATCHED)
-        #  episode_model = EpisodeModel.get_by_id(self.episode.key)
-        #  episode_model.state = self.episode.state.value
-        #  episode_model.save()
+        self.episode.state = Episode.State.WATCHED
 
         self.setIcon(QIcon.fromTheme('emblem-default'))
         self.setToolTip(self.episode.state.name.title())

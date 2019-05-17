@@ -86,8 +86,13 @@ class ShowModel(BaseModel):
         Returns:
             The newly created ShowModel object
         """
-        return cls(title=show.title, anilist_show_id=show.show_id, list_id=show.list_id,
-                   id=show.key)
+        existing = ShowModel.get_or_none(ShowModel.title == show.title)
+
+        show_id = None
+        if existing is not None:
+            show_id = existing.id
+
+        return cls(title=show.title, anilist_show_id=show.show_id, list_id=show.list_id, id=show_id)
 
     def to_show(self):
         """
@@ -102,7 +107,7 @@ class ShowModel(BaseModel):
         for episode_model in episodes:
             episode = episode_model.to_episode()
             all_episodes[episode] = episode
-        return Show(self.title, self.anilist_show_id, self.list_id, all_episodes, self.get_id())
+        return Show(self.title, self.anilist_show_id, self.list_id, all_episodes)
 
 
 class EpisodeModel(BaseModel):
@@ -127,7 +132,7 @@ class EpisodeModel(BaseModel):
             The newly created model representing the Episode
         """
         return cls(path=str(episode.path), number=episode.number, show=show,
-                   state=episode.state.value, id=episode.key)
+                   state=episode.state.value, id=episode.episode_id)
 
     def to_episode(self):
         """

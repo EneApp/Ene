@@ -1,5 +1,6 @@
 """ This module handles series related objects """
 import re
+from collections import UserDict
 from enum import Enum
 from pathlib import Path
 
@@ -8,15 +9,11 @@ class Show:
     """
     Class containing information about a single show
     """
-    def __init__(self, title, show_id=None, list_id=None, episodes: dict = None, key=None):
+    def __init__(self, title, show_id=None, list_id=None, episodes: dict = None):
         self.title = title
         self.show_id = show_id
         self.list_id = list_id
-        if episodes is None:
-            self.episodes = dict()
-        else:
-            self.episodes = episodes
-        self.key = key
+        self.episodes = episodes or {}
 
     def add_or_update_episode(self, episode):
         """
@@ -60,12 +57,12 @@ class Episode:
         UNWATCHED = 2
         WATCHED = 3
 
-    def __init__(self, path: Path, state=State.NEW, number=0, key=None):
+    def __init__(self, path: Path, state=State.NEW, number=0, episode_id=None):
         self.path = path
         self.state = state
         self.name = path.name
         self.number = number
-        self.key = key
+        self.episode_id = episode_id
 
     def parse_episode_number(self, title):
         """
@@ -84,31 +81,27 @@ class Episode:
                 num = num[0]
                 self.number = int(num)
             else:
-                self.number = -1
+                self.number = None
         except ValueError:
-            self.number = -1
-
-    def update_state(self, new_state: State):
-        """
-        Update the Episode's watch state
-
-        Args:
-            new_state:
-                The new state for the Episode
-        """
-        self.state = new_state
+            self.number = None
 
     def __gt__(self, other):
+        if self.number is None:
+            return False
+        if other.number is None:
+            return True
         return self.number > other.number
 
     def __eq__(self, other):
+        if other.number is None or self.number is None:
+            return False
         return self.path == other.path
 
     def __hash__(self):
         return hash(self.path)
 
 
-class ShowList(dict):
+class ShowList(UserDict):
     """
     A specialised dictionary for holding shows
     """
