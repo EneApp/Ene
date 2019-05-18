@@ -75,13 +75,12 @@ class ShowDataAccess:
         """
         show_model = ShowModel.from_show(show)
         show_model.save()
-        show.key = show_model.id
         for episode in show.episodes:
             self.save_episode(episode, show_model)
 
     @staticmethod
     def get_show_from_episode(episode):
-        return ShowModel.select().join(EpisodeModel).where(EpisodeModel.id == episode.key).get()
+        return ShowModel.select().join(EpisodeModel).where(EpisodeModel.id == episode.episode_id).get()
 
     def save_episode(self, episode, parent_show=None):
         """
@@ -96,4 +95,4 @@ class ShowDataAccess:
             parent_show = self.get_show_from_episode(episode)
         episode_model = EpisodeModel.from_episode(episode, parent_show)
         episode_model.save()
-        episode.key = episode_model.id
+        episode.episode_id = episode_model.id
