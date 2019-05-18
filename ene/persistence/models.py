@@ -113,7 +113,7 @@ class ShowModel(BaseModel):
 class EpisodeModel(BaseModel):
     """ Model representing an Episode in the database"""
     path = TextField()
-    number = IntegerField()
+    number = IntegerField(null=True)
     show = ForeignKeyField(ShowModel, backref='show_id')
     state = IntegerField()
 
