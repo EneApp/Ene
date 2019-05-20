@@ -1,5 +1,5 @@
 # source: https://graphql.anilist.co
-# timestamp: Sat Sep 08 2018 15:52:09 GMT-0400 (Eastern Daylight Time)
+# timestamp: Mon May 20 2019 15:38:37 GMT-0400 (Eastern Daylight Time)
 
 # Notification for when a activity is liked
 type ActivityLikeNotification {
@@ -163,6 +163,33 @@ type ActivityReplyNotification {
   user: User
 }
 
+# Notification for when a user replies to activity the authenticated user has replied to
+type ActivityReplySubscribedNotification {
+  # The id of the Notification
+  id: Int!
+
+  # The id of the user who replied to the activity
+  userId: Int!
+
+  # The type of notification
+  type: NotificationType
+
+  # The id of the activity which was replied too
+  activityId: Int!
+
+  # The notification context text
+  context: String
+
+  # The time the notification was created at
+  createdAt: Int
+
+  # The liked activity
+  activity: ActivityUnion
+
+  # The user who replied to the activity
+  user: User
+}
+
 # Activity sort enums
 enum ActivitySort {
   ID
@@ -263,6 +290,12 @@ type AiringScheduleEdge {
   id: Int
 }
 
+input AiringScheduleInput {
+  airingAt: Int
+  episode: Int
+  timeUntilAiring: Int
+}
+
 # Airing schedule sort enums
 enum AiringSort {
   ID
@@ -273,6 +306,17 @@ enum AiringSort {
   TIME_DESC
   EPISODE
   EPISODE_DESC
+}
+
+input AniChartHighlightInput {
+  mediaId: Int
+  highlight: String
+}
+
+type AniChartUser {
+  user: User
+  settings: Json
+  highlights: Json
 }
 
 # A character that features in an anime or manga
@@ -309,6 +353,9 @@ type Character {
     # The amount of entries per page, max 25
     perPage: Int
   ): MediaConnection
+
+  # When the character's data was last updated
+  updatedAt: Int
 
   # The amount of user's who have favourited the character
   favourites: Int
@@ -365,6 +412,21 @@ type CharacterName {
   alternative: [String]
 }
 
+# The names of the character
+input CharacterNameInput {
+  # The character's given name
+  first: String
+
+  # The character's surname
+  last: String
+
+  # The character's full name in their native language
+  native: String
+
+  # Other names the character might be referred by
+  alternative: [String]
+}
+
 # The role the character plays in the media
 enum CharacterRole {
   # A primary character role in the media
@@ -386,6 +448,50 @@ enum CharacterSort {
   SEARCH_MATCH
   FAVOURITES
   FAVOURITES_DESC
+}
+
+# A submission for a character that features in an anime or manga
+type CharacterSubmission {
+  # The id of the submission
+  id: Int!
+
+  # Character that the submission is referencing
+  character: Character
+
+  # The character submission changes
+  submission: Character
+
+  # Submitter for the submission
+  submitter: User
+
+  # Status of the submission
+  status: SubmissionStatus
+
+  # Inner details of submission status
+  notes: String
+  createdAt: Int
+}
+
+type CharacterSubmissionConnection {
+  edges: [CharacterSubmissionEdge]
+  nodes: [CharacterSubmission]
+
+  # The pagination information
+  pageInfo: PageInfo
+}
+
+# CharacterSubmission connection edge
+type CharacterSubmissionEdge {
+  node: CharacterSubmission
+
+  # The characters role in the media
+  role: CharacterRole
+
+  # The voice actors of the character
+  voiceActors: [Staff]
+
+  # The submitted voice actors of the character
+  submittedVoiceActors: [StaffSubmission]
 }
 
 # ISO 3166-1 alpha-2 country code
@@ -511,6 +617,51 @@ type GenreStats {
 
 # Page of data (Used for internal use only)
 type InternalPage {
+  mediaSubmissions(
+    mediaId: Int
+    submissionId: Int
+    userId: Int
+    status: SubmissionStatus
+
+    # Filter by the media's type
+    type: MediaType
+  ): [MediaSubmission]
+  characterSubmissions(
+    characterId: Int
+
+    # Filter by the submitter of the submission
+    userId: Int
+
+    # Filter by the status of the submission
+    status: SubmissionStatus
+  ): [CharacterSubmission]
+  staffSubmissions(
+    staffId: Int
+
+    # Filter by the submitter of the submission
+    userId: Int
+
+    # Filter by the status of the submission
+    status: SubmissionStatus
+  ): [StaffSubmission]
+  revisionHistory(
+    # Filter by the user id
+    userId: Int
+
+    # Filter by the media id
+    mediaId: Int
+
+    # Filter by the character id
+    characterId: Int
+
+    # Filter by the staff id
+    staffId: Int
+
+    # Filter by the studio id
+    studioId: Int
+  ): [RevisionHistory]
+  reports: [Report]
+
   # The pagination information
   pageInfo: PageInfo
   users(
@@ -589,6 +740,12 @@ type InternalPage {
 
     # Filter by the number of users with this media on their list
     popularity: Int
+
+    # Filter by the source type of the media
+    source: MediaSource
+
+    # Filter by the media's country of origin
+    countryOfOrigin: CountryCode
 
     # Filter by search query
     search: String
@@ -709,6 +866,9 @@ type InternalPage {
 
     # Filter by the number of users with this media on their list
     popularity_lesser: Int
+
+    # Filter by the source type of the media
+    source_in: [MediaSource]
 
     # The order the results will be returned in
     sort: [MediaSort]
@@ -1124,6 +1284,9 @@ type InternalPage {
 
     # Filter by the user id of the comment's creator
     userId: Int
+
+    # The order the results will be returned in
+    sort: [ThreadCommentSort]
   ): [ThreadComment]
   reviews(
     # Filter by Review id
@@ -1230,8 +1393,11 @@ type Media {
   # The last official release date of the media
   endDate: FuzzyDate
 
-  # The season the media was initially released in
+  # The year & season the media was initially released in
   season: MediaSeason
+
+  # The year & season the media was initially released in
+  seasonInt: Int
 
   # The amount of episodes the anime has when complete
   episodes: Int
@@ -1252,7 +1418,10 @@ type Media {
   isLicensed: Boolean
 
   # Source type the media was adapted from.
-  source: MediaSource
+  source(
+    # Provide 2 to use new version 2 of sources enum
+    version: Int
+  ): MediaSource
 
   # Official Twitter hashtags for the media
   hashtag: String
@@ -1283,6 +1452,9 @@ type Media {
 
   # The number of users with the media on their list
   popularity: Int
+
+  # Locked media may not be added to lists our favorited. This may be due to the entry pending for deletion or other reasons.
+  isLocked: Boolean
 
   # The amount of related activity in the past hour
   trending: Int
@@ -1392,6 +1564,21 @@ type Media {
   modNotes: String
 }
 
+# Internal - Media characters separated
+type MediaCharacter {
+  # The id of the connection
+  id: Int
+
+  # The characters role in the media
+  role: CharacterRole
+
+  # The characters in the media voiced by the parent actor
+  character: Character
+
+  # The voice actor of the character
+  voiceActor: Staff
+}
+
 type MediaConnection {
   edges: [MediaEdge]
   nodes: [Media]
@@ -1401,11 +1588,17 @@ type MediaConnection {
 }
 
 type MediaCoverImage {
-  # The cover image of media at its largest size
+  # The cover image url of the media at its largest size. If this size isn't available, large will be provided instead.
+  extraLarge: String
+
+  # The cover image url of the media at a large size
   large: String
 
-  # The cover image of media at medium size
+  # The cover image url of the media at medium size
   medium: String
+
+  # Average #hex color of cover image
+  color: String
 }
 
 # Media connection edge
@@ -1416,7 +1609,10 @@ type MediaEdge {
   id: Int
 
   # The type of relation to the parent model
-  relationType: MediaRelation
+  relationType(
+    # Provide 2 to use new version 2 of relation enum
+    version: Int
+  ): MediaRelation
 
   # If the studio is the main animation studio of the media (For Studio->MediaConnection field only)
   isMainStudio: Boolean!
@@ -1439,6 +1635,18 @@ type MediaEdge {
 
 # An external link to another site related to the media
 type MediaExternalLink {
+  # The id of the external link
+  id: Int!
+
+  # The url of the external link
+  url: String!
+
+  # The site location of the external link
+  site: String!
+}
+
+# An external link to another site related to the media
+input MediaExternalLinkInput {
   # The id of the external link
   id: Int!
 
@@ -1477,7 +1685,7 @@ enum MediaFormat {
   # Professionally published manga with more than one chapter
   MANGA
 
-  # Written books released as a novel or series of light novels
+  # Written books released as a series of light novels
   NOVEL
 
   # Manga with just one chapter
@@ -1554,20 +1762,17 @@ type MediaListCollection {
   # Grouped media list entries
   lists: [MediaListGroup]
 
-  # A map of media list entry arrays grouped by status
-  statusLists(
-    # Return the list sections in grouped arrays instead of a map
-    asArray: Boolean
-  ): [[MediaList]] @deprecated(reason: "Not GraphQL spec compliant, use lists field instead.")
-
-  # A map of media list entry arrays grouped by custom lists
-  customLists(
-    # Return the list sections in grouped arrays instead of a map
-    asArray: Boolean
-  ): [[MediaList]] @deprecated(reason: "Not GraphQL spec compliant, use lists field instead.")
-
   # The owner of the list
   user: User
+
+  # If there is another chunk
+  hasNextChunk: Boolean
+
+  # A map of media list entry arrays grouped by status
+  statusLists(asArray: Boolean): [[MediaList]] @deprecated(reason: "Not GraphQL spec compliant, use lists field instead.")
+
+  # A map of media list entry arrays grouped by custom lists
+  customLists(asArray: Boolean): [[MediaList]] @deprecated(reason: "Not GraphQL spec compliant, use lists field instead.")
 }
 
 # List group of anime or manga entries
@@ -1649,6 +1854,14 @@ enum MediaListSort {
   ADDED_TIME_DESC
   UPDATED_TIME
   UPDATED_TIME_DESC
+  MEDIA_TITLE_ROMAJI
+  MEDIA_TITLE_ROMAJI_DESC
+  MEDIA_TITLE_ENGLISH
+  MEDIA_TITLE_ENGLISH_DESC
+  MEDIA_TITLE_NATIVE
+  MEDIA_TITLE_NATIVE_DESC
+  MEDIA_POPULARITY
+  MEDIA_POPULARITY_DESC
 }
 
 # Media list watching/reading status enum.
@@ -1731,7 +1944,7 @@ enum MediaRankType {
 
 # Type of relation media has to its parent.
 enum MediaRelation {
-  # An adaption of the media into a different format
+  # An adaption of this media into a different format
   ADAPTATION
 
   # Released before the relation
@@ -1760,6 +1973,15 @@ enum MediaRelation {
 
   # Other
   OTHER
+
+  # Version 2 only. The source material the media was adapted from
+  SOURCE
+
+  # Version 2 only.
+  COMPILATION
+
+  # Version 2 only.
+  CONTAINS
 }
 
 enum MediaSeason {
@@ -1836,6 +2058,15 @@ enum MediaSource {
 
   # Other
   OTHER
+
+  # Version 2 only. Written works not published in volumes
+  NOVEL
+
+  # Version 2 only. Self-published works
+  DOUJINSHI
+
+  # Version 2 only. Japanese Anime
+  ANIME
 }
 
 # A media's statistics
@@ -1873,6 +2104,54 @@ type MediaStreamingEpisode {
 
   # The site location of the streaming episodes
   site: String
+}
+
+# Media submission
+type MediaSubmission {
+  # The id of the submission
+  id: Int!
+
+  # User submitter of the submission
+  submitter: User
+
+  # Status of the submission
+  status: SubmissionStatus
+  submitterStats: Json
+  notes: String
+  source: String
+  changes: [String]
+  media: Media
+  submission: Media
+  characters: [MediaSubmissionComparison]
+  staff: [MediaSubmissionComparison]
+  studios: [MediaSubmissionComparison]
+  relations: [MediaEdge]
+  externalLinks: [MediaExternalLink]
+  createdAt: Int
+}
+
+# Media submission with comparison to current data
+type MediaSubmissionComparison {
+  submission: MediaSubmissionEdge
+  character: MediaCharacter
+  staff: StaffEdge
+  studio: StudioEdge
+}
+
+type MediaSubmissionEdge {
+  # The id of the direct submission
+  id: Int
+  characterRole: CharacterRole
+  staffRole: String
+  isMain: Boolean
+  character: Character
+  characterSubmission: Character
+  voiceActor: Staff
+  voiceActorSubmission: Staff
+  staff: Staff
+  staffSubmission: Staff
+  studio: Studio
+  media: Media
 }
 
 # A tag that describes a theme or element of the media
@@ -1934,8 +2213,11 @@ type MediaTrailer {
   # The trailer video id
   id: String
 
-  # The site the video is hosted by (Currently either youtube or dailymotion
+  # The site the video is hosted by (Currently either youtube or dailymotion)
   site: String
+
+  # The url for the thumbnail image of the video
+  thumbnail: String
 }
 
 # Daily media statistics
@@ -2075,6 +2357,9 @@ type Mutation {
 
     # Profile highlight color
     donatorBadge: String
+
+    # Notification options
+    notificationOptions: [NotificationOptionInput]
 
     # The user's anime list options
     animeListOptions: MediaListOptionsInput
@@ -2401,6 +2686,26 @@ type Mutation {
     # The id of the thread comment to delete
     id: Int
   ): Deleted
+  UpdateAniChartSettings(titleLanguage: String, outgoingLinkProvider: String, theme: String, sort: String): Json
+  UpdateAniChartHighlights(highlights: [AniChartHighlightInput]): Json
+}
+
+# Notification option
+type NotificationOption {
+  # The type of notification
+  type: NotificationType
+
+  # Whether this type of notification is enabled
+  enabled: Boolean
+}
+
+# Notification option input
+input NotificationOptionInput {
+  # The type of notification
+  type: NotificationType
+
+  # Whether this type of notification is enabled
+  enabled: Boolean
 }
 
 # Notification type enum
@@ -2440,10 +2745,16 @@ enum NotificationType {
 
   # A user has liked your forum comment
   THREAD_COMMENT_LIKE
+
+  # A user has replied to activity you have also replied to
+  ACTIVITY_REPLY_SUBSCRIBED
+
+  # A new anime or manga has been added to the site where its related media is on the user's list
+  RELATED_MEDIA_ADDITION
 }
 
 # Notification union type
-union NotificationUnion = AiringNotification | FollowingNotification | ActivityMessageNotification | ActivityMentionNotification | ActivityReplyNotification | ActivityLikeNotification | ActivityReplyLikeNotification | ThreadCommentMentionNotification | ThreadCommentReplyNotification | ThreadCommentSubscribedNotification | ThreadCommentLikeNotification | ThreadLikeNotification
+union NotificationUnion = AiringNotification | FollowingNotification | ActivityMessageNotification | ActivityMentionNotification | ActivityReplyNotification | ActivityReplySubscribedNotification | ActivityLikeNotification | ActivityReplyLikeNotification | ThreadCommentMentionNotification | ThreadCommentReplyNotification | ThreadCommentSubscribedNotification | ThreadCommentLikeNotification | ThreadLikeNotification | RelatedMediaAdditionNotification
 
 # Page of data
 type Page {
@@ -2525,6 +2836,12 @@ type Page {
 
     # Filter by the number of users with this media on their list
     popularity: Int
+
+    # Filter by the source type of the media
+    source: MediaSource
+
+    # Filter by the media's country of origin
+    countryOfOrigin: CountryCode
 
     # Filter by search query
     search: String
@@ -2645,6 +2962,9 @@ type Page {
 
     # Filter by the number of users with this media on their list
     popularity_lesser: Int
+
+    # Filter by the source type of the media
+    source_in: [MediaSource]
 
     # The order the results will be returned in
     sort: [MediaSort]
@@ -3060,6 +3380,9 @@ type Page {
 
     # Filter by the user id of the comment's creator
     userId: Int
+
+    # The order the results will be returned in
+    sort: [ThreadCommentSort]
   ): [ThreadComment]
   reviews(
     # Filter by Review id
@@ -3175,6 +3498,12 @@ type Query {
 
     # Filter by the number of users with this media on their list
     popularity: Int
+
+    # Filter by the source type of the media
+    source: MediaSource
+
+    # Filter by the media's country of origin
+    countryOfOrigin: CountryCode
 
     # Filter by search query
     search: String
@@ -3295,6 +3624,9 @@ type Query {
 
     # Filter by the number of users with this media on their list
     popularity_lesser: Int
+
+    # Filter by the source type of the media
+    source_in: [MediaSource]
 
     # The order the results will be returned in
     sort: [MediaSort]
@@ -3579,6 +3911,12 @@ type Query {
     # Always return completed list entries in one group, overriding the user's split completed option.
     forceSingleCompletedList: Boolean
 
+    # Which chunk of list entries to load
+    chunk: Int
+
+    # The amount of entries per chunk, max 500
+    perChunk: Int
+
     # Filter by the watching/reading status
     status_in: [MediaListStatus]
 
@@ -3617,7 +3955,10 @@ type Query {
   GenreCollection: [String]
 
   # Collection of all the possible media tags
-  MediaTagCollection: [MediaTag]
+  MediaTagCollection(
+    # Mod Only
+    status: Int
+  ): [MediaTag]
 
   # User query
   User(
@@ -3839,6 +4180,9 @@ type Query {
 
     # Filter by the user id of the comment's creator
     userId: Int
+
+    # The order the results will be returned in
+    sort: [ThreadCommentSort]
   ): [ThreadComment]
 
   # Provide AniList markdown to be converted to html (Requires auth)
@@ -3846,6 +4190,38 @@ type Query {
     # The markdown to be parsed to html
     markdown: String!
   ): ParsedMarkdown
+  AniChartUser: AniChartUser
+}
+
+# Notification for when new media is added to the site
+type RelatedMediaAdditionNotification {
+  # The id of the Notification
+  id: Int!
+
+  # The type of notification
+  type: NotificationType
+
+  # The id of the new media
+  mediaId: Int!
+
+  # The notification context text
+  context: String
+
+  # The time the notification was created at
+  createdAt: Int
+
+  # The associated media of the airing schedule
+  media: Media
+}
+
+type Report {
+  id: Int!
+  reporter: User
+  reported: User
+  reason: String
+
+  # When the entry data was created
+  createdAt: Int
 }
 
 # A Review that features in an anime or manga
@@ -3936,6 +4312,42 @@ enum ReviewSort {
   UPDATED_AT_DESC
 }
 
+# Feed of mod edit activity
+type RevisionHistory {
+  # The id of the media
+  id: Int!
+
+  # The action taken on the objects
+  action: RevisionHistoryAction
+
+  # A JSON object of the fields that changed
+  changes: Json
+
+  # The user who made the edit to the object
+  user: User
+
+  # The media the mod feed entry references
+  media: Media
+
+  # The character the mod feed entry references
+  character: Character
+
+  # The staff member the mod feed entry references
+  staff: Staff
+
+  # The studio the mod feed entry references
+  studio: Studio
+
+  # When the mod feed entry was created
+  createdAt: Int
+}
+
+# Revision history actions
+enum RevisionHistoryAction {
+  CREATE
+  EDIT
+}
+
 # A user's list score distribution.
 type ScoreDistribution {
   score: Int
@@ -4010,6 +4422,21 @@ type Staff {
     # The amount of entries per page, max 25
     perPage: Int
   ): CharacterConnection
+
+  # When the staff's data was last updated
+  updatedAt: Int
+
+  # Staff member that the submission is referencing
+  staff: Staff
+
+  # Submitter for the submission
+  submitter: User
+
+  # Status of the submission
+  submissionStatus: Int
+
+  # Inner details of submission status
+  submissionNotes: String
 
   # The amount of user's who have favourited the staff member
   favourites: Int
@@ -4088,6 +4515,24 @@ type StaffName {
 
   # The person's full name in their native language
   native: String
+
+  # Other names the staff member might be referred to as (pen names)
+  alternative: [String]
+}
+
+# The names of the staff member
+input StaffNameInput {
+  # The person's given name
+  first: String
+
+  # The person's surname
+  last: String
+
+  # The person's full name in their native language
+  native: String
+
+  # Other names the character might be referred by
+  alternative: [String]
 }
 
 # Staff sort enums
@@ -4113,6 +4558,28 @@ type StaffStats {
   timeWatched: Int
 }
 
+# A submission for a staff that features in an anime or manga
+type StaffSubmission {
+  # The id of the submission
+  id: Int!
+
+  # Staff that the submission is referencing
+  staff: Staff
+
+  # The staff submission changes
+  submission: Staff
+
+  # Submitter for the submission
+  submitter: User
+
+  # Status of the submission
+  status: SubmissionStatus
+
+  # Inner details of submission status
+  notes: String
+  createdAt: Int
+}
+
 # The distribution of the watching/reading status of media or a user's list
 type StatusDistribution {
   # The day the activity took place (Unix timestamp)
@@ -4129,6 +4596,9 @@ type Studio {
 
   # The name of the studio
   name: String!
+
+  # If the studio is an animation studio or a different kind of company
+  isAnimationStudio: Boolean!
 
   # The media the studio has worked on
   media(
@@ -4196,6 +4666,14 @@ type StudioStats {
 
   # The amount of time in minutes the studio's works have been watched by the user
   timeWatched: Int
+}
+
+# Submission status
+enum SubmissionStatus {
+  PENDING
+  REJECTED
+  PARTIALLY_ACCEPTED
+  ACCEPTED
 }
 
 # User's tag statistics
@@ -4345,6 +4823,9 @@ type ThreadComment {
   # The time of the comments last update
   updatedAt: Int!
 
+  # The thread the comment belongs to
+  thread: Thread
+
   # The user who created the comment
   user: User
 
@@ -4443,6 +4924,12 @@ type ThreadCommentReplyNotification {
 
   # The user who replied to the activity
   user: User
+}
+
+# Thread comments sort enums
+enum ThreadCommentSort {
+  ID
+  ID_DESC
 }
 
 # Notification for when a user replies to a subscribed forum thread
@@ -4620,6 +5107,9 @@ type UserOptions {
 
   # Profile highlight color (blue, purple, pink, orange, red, green, gray)
   profileColor: String
+
+  # Notification options
+  notificationOptions: [NotificationOption]
 }
 
 # User sort enums

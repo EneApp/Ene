@@ -113,6 +113,14 @@ class MediaListSort(GettableEnum):
     ADDED_TIME_DESC = auto()
     UPDATED_TIME = auto()
     UPDATED_TIME_DESC = auto()
+    MEDIA_TITLE_ROMAJI = auto()
+    MEDIA_TITLE_ROMAJI_DESC = auto()
+    MEDIA_TITLE_ENGLISH = auto()
+    MEDIA_TITLE_ENGLISH_DESC = auto()
+    MEDIA_TITLE_NATIVE = auto()
+    MEDIA_TITLE_NATIVE_DESC = auto()
+    MEDIA_POPULARITY = auto()
+    MEDIA_POPULARITY_DESC = auto()
 
 
 class MediaListStatus(GettableEnum):
@@ -140,6 +148,9 @@ class MediaRelation(GettableEnum):
     ALTERNATIVE = auto()
     SPIN_OFF = auto()
     OTHER = auto()
+    SOURCE = auto()
+    COMPILATION = auto()
+    CONTAINS = auto()
 
 
 class MediaSeason(GettableEnum):
@@ -196,6 +207,9 @@ class MediaSource(GettableEnum):
     VISUAL_NOVEL = auto()
     VIDEO_GAME = auto()
     OTHER = auto()
+    NOVEL = auto()
+    DOUJINSHI = auto()
+    ANIME = auto()
 
 
 class MediaStatus(GettableEnum):
@@ -240,6 +254,8 @@ class NotificationType(GettableEnum):
     ACTIVITY_REPLY_LIKE = auto()
     THREAD_LIKE = auto()
     THREAD_COMMENT_LIKE = auto()
+    ACTIVITY_REPLY_SUBSCRIBED = auto()
+    RELATED_MEDIA_ADDITION = auto()
 
 
 class ReviewRating(GettableEnum):
@@ -259,6 +275,11 @@ class ReviewSort(GettableEnum):
     CREATED_AT_DESC = auto()
     UPDATED_AT = auto()
     UPDATED_AT_DESC = auto()
+
+
+class RevisionHistoryAction(GettableEnum):
+    CREATE = auto()
+    EDIT = auto()
 
 
 class ScoreFormat(GettableEnum):
@@ -302,6 +323,18 @@ class StudioSort(GettableEnum):
     SEARCH_MATCH = auto()
     FAVOURITES = auto()
     FAVOURITES_DESC = auto()
+
+
+class SubmissionStatus(GettableEnum):
+    PENDING = auto()
+    REJECTED = auto()
+    PARTIALLY_ACCEPTED = auto()
+    ACCEPTED = auto()
+
+
+class ThreadCommentSort(GettableEnum):
+    ID = auto()
+    ID_DESC = auto()
 
 
 class ThreadSort(GettableEnum):
