@@ -1,6 +1,6 @@
 #!/bin/bash
 #  ENE, Automatically track and sync anime watching progress
-#  Copyright (C) 2018 Peijun Ma, Justin Sedge
+#  Copyright (C) 2018-2019 Peijun Ma, Justin Sedge
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
