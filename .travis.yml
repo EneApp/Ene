@@ -11,18 +11,11 @@ matrix:
     - os: linux
       dist: xenial
       sudo: false
-      python: '3.6'
-    - os: linux
-      dist: xenial
-      sudo: false
       python: '3.7'
       env: UPLOAD_COV=true
     - os: osx
       language: objective-c
-      env: PYENV_VERSION=3.6.7
-    - os: osx
-      language: objective-c
-      env: PYENV_VERSION=3.7.1
+      env: PYENV_VERSION=3.7.3
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
@@ -30,33 +23,33 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cask install vlc; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; sudo apt-get install qt5-default mpv vlc xvfb -y; fi
 
-install: 
+install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      PYENV_ROOT="$HOME/.pyenv";
-      PATH="$PYENV_ROOT/bin:$PATH";
-      eval "$(pyenv init -)";
-      eval "$(pyenv virtualenv-init -)";
-      pyenv install -s $PYENV_VERSION;
-      pyenv virtualenv $PYENV_VERSION ene;
-      pyenv activate ene;
+    PYENV_ROOT="$HOME/.pyenv";
+    PATH="$PYENV_ROOT/bin:$PATH";
+    eval "$(pyenv init -)";
+    eval "$(pyenv virtualenv-init -)";
+    pyenv install -s $PYENV_VERSION;
+    pyenv virtualenv $PYENV_VERSION ene;
+    pyenv activate ene;
     fi
   - "make ci_setup"
 
 before_script:
-  - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "UPLOAD_COV" == "true" ]]; then 
-      curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter;
-      chmod +x ./cc-test-reporter;
-      ./cc-test-reporter before-build;
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" && "UPLOAD_COV" == "true" ]]; then
+    curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter;
+    chmod +x ./cc-test-reporter;
+    ./cc-test-reporter before-build;
     fi
 
 script:
   - make lint
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      make test;
+    make test;
     elif [[ $UPLOAD_COV == "true" ]]; then
-      xvfb-run --server-args="-screen 0 1920x1080x24" make coverage;
+    xvfb-run --server-args="-screen 0 1920x1080x24" make coverage;
     else
-      xvfb-run --server-args="-screen 0 1920x1080x24" make test;
+    xvfb-run --server-args="-screen 0 1920x1080x24" make test;
     fi
 
 after_script:
