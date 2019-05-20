@@ -20,7 +20,6 @@ python-vlc = "*"
 fuzzywuzzy = "*"
 PySide2 = "*"
 python-Levenshtein = "*"
-qdarkstyle = {git = "https://github.com/ColinDuquesnoy/QDarkStyleSheet.git", branch = "master"}
 attrs = "*"
 option = "*"
 peewee = "^3.8"
