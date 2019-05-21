@@ -20,9 +20,9 @@ from secrets import token_urlsafe
 import pytest
 from requests import post
 
-from ene.api import OAuth
+from anilist.auth import OAuth
 from ene.errors import AuthError
-from . import DATA_HOME, rmdir
+from tests import DATA_HOME, rmdir
 
 CLIENT_ID = 0
 TEST_ADDR = '127.0.0.1'

@@ -14,7 +14,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# pylint: skip-file
-from .anilist import API
-from .auth import OAuth
-from .enums import *
+from time import time
+
+import attr
+
+
+@attr.s(slots=True, auto_attribs=True, frozen=True)
+class AiringEpisode:
+    id: int
+    airing_at: int
+    episode: int
+    media_id: int
+
+    @property
+    def time_until_airing(self) -> int:
+        return int(self.airing_at - time())

@@ -35,7 +35,7 @@ gql:
 	tools/format_graphql_schema.py schema.graphql > tools/schema.graphqls
 	rm schema.graphql
 	rm .graphqlconfig
-	tools/make_enums.py tools/schema.graphqls > ene/api/enums.py
+	tools/make_enums.py tools/schema.graphqls > ene/graphql/schema/enums.py
 
 ci_setup:
 	pip install -U pip

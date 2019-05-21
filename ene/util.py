@@ -17,9 +17,8 @@
 """This module contains various helper function"""
 import re
 import webbrowser
-from functools import lru_cache, singledispatch, update_wrapper
+from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Optional
 
 from requests import get
 
@@ -60,40 +59,3 @@ def get_resource(url: str, cache_home: Path) -> Path:
         res = get(url)
         path.write_bytes(res.content)
     return path
-
-
-def dict_filter(dict_: dict, filter_: Optional[Callable] = None) -> dict:
-    """
-    Filter a dictionary by a given filter function
-
-    Args:
-        dict_: The dict to filter
-        filter_:
-            The filter function, takes the dict key and values as arguments,
-            defaults to checking for both the key and value to be not None
-
-    Returns:
-        The filtered dict
-    """
-    filter_func = filter_ if filter_ else lambda key, val: key is not None and val is not None
-    return {key: val for key, val in dict_.items() if filter_func(key, val)}
-
-
-def method_dispatch(func):
-    """
-    Decorator to use functools.singledispatch on methods
-
-    Args:
-        func: The method to dispatch
-
-    Returns:
-        The single dispatched method
-    """
-    dispatcher = singledispatch(func)
-
-    def wrapper(*args, **kw):
-        return dispatcher.dispatch(args[1].__class__)(*args, **kw)
-
-    wrapper.register = dispatcher.register
-    update_wrapper(wrapper, func)
-    return wrapper

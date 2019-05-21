@@ -4,7 +4,7 @@
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
-#  (at your Option) any later version.
+#  (at your option) any later version.
 #
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,21 +14,23 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pathlib import Path
-from typing import List, Union
+from collections import UserDict
+from datetime import date
+from typing import List
 
 import attr
 from option import NONE, Option, Some, maybe
 
-from ene.util import get_resource
-from .enums import MediaFormat, MediaSeason, MediaStatus, MediaType
-from .types_ import AiringEpisode, FuzzyDate, MediaList, Studio
+from graphql.schema.airing_episode import AiringEpisode
+from graphql.schema.enums import MediaFormat, MediaSeason, MediaStatus, MediaType
+from graphql.schema.media_list import MediaList
+from graphql.schema.studio import Studio
 
 
-@attr.s(repr=False, slots=True, auto_attribs=True)
-class Media:
-    data: dict
-    cache_home: Union[str, Path]
+@attr.s(repr=False, slots=True, init=False)
+class Media(UserDict):
+    def __init__(self, data):
+        super().__init__(data)
 
     @property
     def id(self) -> int:
@@ -55,24 +57,24 @@ class Media:
         return maybe(self.data['description'])
 
     @property
-    def start_date(self) -> Option[FuzzyDate]:
-        return maybe(self.data['startDate']).map(FuzzyDate.from_dict)
+    def start_date(self) -> Option[date]:
+        return maybe(self.data['startDate']).map(lambda start_date: date(**start_date))
 
     @property
-    def end_date(self) -> Option[FuzzyDate]:
-        return maybe(self.data['endDate']).map(FuzzyDate.from_dict)
+    def end_date(self) -> Option[date]:
+        return maybe(self.data['endDate']).map(lambda end_date: date(**end_date))
 
     @property
     def season(self) -> Option[MediaSeason]:
         return maybe(MediaSeason.get(self.data['season']))
 
     @property
-    def cover_image(self) -> Option[Path]:
-        return maybe(self.data['coverImage']).get('large').map(self._get_resource)
+    def cover_image(self) -> Option[str]:
+        return maybe(self.data['coverImage']).get('large')
 
     @property
-    def banner_image(self) -> Option[Path]:
-        return maybe(self.data['bannerImage']).map(self._get_resource)
+    def banner_image(self) -> Option[str]:
+        return maybe(self.data['bannerImage'])
 
     @property
     def genres(self) -> List[str]:
@@ -93,24 +95,13 @@ class Media:
     @property
     def media_list_entry(self) -> Option[MediaList]:
         media_list_entry = self.data['mediaListEntry']
-        return Some(MediaList(
-            id=media_list_entry['id'],
-            media_id=self.id,
-            status=media_list_entry.get('status'),
-            score=media_list_entry.get('score'),
-            progress=media_list_entry.get('progress'),
-            repeat=media_list_entry.get('repeat'),
-            private=media_list_entry.get('private'),
-            notes=media_list_entry.get('notes'),
-            custom_lists=media_list_entry.get('customLists'),
-            started_at=media_list_entry.get('startedAt'),
-            completed_at=media_list_entry.get('completedAt')
-        )) if media_list_entry else NONE
+        return Some(MediaList(media_list_entry)) if media_list_entry else NONE
 
     @property
     def next_airing_episode(self) -> Option[AiringEpisode]:
         if self.type.unwrap_or(None) != MediaType.ANIME:
             raise NotImplementedError('Only available for anime.')
+
         airing_episode = self.data['nextAiringEpisode']
         return Some(AiringEpisode(
             id=airing_episode['id'],
@@ -127,9 +118,6 @@ class Media:
                 node = studio['node']
                 return Some(Studio(id=node['id'], name=node['name']))
         return NONE
-
-    def _get_resource(self, url) -> Path:
-        return get_resource(url, self.cache_home)
 
     def __repr__(self):
         return f'{self.__class__.__name__}(id={self.id}, data={self.data!r})'

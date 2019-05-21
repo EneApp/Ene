@@ -13,21 +13,15 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from itertools import repeat
 
-from pathlib import Path
-from shutil import rmtree
-
-HERE = Path(__file__).parent.resolve()
-CONFIG_HOME = HERE / '.config'
-DATA_HOME = HERE / '.data'
-CACHE_HOME = HERE / '.cache'
+from domain.faults import Fault, Faults
+from tests.conftest import fake
 
 
-def rmdir(path, force):
-    try:
-        rmtree(path)
-    except FileNotFoundError:
-        if force:
-            pass
-        else:
-            raise
+def fake_fault():
+    return Fault(fake.pystr(), fake.pystr())
+
+
+def fake_faults(fault_count=2):
+    return Faults([fault() for fault in repeat(fake_fault, fault_count)])
