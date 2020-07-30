@@ -57,6 +57,10 @@ class AbstractPlayer(ABC):
         """Should the instance be destroyed"""
         raise NotImplementedError()
 
+    @abstractmethod
+    def terminate(self):
+        """Stops the player, should be called on Ene shutdown"""
+
 
 class VlcPlayer(AbstractPlayer):
     """
@@ -88,6 +92,9 @@ class VlcPlayer(AbstractPlayer):
 
     def needs_destruction(self):
         return False
+
+    def terminate(self):
+        self.instance.release()
 
 
 class HttpVlcPlayer(AbstractPlayer):
@@ -133,6 +140,9 @@ class HttpVlcPlayer(AbstractPlayer):
         except requests.exceptions.ConnectionError:
             # more likely is a connection failure. destroy it in this case
             return True
+
+    def terminate(self):
+        self.process.terminate()
 
 
 class MpvPlayer(AbstractPlayer):
@@ -187,6 +197,9 @@ class MpvPlayer(AbstractPlayer):
     def needs_destruction(self):
         return self.closed
 
+    def terminate(self):
+        self.player.wait_for_shutdown()
+
 
 class GenericPlayer(AbstractPlayer):
     """
@@ -218,6 +231,9 @@ class GenericPlayer(AbstractPlayer):
 
     def needs_destruction(self):
         return True
+
+    def terminate(self):
+        self.player.terminate()
 
 
 def get_player(config):

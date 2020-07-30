@@ -29,7 +29,7 @@ import multiprocessing
 import pytest
 import toml
 from requests import post
-from ene.app import App, launch
+from ene.app import EneApp, launch
 from ene.constants import APP_NAME
 from . import CACHE_HOME, CONFIG_HOME, DATA_HOME, rmdir, skip_travis_osx
 
@@ -59,7 +59,7 @@ def set_up_dir(dir_, exists):
 def _test_init(results, lock, cfg_exist, data_exist, cache_exist):
     with lock:
         API.query = lambda *args, **kwargs: {}
-        app = App(CONFIG_HOME, DATA_HOME, CACHE_HOME)
+        app = EneApp(CONFIG_HOME, DATA_HOME, CACHE_HOME)
         results.append((True, app.config_home.is_dir(), 'True,app.config_home.is_dir()'))
         results.append((True, app.data_home.is_dir(), 'True,app.data_home.is_dir()'))
         results.append((True, app.cache_home.is_dir(), 'True,app.cache_home.is_dir()'))
