@@ -15,6 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains the main window."""
+from enum import Enum
 from pathlib import Path
 
 from PySide2.QtCore import Qt, Slot
@@ -38,11 +39,18 @@ from ene.resources import Ui_window_main
 from ene.series_manager import SeriesManager
 from ene.util import open_source_code
 from .custom import EpisodeButton, FlowLayout, SeriesButton
-from .media_browser import MediaBrowser
+from ene.ui.widgets.media_browser import MediaBrowser
+from ene.ui.widgets.series_browser import SeriesBrowser
 
 
 class MainWindow(QMainWindow, Ui_window_main):
     """Main window of the application."""
+
+    class Tabs(Enum):
+        Files = 0
+        Streams = 1
+        Browse = 2
+        MyList = 3
 
     def __init__(self, app):
         """
@@ -54,7 +62,6 @@ class MainWindow(QMainWindow, Ui_window_main):
         self.series = SeriesManager(self.app.config)
         self.series.init_db(self.app.data_home)
         self.series.fetch_shows_from_db()
-        self.series.save_shows()
 
         self.player = None
         self.current_show = None
@@ -82,7 +89,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         Returns:
             None
         """
-        if index == 2:
+        if index == self.Tabs.Browse:
             if not self.media_browser.is_setup:
                 self.media_browser.is_setup = True
                 self.app.pool.submit(
@@ -143,94 +150,15 @@ class MainWindow(QMainWindow, Ui_window_main):
         """
         Sets up the local files tab. Triggered when the tab is selected
         """
-        series_layout = FlowLayout()
-        series_layout.setContentsMargins(11, 75, 11, 11)
-        series_layout.setAlignment(Qt.AlignTop)
-        series_layout.setSizeConstraint(FlowLayout.SetMaximumSize)
 
-        self.page_widget = QWidget()
-        self.page_widget.setLayout(series_layout)
+        self.page_widget = SeriesBrowser(self.app, self.series, self.stack_local_files)
+        self.page_widget.init_layout()
         series_page = QScrollArea()
         series_page.setWidget(self.page_widget)
         series_page.setWidgetResizable(True)
-        self._setup_search()
-        self.search.setParent(series_page)
+        self.page_widget.setup_search(series_page)
         self.stack_local_files.addWidget(series_page)
-        self.stack_local_files.addWidget(QWidget())
-        self.refresh_shows_view()
-
-    def refresh_shows_view(self):
-        """
-        Refreshes the local files UI, updating any existing series buttons and creating
-        any new ones
-        """
-        for show, num_episodes in sorted(self.series.get_shows_overview()):
-            existing = self.page_widget.findChild(SeriesButton, show)
-            if not existing:
-                button = SeriesButton(show, num_episodes)
-                button.clicked.connect(self.on_series_click)
-                button.add_action('Delete', self.delete_show_action)
-                self.page_widget.layout().addWidget(button)
-            else:
-                existing.update_episode_count(num_episodes)
-
-    def _setup_search(self):
-        """
-        Sets up the search area
-        """
-        self.search = QWidget()
-        search_bar = QLineEdit()
-        search_bar.setParent(self.search)
-        search_bar.setGeometry(11, 11, self.page_widget.width(), 35)
-        search_bar.setPlaceholderText("Search...")
-        search_button = QPushButton()
-        search_button.setParent(self.search)
-        search_button.setGeometry(self.page_widget.width() + 15, 11, 150, 35)
-        search_button.setText("Search")
-        search_button.clicked.connect(self.search_shows)
-
-    def on_series_click(self, *, show=None):
-        """
-        Sets up the window for the episodes of a show. Triggered when a show is
-        clicked from the local files page
-        """
-        if show is None:
-            show = self.sender().title
-        self.current_show = show
-        self.stack_local_files.setCurrentIndex(1)
-        menu_layout = QGridLayout()
-        menu = QWidget()
-        layout = FlowLayout()
-        layout.setAlignment(Qt.AlignTop)
-
-        back_button = QPushButton('Back')
-        back_button.clicked.connect(self.on_back_click)
-        menu_layout.addWidget(back_button, 0, 0)
-
-        refresh_button = QPushButton('Refresh')
-        refresh_button.clicked.connect(self.refresh_show)
-        menu_layout.addWidget(refresh_button, 1, 0)
-
-        delete_button = QPushButton('Delete')
-        delete_button.clicked.connect(self.delete_show)
-        menu_layout.addWidget(delete_button, 0, 1)
-
-        rename_button = QPushButton('Rename')
-        rename_button.clicked.connect(self.rename_show)
-        menu_layout.addWidget(rename_button, 1, 1)
-
-        label = QLabel(show)
-        menu_layout.addWidget(label, 0, 2, 2, 2)
-        menu.setLayout(menu_layout)
-        menu.setMaximumWidth(self.stack_local_files.width())
-        menu.setMinimumWidth(self.stack_local_files.width() / 2)
-        layout.addWidget(menu)
-
-        for episode in sorted(self.series.get_episodes(show)):
-            button = EpisodeButton(episode)
-            button.clicked.connect(self.play_episode)
-            layout.addWidget(button)
-        self.stack_local_files.currentWidget().setLayout(layout)
+        self.page_widget.refresh_shows_view()
 
     def refresh_show(self):
         """
@@ -244,32 +172,6 @@ class MainWindow(QMainWindow, Ui_window_main):
             button.clicked.connect(self.play_episode)
             layout.addWidget(button)
         self.files.dump_to_db()
-
-    def play_episode(self):
-        """
-        Plays the selected episode with the users player of choice
-        """
-        if self.player is not None and self.player.needs_destruction():
-            self.player = None
-
-        if self.player is None:
-            self.player = ene.player.get_player(self.app.config)
-        episode = self.sender().episode
-        self.sender().mark_watched()
-        self.series.save_episode(episode)
-        self.player.play(episode)
-
-    def on_back_click(self):
-        """
-        Deletes all child widgets of the layout for episodes and the layout
-        itself then returns to the shows page
-        """
-        self.current_show = None
-        layout = self.stack_local_files.currentWidget().layout()
-        for i in reversed(range(layout.count())):
-            layout.itemAt(i).widget().deleteLater()
-        layout.deleteLater()
-        self.stack_local_files.setCurrentIndex(0)
 
     def choose_dir(self) -> Path:
         """
@@ -289,10 +191,9 @@ class MainWindow(QMainWindow, Ui_window_main):
         Triggers a full refresh of the users library, updating episode counts
         and adding new shows to the UI as needed
         """
-        #  old = set(self.files.series.keys())
         self.series.fetch_shows_from_files()
         self.series.save_shows()
-        self.refresh_shows_view()
+        self.page_widget.refresh_shows_view()
 
     def rename_show(self):
         """
@@ -311,13 +212,6 @@ class MainWindow(QMainWindow, Ui_window_main):
         """
         self.series.delete_show(self.current_show)
         self.on_back_click()
-
-    def delete_show_action(self):
-        """
-        Deletes a single show using right click > Delete on a show
-        """
-        self.sender().parentWidget().deleteLater()
-        self.series.delete_show(self.sender().parentWidget().title)
 
     def search_shows(self):
         """

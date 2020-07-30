@@ -34,6 +34,17 @@ class SeriesManager:
         for show in self._series.values():
             yield show.title, len(show)
 
+    def get_show(self, title):
+        """
+        Gets a single show object by name
+        Args:
+            title:
+                Name of the show to get
+        Returns:
+            A Show object
+        """
+        return self._series[title]
+
     def get_episodes(self, show_name):
         """
         Gets all episodes for a given show

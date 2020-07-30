@@ -30,7 +30,7 @@ from .ui import MainWindow, SettingsWindow
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
 
 
-class App(QApplication):
+class EneApp:
     """Main Application class"""
 
     def __init__(self, config_home: Path, data_home: Path, cache_home: Path):
@@ -40,9 +40,6 @@ class App(QApplication):
             data_home:
             cache_home:
         """
-        args = [APP_NAME]
-        args.extend(sys.argv[1:])
-        super().__init__(args)
         self.config_home = config_home
         self.data_home = data_home
         self.cache_home = cache_home
@@ -51,9 +48,18 @@ class App(QApplication):
         self.config = Config(config_home)
         self.pool = ThreadPoolExecutor()
         self.api = API(data_home, cache_home)
-        self.main_window = MainWindow(self)
-        self.settings_window = SettingsWindow(self)
-        self.main_window.action_prefences.triggered.connect(self.settings_window.show)
+        self.player = None
+
+    def __del__(self):
+        print('Called EneApp destructor')
+        if self.player:
+            self.player.terminate()
+
+
+def setup_qt_ui(ui, app):
+    ui.main_window = MainWindow(app)
+    ui.settings_window = SettingsWindow(app)
+    ui.main_window.action_prefences.triggered.connect(ui.settings_window.show)
 
 
 def launch(config_home=CONFIG_HOME, data_home=DATA_HOME, cache_home=CACHE_HOME, test=False):
@@ -68,8 +74,13 @@ def launch(config_home=CONFIG_HOME, data_home=DATA_HOME, cache_home=CACHE_HOME, 
     """
     if test:
         API.query = lambda *args, **kwargs: {}
-    app = App(config_home, data_home, cache_home)
+    args = [APP_NAME]
+    args.extend(sys.argv[1:])
+    ene_ui = QApplication(args)
+    app = EneApp(config_home, data_home, cache_home)
+    setup_qt_ui(ene_ui, app)
+
     if test:
         QTimer.singleShot(5000, app.quit)
-    app.main_window.show()
-    return app.exec_()
+    ene_ui.main_window.show()
+    return ene_ui.exec_()
