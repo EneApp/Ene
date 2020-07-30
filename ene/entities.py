@@ -93,7 +93,7 @@ class Episode:
         return self.number > other.number
 
     def __eq__(self, other):
-        if other.number is None or self.number is None:
+        if (other.number is None) ^ (self.number is None):
             return False
         return self.path == other.path
 
