@@ -68,13 +68,13 @@ class EpisodeBrowser(QWidget):
         for i in reversed(range(layout.count())):
             layout.itemAt(i).widget().deleteLater()
         layout.deleteLater()
-        self.cleanup_callback()
+        self.cleanup()
 
     def play_episode(self):
         """
         Plays the selected episode with the users player of choice
         """
-        if self.app.player is not None and self.player.needs_destruction():
+        if self.app.player is not None and self.app.player.needs_destruction():
             self.app.player = None
 
         if self.app.player is None:
