@@ -50,6 +50,7 @@ class SeriesBrowser(QWidget):
                 button = SeriesButton(show, num_episodes)
                 button.clicked.connect(self.on_series_click)
                 button.add_action('Delete', self.delete_show_action)
+                button.add_action('Organize', self.organize)
                 self.layout().addWidget(button)
             else:
                 existing.update_episode_count(num_episodes)
@@ -79,3 +80,9 @@ class SeriesBrowser(QWidget):
         """
         self.sender().parentWidget().deleteLater()
         self.series.delete_show(self.sender().parentWidget().title)
+
+    def organize(self):
+        """
+        Organizes a single show using right click > Organize on a show
+        """
+        self.series.organize_show(self.sender().parentWidget().title)

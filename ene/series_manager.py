@@ -89,6 +89,19 @@ class SeriesManager:
         for show in file_manager.series.values():
             self._series.add(show)
 
+    def organize_show(self, show_name):
+        """
+        Organizes a given show in the filesystem and updates the paths in the DB
+
+        Args:
+            show_name:
+                The name of the show to organize
+        """
+        show = self._series[show_name]
+        file_manager = FileManager(self._config)
+        file_manager.organize_show(show)
+        self._db.save_show(show)
+
     def delete_show(self, show_name):
         """
         Deletes a given show from the series list and the database

@@ -198,7 +198,7 @@ class MpvPlayer(AbstractPlayer):
         return self.closed
 
     def terminate(self):
-        self.player.wait_for_shutdown()
+        self.player.terminate()
 
 
 class GenericPlayer(AbstractPlayer):

@@ -123,6 +123,34 @@ class FileManager:
             episode.parse_episode_number(title)
             self.series[title].add_or_update_episode(episode)
 
+    def organize_show(self, show):
+        """
+        Organizes a show into a subfolder in its current path.
+        Will generate a subfolder with the show's title then move every episode into it.
+
+        Args:
+            show:
+                The show object to organize episodes on the file system for
+        """
+        # Need to remove "." from the end or the folder name is invalid
+        target_dir = self.dirs[0] / show.title.strip('.') 
+        print(show.title)
+        print(target_dir)
+        if not target_dir.exists():
+            target_dir.mkdir()
+        for episode in show.episodes:
+            if episode.path.parent == target_dir:
+                print(f'{episode.path} already good.')
+            else:
+                print(f'{episode.path} needs to be moved -> ', end='')
+                target = target_dir / episode.path.name
+                if target.exists():
+                    print(f'Target path {target} already exists, not replacing it')
+                else:
+                    episode.path = episode.path.replace(target)
+                    print(f'Moved to to: {episode.path}')
+        
+
 
 def clean_title(title):
     """
