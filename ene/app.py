@@ -81,6 +81,6 @@ def launch(config_home=CONFIG_HOME, data_home=DATA_HOME, cache_home=CACHE_HOME, 
     setup_qt_ui(ene_ui, app)
 
     if test:
-        QTimer.singleShot(5000, app.quit)
+        QTimer.singleShot(5000, ene_ui.quit)
     ene_ui.main_window.show()
     return ene_ui.exec_()
