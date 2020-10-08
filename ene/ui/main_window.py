@@ -21,26 +21,22 @@ from pathlib import Path
 from PySide2.QtCore import Qt, Slot
 from PySide2.QtWidgets import (
     QFileDialog,
-    QGridLayout,
     QHBoxLayout,
     QInputDialog,
-    QLabel,
     QLineEdit,
     QMainWindow,
-    QPushButton,
     QScrollArea,
     QVBoxLayout,
     QWidget,
 )
 
-import ene.player
 from ene.constants import IS_WIN
 from ene.resources import Ui_window_main
 from ene.series_manager import SeriesManager
 from ene.util import open_source_code
-from .custom import EpisodeButton, FlowLayout, SeriesButton
 from ene.ui.widgets.media_browser import MediaBrowser
 from ene.ui.widgets.series_browser import SeriesBrowser
+from .custom import EpisodeButton, SeriesButton
 
 
 class MainWindow(QMainWindow, Ui_window_main):

@@ -1,8 +1,8 @@
-from PySide2.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QGridLayout, QStackedWidget, QScrollArea
+from PySide2.QtWidgets import QWidget, QLineEdit, QPushButton, QStackedWidget
 from PySide2.QtCore import Qt
 
 from ene.series_manager import SeriesManager
-from ene.ui.custom import FlowLayout, SeriesButton, EpisodeButton
+from ene.ui.custom import FlowLayout, SeriesButton
 from ene.ui.widgets.episode_browser import EpisodeBrowser
 
 
@@ -64,6 +64,8 @@ class SeriesBrowser(QWidget):
             show = self.sender().title
         current_show = self.series.get_show(show)
         self.episode_browser = EpisodeBrowser(self.app, current_show)
+        self.episode_browser.width = self.width
+        self.episode_browser.height = self.height
         self.episode_browser.register_callbacks(self.cleanup_episode_view, self.series.save_episode)
         self.episode_browser.setup_view()
         self.stack_local_files.addWidget(self.episode_browser)

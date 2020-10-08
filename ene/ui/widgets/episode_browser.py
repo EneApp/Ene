@@ -2,7 +2,7 @@ from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel
 
 from ene.entities import Show
-from ene.player import AbstractPlayer, get_player
+from ene.player import get_player
 from ene.ui.custom import FlowLayout, EpisodeButton
 
 
@@ -26,6 +26,7 @@ class EpisodeBrowser(QWidget):
     def setup_view(self):
         menu_layout = QGridLayout()
         menu = QWidget()
+        episode_widget = QWidget()
         layout = FlowLayout()
         layout.setAlignment(Qt.AlignTop)
 
@@ -50,13 +51,17 @@ class EpisodeBrowser(QWidget):
         menu.setLayout(menu_layout)
         menu.setMaximumWidth(self.width())
         menu.setMinimumWidth(self.width() / 2)
-        layout.addWidget(menu)
 
         for episode in sorted(self.current_show.episodes):
             button = EpisodeButton(episode)
             button.clicked.connect(self.play_episode)
             layout.addWidget(button)
-        self.setLayout(layout)
+        episode_widget.setLayout(layout)
+        main_layout = QGridLayout()
+        main_layout.setAlignment(Qt.AlignTop)
+        main_layout.addWidget(menu, 0, 0)
+        main_layout.addWidget(episode_widget, 1, 0)
+        self.setLayout(main_layout)
 
     def on_back_click(self):
         """
@@ -83,7 +88,3 @@ class EpisodeBrowser(QWidget):
         self.sender().mark_watched()
         self.save(episode)
         self.app.player.play(episode)
-
-
-
-
