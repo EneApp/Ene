@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QWidget, QLineEdit, QPushButton, QStackedWidget
+from PySide2.QtWidgets import QWidget, QLineEdit, QMessageBox, QPushButton, QStackedWidget
 from PySide2.QtCore import Qt
 
 from ene.series_manager import SeriesManager
@@ -80,11 +80,17 @@ class SeriesBrowser(QWidget):
         """
         Deletes a single show using right click > Delete on a show
         """
+        prompt = QMessageBox.question(self, 'Delete', 'Delete files on disk as well?')
+        if prompt == QMessageBox.Yes:
+            print('yes')
+        else:
+            print('no')
         self.sender().parentWidget().deleteLater()
-        self.series.delete_show(self.sender().parentWidget().title)
+        self.series.delete_show(self.sender().parentWidget().title, prompt == QMessageBox.Yes)
 
     def organize(self):
         """
         Organizes a single show using right click > Organize on a show
         """
         self.series.organize_show(self.sender().parentWidget().title)
+

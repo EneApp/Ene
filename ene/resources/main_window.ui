@@ -481,6 +481,7 @@
     </property>
     <addaction name="action_open_folder"/>
     <addaction name="action_refresh_library"/>
+    <addaction name="actionOrganize_Library"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -530,6 +531,11 @@
   <action name="action_refresh_library">
    <property name="text">
     <string>Refresh Library</string>
+   </property>
+  </action>
+  <action name="actionOrganize_Library">
+   <property name="text">
+    <string>Organize Library</string>
    </property>
   </action>
  </widget>

@@ -71,6 +71,7 @@ class MainWindow(QMainWindow, Ui_window_main):
         self.action_open_folder.triggered.connect(self.choose_dir)
         self.action_source_code.triggered.connect(open_source_code)
         self.action_refresh_library.triggered.connect(self.refresh_library)
+        self.actionOrganize_Library.triggered.connect(self.organize_library)
         self.widget_tab.currentChanged.connect(self.handle_current_tab_changed)
 
     @Slot(int)
@@ -221,3 +222,6 @@ class MainWindow(QMainWindow, Ui_window_main):
             else:
                 show.show()
         self.page_widget.layout().do_layout(self.page_widget.rect(), False)
+
+    def organize_library(self):
+        self.series.organize_library()

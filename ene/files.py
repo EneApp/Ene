@@ -19,7 +19,7 @@
 import re
 from os import walk
 from pathlib import Path
-from ene.entities import Episode, ShowList
+from ene.entities import Episode, Show, ShowList
 
 
 EXTENSIONS = ['.mkv',
@@ -133,12 +133,15 @@ class FileManager:
                 The show object to organize episodes on the file system for
         """
         # Need to remove "." from the end or the folder name is invalid
-        target_dir = self.dirs[0] / show.title.strip('.') 
+        target_dir = self.dirs[0] / show.title.strip('.')
         print(show.title)
         print(target_dir)
         if not target_dir.exists():
             target_dir.mkdir()
         for episode in show.episodes:
+            if not episode.path.exists():
+                print('File not found, moving on')
+                continue
             if episode.path.parent == target_dir:
                 print(f'{episode.path} already good.')
             else:
@@ -149,8 +152,19 @@ class FileManager:
                 else:
                     episode.path = episode.path.replace(target)
                     print(f'Moved to to: {episode.path}')
-        
 
+    def delete_show(self, show: Show):
+        folders = set()
+        for episode in show.episodes:
+            folders.add(episode.path.parent)
+            episode.path.unlink(True)
+        for folder in folders:
+            print(folder)
+            if next(folder.iterdir(), False):
+                print('Folder is not empty')
+            else:
+                print('Empty, can be deleted')
+                folder.rmdir()
 
 def clean_title(title):
     """

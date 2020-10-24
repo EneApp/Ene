@@ -1,6 +1,6 @@
 """ This module handles interactions with Show and Episode objects """
 from ene.persistence.data_access import ShowDataAccess
-from ene.entities import ShowList
+from ene.entities import ShowList, Show
 from ene.files import FileManager
 
 
@@ -89,6 +89,10 @@ class SeriesManager:
         for show in file_manager.series.values():
             self._series.add(show)
 
+    def organize_library(self):
+        for show in self._series.values():
+            self._do_organize_show(show)
+
     def organize_show(self, show_name):
         """
         Organizes a given show in the filesystem and updates the paths in the DB
@@ -98,18 +102,27 @@ class SeriesManager:
                 The name of the show to organize
         """
         show = self._series[show_name]
+        self._do_organize_show(show)
+
+    def _do_organize_show(self, show: Show):
         file_manager = FileManager(self._config)
         file_manager.organize_show(show)
         self._db.save_show(show)
 
-    def delete_show(self, show_name):
+    def delete_show(self, show_name, delete_local_files):
         """
         Deletes a given show from the series list and the database
         Args:
             show_name:
                 The show name to remove
+            delete_local_files:
+                Also delete the files on disk if true
         """
-        self._db.delete_show(self._series.pop(show_name))
+        show = self._series.pop(show_name)
+        self._db.delete_show(show)
+        if delete_local_files:
+            file_manager = FileManager(self._config)
+            file_manager.delete_show(show)
 
     def rename_show(self, old, new):
         """

@@ -3,8 +3,8 @@
 # Form implementation generated from reading ui file 'ene/resources/main_window.ui',
 # licensing of 'ene/resources/main_window.ui' applies.
 #
-# Created: Thu Sep  6 18:54:13 2018
-#      by: pyside2-uic  running on PySide2 5.11.1
+# Created: Sat Oct 24 11:06:35 2020
+#      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -174,8 +174,11 @@ class Ui_window_main(object):
         self.actionHelp.setObjectName("actionHelp")
         self.action_refresh_library = QtWidgets.QAction(window_main)
         self.action_refresh_library.setObjectName("action_refresh_library")
+        self.actionOrganize_Library = QtWidgets.QAction(window_main)
+        self.actionOrganize_Library.setObjectName("actionOrganize_Library")
         self.menuFile.addAction(self.action_open_folder)
         self.menuFile.addAction(self.action_refresh_library)
+        self.menuFile.addAction(self.actionOrganize_Library)
         self.menuSettings.addAction(self.action_prefences)
         self.menuHelp.addAction(self.actionHelp)
         self.menuHelp.addSeparator()
@@ -253,4 +256,5 @@ class Ui_window_main(object):
         self.action_source_code.setText(QtWidgets.QApplication.translate("window_main", "&Source Code", None, -1))
         self.actionHelp.setText(QtWidgets.QApplication.translate("window_main", "&Help", None, -1))
         self.action_refresh_library.setText(QtWidgets.QApplication.translate("window_main", "Refresh Library", None, -1))
+        self.actionOrganize_Library.setText(QtWidgets.QApplication.translate("window_main", "Organize Library", None, -1))
 
