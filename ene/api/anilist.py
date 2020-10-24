@@ -353,7 +353,7 @@ $perPage: Int,
         variables = {
             'title': show
         }
-        return self.query(query, variables).map(lambda v: Media(v, self.cache_home))
+        return self.query(query, variables).map(lambda v: Media(v['data']['Media'], self.cache_home))
 
     def update_media_list_entry(  # pylint: disable=R0913
             self,

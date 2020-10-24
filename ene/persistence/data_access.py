@@ -1,5 +1,5 @@
 """ This module handles persistence of data to the database """
-from .migrations import migrate
+from .migrations import check_and_run_migrate
 from .models import ShowModel, EpisodeModel, EneDatabase
 
 
@@ -18,7 +18,7 @@ class ShowDataAccess:
                 The path that contains the database file
         """
         self.database = EneDatabase(str(db_path / 'ene.db'))
-        migrate(self.database)
+        check_and_run_migrate(self.database)
 
     @staticmethod
     def get_all_shows():

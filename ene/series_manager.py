@@ -34,6 +34,16 @@ class SeriesManager:
         for show in self._series.values():
             yield show.title, len(show)
 
+    def get_all_shows(self):
+        """
+        Gets a list of all shows
+
+        Returns:
+            A list of Show objects
+        """
+        for show in self._series.values():
+            yield show
+
     def get_show(self, title):
         """
         Gets a single show object by name
@@ -150,3 +160,8 @@ class SeriesManager:
 
     def save_episode(self, episode):
         self._db.save_episode(episode)
+
+    def set_cover_art(self, show_title, cover_path):
+        show = self._series[show_title]
+        show.cover_image = cover_path
+        self._db.save_show(show)

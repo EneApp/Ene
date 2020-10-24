@@ -1,6 +1,9 @@
-from PySide2.QtWidgets import QWidget, QLineEdit, QMessageBox, QPushButton, QStackedWidget
+from pathlib import Path
+
+from PySide2.QtWidgets import QWidget, QLineEdit, QMessageBox, QPushButton, QStackedWidget, QFileDialog
 from PySide2.QtCore import Qt
 
+from ene.constants import IS_WIN
 from ene.series_manager import SeriesManager
 from ene.ui.custom import FlowLayout, SeriesButton
 from ene.ui.widgets.episode_browser import EpisodeBrowser
@@ -44,16 +47,18 @@ class SeriesBrowser(QWidget):
         Refreshes the local files UI, updating any existing series buttons and creating
         any new ones
         """
-        for show, num_episodes in sorted(self.series.get_shows_overview()):
-            existing = self.findChild(SeriesButton, show)
+        for show in sorted(self.series.get_all_shows()):
+            existing = self.findChild(SeriesButton, show.title)
             if not existing:
-                button = SeriesButton(show, num_episodes)
+                button = SeriesButton(show)
                 button.clicked.connect(self.on_series_click)
                 button.add_action('Delete', self.delete_show_action)
                 button.add_action('Organize', self.organize)
+                button.add_action('Fetch Cover from AniList', self.fetch_cover)
+                button.add_action('Set Cover Image from saved file', self.set_cover)
                 self.layout().addWidget(button)
             else:
-                existing.update_episode_count(num_episodes)
+                existing.update_episode_count(len(show))
 
     def on_series_click(self, *, show=None):
         """
@@ -80,13 +85,12 @@ class SeriesBrowser(QWidget):
         """
         Deletes a single show using right click > Delete on a show
         """
-        prompt = QMessageBox.question(self, 'Delete', 'Delete files on disk as well?')
-        if prompt == QMessageBox.Yes:
-            print('yes')
-        else:
-            print('no')
-        self.sender().parentWidget().deleteLater()
-        self.series.delete_show(self.sender().parentWidget().title, prompt == QMessageBox.Yes)
+        prompt = QMessageBox.question(self, 'Delete', 'Delete files on disk as well?',
+                                      QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
+        print(prompt)
+        if prompt != QMessageBox.Cancel:
+            self.sender().parentWidget().deleteLater()
+            self.series.delete_show(self.sender().parentWidget().title, prompt == QMessageBox.Yes)
 
     def organize(self):
         """
@@ -94,3 +98,31 @@ class SeriesBrowser(QWidget):
         """
         self.series.organize_show(self.sender().parentWidget().title)
 
+    def fetch_cover(self):
+        res = self.app.api.get_show(self.sender().parentWidget().title)
+        if res.is_ok:
+            media = res.unwrap()
+            image = media.cover_image.unwrap()
+            self.series.set_cover_art(self.sender().parentWidget().title, image)
+            self.sender().parentWidget().set_image(image)
+        else:
+            print('bad response')
+            print(res.unwrap_err())
+
+    def set_cover(self):
+        path = self.choose_file()
+        if path:
+            self.series.set_cover_art(self.sender().parentWidget().title, path)
+            self.sender().parentWidget().set_image(path)
+
+    def choose_file(self) -> Path:
+        """
+        Choose a file from a file dialog
+
+        Returns: A Path object with the selected file
+        """
+        args = [self, self.tr("Open Directory"), str(Path.home())]
+        if IS_WIN:
+            args.append(QFileDialog.DontUseNativeDialog)
+        dir_ = QFileDialog.getOpenFileName(*args)
+        return Path(dir_[0])

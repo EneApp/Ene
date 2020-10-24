@@ -73,6 +73,7 @@ class ShowModel(BaseModel):
     title = TextField(unique=True)
     anilist_show_id = IntegerField(null=True)
     list_id = IntegerField(null=True)
+    cover_image = TextField()
 
     @classmethod
     def from_show(cls, show: Show):
@@ -92,7 +93,7 @@ class ShowModel(BaseModel):
         if existing is not None:
             show_id = existing.id
 
-        return cls(title=show.title, anilist_show_id=show.show_id, list_id=show.list_id, id=show_id)
+        return cls(title=show.title, anilist_show_id=show.show_id, list_id=show.list_id, id=show_id, cover_image=show.cover_image)
 
     def to_show(self):
         """
@@ -107,7 +108,7 @@ class ShowModel(BaseModel):
         for episode_model in episodes:
             episode = episode_model.to_episode()
             all_episodes[episode] = episode
-        return Show(self.title, self.anilist_show_id, self.list_id, all_episodes)
+        return Show(self.title, self.anilist_show_id, self.list_id, all_episodes, self.cover_image)
 
 
 class EpisodeModel(BaseModel):

@@ -203,13 +203,6 @@ class MainWindow(QMainWindow, Ui_window_main):
         if title[1]:
             self.series.rename_show(self.current_show, title[0])
 
-    def delete_show(self):
-        """
-        Deletes the current show
-        """
-        self.series.delete_show(self.current_show)
-        self.on_back_click()
-
     def search_shows(self):
         """
         Hides all shows that do not match the search criteria

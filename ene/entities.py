@@ -9,11 +9,13 @@ class Show:
     """
     Class containing information about a single show
     """
-    def __init__(self, title, show_id=None, list_id=None, episodes: dict = None):
+    def __init__(self, title, show_id=None, list_id=None, episodes: dict = None,
+                 cover_image: Path = None):
         self.title = title
         self.show_id = show_id
         self.list_id = list_id
         self.episodes = episodes or {}
+        self.cover_image = cover_image
 
     def add_or_update_episode(self, episode):
         """
@@ -47,6 +49,9 @@ class Show:
             An integer representing the length of the episodes set
         """
         return len(self.episodes)
+
+    def __lt__(self, other):
+        return self.title < other.title
 
 
 class Episode:

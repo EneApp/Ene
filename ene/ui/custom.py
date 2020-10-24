@@ -20,7 +20,7 @@ from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple, Union
 
 from PySide2.QtCore import QModelIndex, QObject, QPoint, QRect, QSize, Qt
-from PySide2.QtGui import QIcon, QStandardItem, QStandardItemModel
+from PySide2.QtGui import QIcon, QStandardItem, QStandardItemModel, QPixmap, QPainter, QPainterPath, QPen, QColor
 from PySide2.QtWidgets import (
     QAction, QComboBox, QLabel, QLayout, QPushButton, QSizePolicy, QStyle, QStyleOptionViewItem,
     QStyledItemDelegate, QToolButton, QVBoxLayout,
@@ -388,27 +388,42 @@ class FlowLayout(QLayout):
         else:
             return parent.spacing()
 
+class OutlinedLabel(QLabel):
+    def __init__(self, text):
+        super().__init__(text)
+
+    def paintEvent(self, event):
+        painter = QPainter()
+        paint_path = QPainterPath()
+        paint_path.addText(2, self.height() -5, self.font(), self.text())
+        painter.begin(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.strokePath(paint_path, QPen(QColor('black'), 2))
+        painter.fillPath(paint_path, QColor('white'))
+        painter.end()
 
 class SeriesButton(QPushButton):
-    def __init__(self, series, episodes):
+    def __init__(self, series):
         super().__init__()
-        self.title = series
-        self.setObjectName(series)
+        self.title = series.title
+        self.setObjectName(series.title)
         self.setContextMenuPolicy(Qt.ActionsContextMenu)
         self.image_frame = QLabel()
         layout = QVBoxLayout()
         self.image_frame.setLayout(layout)
         layout.setAlignment(Qt.AlignBottom)
-        title_label = QLabel(series)
+        title_label = OutlinedLabel(series.title)
         title_label.setWordWrap(True)
         layout.addWidget(title_label)
-        self.episodes_label = QLabel('Episodes: ' + str(episodes))
+        self.episodes_label = OutlinedLabel('Episodes: ' + str(len(series)))
         layout.addWidget(self.episodes_label)
-        self.setMinimumWidth(200)
-        self.setMinimumHeight(200)
+        self.setMinimumWidth(221)
+        self.setMinimumHeight(221)
         base_layout = QVBoxLayout()
-        base_layout.setContentsMargins(1, 1, 1, 1)
+        base_layout.setContentsMargins(2.5, 2.5, 2.5, 2.5)
         base_layout.addWidget(self.image_frame)
+        if series.cover_image:
+            self.set_image(series.cover_image)
         super().setLayout(base_layout)
 
     def add_action(self, label, callback):
@@ -418,7 +433,8 @@ class SeriesButton(QPushButton):
         self.addAction(action)
 
     def set_image(self, image):
-        self.image_frame.setPixmap(image)
+        pixmap = QPixmap(str(image))
+        self.image_frame.setPixmap(pixmap)
 
     def update_episode_count(self, count):
         self.episodes_label.setText('Episodes: ' + str(count))
