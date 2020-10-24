@@ -16,7 +16,7 @@
 
 """This module handles data persistence models."""
 from pathlib import Path
-from peewee import Model, SqliteDatabase, TextField, IntegerField, ForeignKeyField
+from peewee import Model, SqliteDatabase, TextField, IntegerField, ForeignKeyField, DateTimeField
 
 from ene.entities import Show, Episode
 
@@ -38,7 +38,7 @@ class EneDatabase:
         self.database = db
         db.init(path)
         db.connect()
-        db.create_tables([ShowModel, EpisodeModel])
+        db.create_tables([ShowModel, EpisodeModel, VersionModel])
 
 
 def table_name(table):
@@ -142,3 +142,8 @@ class EpisodeModel(BaseModel):
             The new Episode object represented by this model
         """
         return Episode(Path(self.path), Episode.State(self.state), self.number, self.get_id())
+
+class VersionModel(BaseModel):
+    """ Model representing the current database version information """
+    version = IntegerField()
+    migration_date = DateTimeField()
